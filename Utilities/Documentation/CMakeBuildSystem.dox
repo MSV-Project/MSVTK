@@ -1,0 +1,11 @@
+/*! \namespace CMake
+    \brief A pseudo-namespace used to group CMake macros and functions.
+
+    This is not a regular C++ namespace. It is just used to group the CMake
+    macros and function of the MSVTK build system.
+*/
+
+/*! \page BuildSystem The MSVTK Build System
+
+  The MSVTK build system is based on CMake.
+*/

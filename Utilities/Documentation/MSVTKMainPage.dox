@@ -1,0 +1,15 @@
+/**
+
+\mainpage
+
+\section intro_sec Introduction
+
+See the <a href="http://www.commontk.org">MSVTK Wiki</a> for more information.
+
+\defgroup Apps MSVTK Applications
+
+\defgroup Libs MSVTK Libraries
+
+\defgroup Plugins MSVTK Plugins
+
+*/
