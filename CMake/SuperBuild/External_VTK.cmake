@@ -57,7 +57,7 @@ set(proj VTK)
 if(NOT DEFINED VTK_DIR)
 
   #set(revision_tag "v5.8.0")
-  set(revision_tag 1096b7326afe68ce4827d781d44ac3f725e02633)
+  set(revision_tag fea2d622cf01dfd22f727330dbace97d4af892db)
   if(${proj}_REVISION_TAG)
     set(revision_tag ${${proj}_REVISION_TAG})
   endif()
