@@ -263,9 +263,9 @@ mark_as_advanced(ADDITIONAL_CXX_FLAGS)
 # Set symbol visibility Flags
 #
 # MinGW does not export all symbols automatically, so no need to set flags
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
-  set(VISIBILITY_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
-endif()
+#if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
+#  set(VISIBILITY_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
+#endif()
 
 #-----------------------------------------------------------------------------
 # MSVTK C/CXX Flags
