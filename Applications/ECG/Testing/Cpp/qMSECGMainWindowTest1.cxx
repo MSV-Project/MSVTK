@@ -25,7 +25,9 @@
 #include "qMSECGMainWindow.h"
 
 // STD includes
+#include <cstdlib>
 
+// -----------------------------------------------------------------------------
 int qMSECGMainWindowTest1(int argc, char * argv[] )
 {
   QApplication app(argc, argv);

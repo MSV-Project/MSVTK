@@ -23,6 +23,7 @@
 #include <QProcess>
 
 // STD includes
+#include <cstdlib>
 #include <iostream>
 
 // -----------------------------------------------------------------------------
