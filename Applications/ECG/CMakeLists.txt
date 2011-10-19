@@ -44,9 +44,9 @@ include_directories(${include_dirs})
 # --------------------------------------------------------------------------
 
 add_library(msvtk${KIT}
-  ${msvtkECG_SRCS}
-  ${msvtkECG_UI_CXX}
-  ${msvtkECG_QRC_SRCS}
+  ${msvtk${KIT}_SRCS}
+  ${msvtk${KIT}_UI_CXX}
+  ${msvtk${KIT}_QRC_SRCS}
   )
 
 target_link_libraries(msvtk${KIT}
@@ -60,14 +60,10 @@ target_link_libraries(msvtk${KIT}
 # Build the executable
 # --------------------------------------------------------------------------
 
-if(NOT APPLE)
-  #set(msvECG_EXE_SUFFIX -real)
-  set(msvtkECG_EXE_SUFFIX )
-endif()
-
 add_executable(${KIT}
   ecg.cxx
   )
+set_target_properties(${KIT} PROPERTIES OUTPUT_NAME ecg)
 
 target_link_libraries(${KIT}
   msvtk${KIT}

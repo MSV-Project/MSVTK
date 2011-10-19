@@ -49,8 +49,6 @@ qMSECGMainWindowPrivate::qMSECGMainWindowPrivate(qMSECGMainWindow& object)
 //-----------------------------------------------------------------------------
 void qMSECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 {
-  Q_Q(qMSECGMainWindow);
-
   this->Ui_qMSECGMainWindow::setupUi(mainWindow);
 }
 
@@ -58,7 +56,8 @@ void qMSECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 // qMSECGMainWindow methods
 
 //-----------------------------------------------------------------------------
-qMSECGMainWindow::qMSECGMainWindow(QWidget *_parent):Superclass(_parent)
+qMSECGMainWindow::qMSECGMainWindow(QWidget* parentWidget)
+  : Superclass(parentWidget)
   , d_ptr(new qMSECGMainWindowPrivate(*this))
 {
   Q_D(qMSECGMainWindow);

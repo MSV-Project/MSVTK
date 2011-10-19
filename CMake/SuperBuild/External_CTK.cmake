@@ -60,7 +60,7 @@ if(NOT DEFINED CTK_DIR)
     GIT_REPOSITORY "${git_protocol}://github.com/commontk/CTK.git"
     GIT_TAG "5c6d3019fa97c389b34cff2178ee91e8929acace"
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
-    BINARY_DIR ${proj}-build
+    BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -100,7 +100,7 @@ if(NOT DEFINED CTK_DIR)
     DEPENDS
       ${CTK_DEPENDENCIES}
     )
-  set(CTK_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
 else()
   # The project is provided using CTK_DIR, nevertheless since other project may depend on CTK,

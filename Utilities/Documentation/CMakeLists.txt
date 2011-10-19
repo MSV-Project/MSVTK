@@ -24,8 +24,8 @@ if( DOXYGEN_FOUND )
   if( DOXYGEN_DOT_FOUND )
 
     # Compile a doxygen input filter for processing CMake scripts
-    include(ctkFunctionCMakeDoxygenFilterCompile)
-    ctkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
+    include(msvtkFunctionCMakeDoxygenFilterCompile)
+    msvtkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
 
     # Automatically generate documentation at build time
     set(all_arg)
