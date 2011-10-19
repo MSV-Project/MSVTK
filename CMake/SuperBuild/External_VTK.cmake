@@ -72,9 +72,10 @@ if(NOT DEFINED VTK_DIR)
   endif()
 
 #     message(STATUS "Adding project:${proj}")
+
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
-    BINARY_DIR ${proj}-build
+    BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
     GIT_REPOSITORY ${git_protocol}://vtk.org/VTK.git
     GIT_TAG ${revision_tag}
@@ -102,7 +103,7 @@ if(NOT DEFINED VTK_DIR)
     DEPENDS
       ${VTK_DEPENDENCIES}
     )
-  set(VTK_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
   # Since the link directories associated with VTK is used, it makes sens to
   # update MSVTK_EXTERNAL_LIBRARY_DIRS with its associated library output directory

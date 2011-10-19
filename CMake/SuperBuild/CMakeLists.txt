@@ -103,6 +103,11 @@ set(MSVTK_SUPERBUILD_EP_ARGS)
 
 msvtkMacroCheckExternalProjectDependency(MSVTK)
 
+#-----------------------------------------------------------------------------
+# Makes sure ${MSVTK_BINARY_DIR}/MSVTK-build/bin exists
+IF(NOT EXISTS ${MSVTK_BINARY_DIR}/MSVTK-build/bin)
+  FILE(MAKE_DIRECTORY ${MSVTK_BINARY_DIR}/MSVTK-build/bin)
+ENDIF()
 
 
 #-----------------------------------------------------------------------------

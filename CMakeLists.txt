@@ -305,7 +305,7 @@ endif()
 #-----------------------------------------------------------------------------
 # QT
 #
-include(CMake/MSVTKMacroSetupQt.cmake)
+include(CMake/msvtkMacroSetupQt.cmake)
 msvtkMacroSetupQt()
 
 # Update MSVTK_BASE_LIBRARIES with QT libraries
