@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Library: MSVECG
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -25,24 +25,24 @@
 #include <QMainWindow>
 
 // ECG includes
-#include "vtkMSECGExport.h"
-class qMSECGMainWindowPrivate;
+#include "msvECGExport.h"
 
-class MSVTK_ECG_EXPORT qMSECGMainWindow : public QMainWindow
+class msvQECGMainWindowPrivate;
+
+class MSV_ECG_EXPORT msvQECGMainWindow : public QMainWindow
 {
   Q_OBJECT
 public:
-
   typedef QMainWindow Superclass;
-  qMSECGMainWindow(QWidget *parent=0);
-  virtual ~qMSECGMainWindow();
+  msvQECGMainWindow(QWidget *parent=0);
+  virtual ~msvQECGMainWindow();
 
 protected:
-  QScopedPointer<qMSECGMainWindowPrivate> d_ptr;
+  QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
 
 private:
-  Q_DECLARE_PRIVATE(qMSECGMainWindow);
-  Q_DISABLE_COPY(qMSECGMainWindow);
+  Q_DECLARE_PRIVATE(msvQECGMainWindow);
+  Q_DISABLE_COPY(msvQECGMainWindow);
 };
 
 #endif

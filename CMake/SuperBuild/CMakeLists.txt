@@ -47,8 +47,8 @@ endif()
 # Enable and setup External project global properties
 #
 include(ExternalProject)
-include(msvtkMacroEmptyExternalProject)
-include(msvtkMacroCheckExternalProjectDependency)
+include(msvMacroEmptyExternalProject)
+include(msvMacroCheckExternalProjectDependency)
 
 #SET(ep_base "${CMAKE_BINARY_DIR}/SuperBuild")
 #SET_PROPERTY(DIRECTORY PROPERTY EP_BASE ${ep_base})
@@ -101,7 +101,7 @@ set(sep "^^")
 # where '<EP>' is an external project name.
 set(MSVTK_SUPERBUILD_EP_ARGS)
 
-msvtkMacroCheckExternalProjectDependency(MSVTK)
+msvMacroCheckExternalProjectDependency(MSVTK)
 
 #-----------------------------------------------------------------------------
 # Makes sure ${MSVTK_BINARY_DIR}/MSVTK-build/bin exists
@@ -194,6 +194,7 @@ ExternalProject_Add(${proj}
     -DMSVTK_C_FLAGS:STRING=${MSVTK_C_FLAGS}
     -DMSVTK_EXTERNAL_LIBRARY_DIRS:STRING=${MSVTK_EXTERNAL_LIBRARY_DIRS}
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+    -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
     ${MSVTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}
   SOURCE_DIR ${MSVTK_SOURCE_DIR}

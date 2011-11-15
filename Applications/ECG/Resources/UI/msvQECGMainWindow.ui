@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>qMSECGMainWindow</class>
- <widget class="QMainWindow" name="ECGMainWindow">
+ <class>msvQECGMainWindow</class>
+ <widget class="QMainWindow" name="msvQECGMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31,7 +31,7 @@
        </widget>
       </item>
       <item>
-       <widget class="ctkSliderWidget" name="currentFrameSlider"/>
+       <widget class="ctkSliderWidget" name="currentFrameSlider" native="true"/>
       </item>
      </layout>
     </item>
@@ -43,7 +43,7 @@
      <x>0</x>
      <y>0</y>
      <width>421</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -84,8 +84,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>80</width>
-          <height>304</height>
+          <width>79</width>
+          <height>295</height>
          </rect>
         </property>
        </widget>

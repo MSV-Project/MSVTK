@@ -1,29 +1,29 @@
 set(KIT ECG)
-project(msvtk${KIT})
+project(msv${KIT})
 
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
 
-set(msvtk${KIT}_SRCS
-  qMSECGMainWindow.cxx
+set(msv${KIT}_SRCS
+  msvQECGMainWindow.cxx
   )
 
-set(msvtk${KIT}_MOC_SRCS
-  qMSECGMainWindow.h
+set(msv${KIT}_MOC_SRCS
+  msvQECGMainWindow.h
   )
 
-set(msvtk${KIT}_UI_SRCS
-  Resources/UI/qMSECGMainWindow.ui
+set(msv${KIT}_UI_SRCS
+  Resources/UI/msvQECGMainWindow.ui
   )
 
-set(msvtk${KIT}_QRC
-  Resources/qMSECG.qrc
+set(msv${KIT}_QRC
+  Resources/msvQECG.qrc
   )
 
-QT4_WRAP_CPP(msvtk${KIT}_SRCS ${msvtk${KIT}_MOC_SRCS})
-QT4_WRAP_UI(msvtk${KIT}_UI_CXX ${msvtk${KIT}_UI_SRCS})
-QT4_ADD_RESOURCES(msvtk${KIT}_QRC_SRCS ${msvtk${KIT}_QRC})
+QT4_WRAP_CPP(msv${KIT}_SRCS ${msv${KIT}_MOC_SRCS})
+QT4_WRAP_UI(msv${KIT}_UI_CXX ${msv${KIT}_UI_SRCS})
+QT4_ADD_RESOURCES(msv${KIT}_QRC_SRCS ${msv${KIT}_QRC})
 
 # --------------------------------------------------------------------------
 # Include dirs
@@ -35,6 +35,7 @@ set(include_dirs
   ${MSVTK_INCLUDE_DIRS}
   ${VTK_INCLUDE_DIRS}
   ${CTK_INCLUDE_DIRS}
+  ${msvVTKParallel_INCLUDE_DIRS}
   )
 
 include_directories(${include_dirs})
@@ -43,16 +44,17 @@ include_directories(${include_dirs})
 # Build the library so it can be tested in Testing/Cpp.
 # --------------------------------------------------------------------------
 
-add_library(msvtk${KIT}
-  ${msvtk${KIT}_SRCS}
-  ${msvtk${KIT}_UI_CXX}
-  ${msvtk${KIT}_QRC_SRCS}
+add_library(msv${KIT}
+  ${msv${KIT}_SRCS}
+  ${msv${KIT}_UI_CXX}
+  ${msv${KIT}_QRC_SRCS}
   )
 
-target_link_libraries(msvtk${KIT}
+target_link_libraries(msv${KIT}
   ${MSVTK_LIBRARIES}
   ${CTK_LIBRARIES}
   ${VTK_LIBRARIES}
+  msvVTKParallel
   )
 
 
@@ -66,24 +68,23 @@ add_executable(${KIT}
 set_target_properties(${KIT} PROPERTIES OUTPUT_NAME ecg)
 
 target_link_libraries(${KIT}
-  msvtk${KIT}
+  msv${KIT}
   )
 
 #-----------------------------------------------------------------------------
 # Configure
 # --------------------------------------------------------------------------
-string(TOUPPER ${KIT} UPPER_CASE_KIT)
-set(MY_LIBRARY_EXPORT_DIRECTIVE "MSVTK_${UPPER_CASE_KIT}_EXPORT")
-set(MY_EXPORT_HEADER_PREFIX vtkMS${KIT})
-set(MY_LIBNAME msvtk${KIT})
+set(MY_LIBRARY_EXPORT_DIRECTIVE "MSV_${KIT}_EXPORT")
+set(MY_EXPORT_HEADER_PREFIX MSV_${KIT})
+set(MY_LIBNAME ${PROJECT_NAME})
 
 configure_file(
-  ${MSVTK_SOURCE_DIR}/CMake/vtkMSExport.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${MY_EXPORT_HEADER_PREFIX}Export.h
+  ${MSVTK_SOURCE_DIR}/CMake/msvExport.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Export.h
   )
 
 set(dynamicHeaders
-  "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/${MY_EXPORT_HEADER_PREFIX}Export.h")
+  "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Export.h")
 
 # --------------------------------------------------------------------------
 # Testing

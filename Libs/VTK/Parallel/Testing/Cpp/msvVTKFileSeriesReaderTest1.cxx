@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -18,22 +18,12 @@
 
 ==============================================================================*/
 
-// Qt includes
-#include <QApplication>
+// STD includes
+#include <cstdlib>
+#include <iostream>
 
-// msvECG includes
-#include "msvQECGMainWindow.h"
-
-//----------------------------------------------------------------------------
-int main(int argc, char* argv[])
+// -----------------------------------------------------------------------------
+int msvVTKFileSeriesReaderTest1(int argc, char * argv[])
 {
-  QCoreApplication::setApplicationName("MSV ECG");
-  QApplication app(argc, argv);
-
-  msvQECGMainWindow mainWindow;
-  mainWindow.show();
-
-  // Look at QApplication::exec() documentation, it is recommended to connect
-  // clean up code to the aboutToQuit() signal
-  return app.exec();
+  return EXIT_SUCCESS;
 }

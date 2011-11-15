@@ -18,7 +18,7 @@
 #
 ###########################################################################
 
-macro(msvtkMacroCheckExternalProjectDependency proj)
+macro(msvMacroCheckExternalProjectDependency proj)
   # Set indent variable if needed
   if(NOT DEFINED __indent)
     set(__indent "")

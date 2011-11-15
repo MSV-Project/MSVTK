@@ -16,7 +16,7 @@
 #! http://github.com/saschazelzer/CMakeDoxygenFilter/blob/master/README for more details.
 #!
 #! \ingroup CMakeUtilities
-function(msvtkFunctionCMakeDoxygenFilterCompile)
+function(msvFunctionCMakeDoxygenFilterCompile)
 
   #-------------------- parse function arguments -------------------
 

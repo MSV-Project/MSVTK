@@ -1,7 +1,7 @@
-set(KIT ECG)
+set(KIT VTKParallel)
+
 set(KIT_TEST_SRCS
-  ecgTest1.cxx
-  msvQECGMainWindowTest1.cxx
+  msvVTKFileSeriesReaderTest1.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
@@ -24,5 +24,4 @@ endmacro()
 # Add Tests
 #
 
-SIMPLE_TEST( ecgTest1 )
-SIMPLE_TEST( msvQECGMainWindowTest1 )
+SIMPLE_TEST( msvVTKFileSeriesReaderTest1 )

@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVECG
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -22,17 +22,17 @@
 #include <QApplication>
 
 // ECG includes
-#include "qMSECGMainWindow.h"
+#include "msvQECGMainWindow.h"
 
 // STD includes
 #include <cstdlib>
 
 // -----------------------------------------------------------------------------
-int qMSECGMainWindowTest1(int argc, char * argv[] )
+int msvQECGMainWindowTest1(int argc, char * argv[] )
 {
   QApplication app(argc, argv);
 
-  qMSECGMainWindow mainWindow;
+  msvQECGMainWindow mainWindow;
   mainWindow.show();
 
   return app.exec();
