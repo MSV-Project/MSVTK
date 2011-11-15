@@ -41,7 +41,7 @@ set(CTK_DEPENDENCIES VTK)
 #endif()
 
 # Include dependent projects if any
-msvtkMacroCheckExternalProjectDependency(CTK)
+msvMacroCheckExternalProjectDependency(CTK)
 set(proj CTK)
 
 if(NOT DEFINED CTK_DIR)
@@ -105,7 +105,7 @@ if(NOT DEFINED CTK_DIR)
 else()
   # The project is provided using CTK_DIR, nevertheless since other project may depend on CTK,
   # let's add an 'empty' one
-  msvtkMacroEmptyExternalProject(${proj} "${CTK_DEPENDENCIES}")
+  msvMacroEmptyExternalProject(${proj} "${CTK_DEPENDENCIES}")
 endif()
 
 list(APPEND MSVTK_SUPERBUILD_EP_ARGS -DCTK_DIR:PATH=${CTK_DIR})

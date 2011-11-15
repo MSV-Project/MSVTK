@@ -1,7 +1,7 @@
 set(KIT ECG)
 set(KIT_TEST_SRCS
   ecgTest1.cxx
-  qMSECGMainWindowTest1.cxx
+  msvQECGMainWindowTest1.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
@@ -11,7 +11,7 @@ create_test_sourcelist(Tests ${KIT}CxxTests.cxx
 #set(TestsToRun ${Tests})
 #list(REMOVE_ITEM TestsToRun ${KIT}CxxTests.cxx)
 
-set(LIBRARY_NAME msvtk${KIT})
+set(LIBRARY_NAME msv${KIT})
 
 add_executable(${KIT}CxxTests ${Tests})
 target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
@@ -25,4 +25,4 @@ endmacro()
 #
 
 SIMPLE_TEST( ecgTest1 )
-SIMPLE_TEST( qMSECGMainWindowTest1 )
+SIMPLE_TEST( msvQECGMainWindowTest1 )

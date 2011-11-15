@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVECG
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -21,16 +21,16 @@
 // Qt includes
 #include <QApplication>
 
-// msvtkECG includes
-#include "qMSECGMainWindow.h"
+// msvECG includes
+#include "msvQECGMainWindow.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  QCoreApplication::setApplicationName("MSVTK ECG");
+  QCoreApplication::setApplicationName("MSV ECG");
   QApplication app(argc, argv);
 
-  qMSECGMainWindow mainWindow;
+  msvQECGMainWindow mainWindow;
   mainWindow.show();
 
   // Look at QApplication::exec() documentation, it is recommended to connect

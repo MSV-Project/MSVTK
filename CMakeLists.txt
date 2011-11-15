@@ -39,7 +39,7 @@ project(MSVTK)
 #
 set(MSVTK_LIBRARY_MODE "SHARED")
 
-option(BUILD_SHARED_LIBS "Build MSVVTK with shared libraries." ON)
+option(BUILD_SHARED_LIBS "Build MSVTK with shared libraries." ON)
 set(MSVTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 mark_as_advanced(BUILD_SHARED_LIBS)
 
@@ -305,8 +305,8 @@ endif()
 #-----------------------------------------------------------------------------
 # QT
 #
-include(CMake/msvtkMacroSetupQt.cmake)
-msvtkMacroSetupQt()
+include(CMake/msvMacroSetupQt.cmake)
+msvMacroSetupQt()
 
 # Update MSVTK_BASE_LIBRARIES with QT libraries
 #if(QT4_FOUND)
@@ -349,7 +349,6 @@ option(MSVTK_USE_KWSTYLE     "Enable sourcecode-based style tests." OFF)
 #---------------------------------------------------------------------------
 # Will contain a list of sub-directory without option ON or OFF
 #
-set(MSVTK_LIBS_SUBDIRS )
 set(MSVTK_PLUGINS_SUBDIRS )
 set(MSVTK_APPLICATIONS_SUBDIRS )
 
@@ -417,16 +416,12 @@ set(CMAKE_C_FLAGS ${MSVTK_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 # Set the header template which defines custom export/import macros
 # for shared libraries
 #
-set(MSVTK_EXPORT_HEADER_TEMPLATE "${MSVTK_SOURCE_DIR}/Libs/MSVTKExport.h.in")
+set(MSVTK_EXPORT_HEADER_TEMPLATE "${MSVTK_SOURCE_DIR}/Libs/msvExport.h.in")
 
 #-----------------------------------------------------------------------------
 # Add MSVTK library subdirectories
 #
-foreach(lib ${MSVTK_LIBS_SUBDIRS})
-  if(MSVTK_LIB_${lib})
-    add_subdirectory(Libs/${lib})
-  endif()
-endforeach()
+add_subdirectory(Libs)
 
 #-----------------------------------------------------------------------------
 # Add MSVTK plugin subdirectories

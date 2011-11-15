@@ -51,7 +51,7 @@ endif()
 
 set(VTK_DEPENDENCIES "")
 # Include dependent projects if any
-msvtkMacroCheckExternalProjectDependency(VTK)
+msvMacroCheckExternalProjectDependency(VTK)
 set(proj VTK)
 
 if(NOT DEFINED VTK_DIR)
@@ -110,7 +110,7 @@ if(NOT DEFINED VTK_DIR)
   list(APPEND MSVTK_EXTERNAL_LIBRARY_DIRS ${VTK_DIR}/bin)
 
 else()
-  msvtkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+  msvMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 endif()
 
 list(APPEND MSVTK_SUPERBUILD_EP_ARGS -DVTK_DIR:PATH=${VTK_DIR})

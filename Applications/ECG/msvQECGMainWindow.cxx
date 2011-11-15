@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Library: MSVECG
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -20,51 +20,51 @@
 
 // Qt includes
 
-// MSVTK includes
-#include "qMSECGMainWindow.h"
-#include "ui_qMSECGMainWindow.h"
+// MSV includes
+#include "msvQECGMainWindow.h"
+#include "ui_msvQECGMainWindow.h"
 
 // VTK includes
 
 //-----------------------------------------------------------------------------
-class qMSECGMainWindowPrivate: public Ui_qMSECGMainWindow
+class msvQECGMainWindowPrivate: public Ui_msvQECGMainWindow
 {
-  Q_DECLARE_PUBLIC(qMSECGMainWindow);
+  Q_DECLARE_PUBLIC(msvQECGMainWindow);
 protected:
-  qMSECGMainWindow* const q_ptr;
+  msvQECGMainWindow* const q_ptr;
 
 public:
-  qMSECGMainWindowPrivate(qMSECGMainWindow& object);
+  msvQECGMainWindowPrivate(msvQECGMainWindow& object);
   virtual void setupUi(QMainWindow * mainWindow);
 };
 
 //-----------------------------------------------------------------------------
-// qMSECGMainWindowPrivate methods
+// msvQECGMainWindowPrivate methods
 
-qMSECGMainWindowPrivate::qMSECGMainWindowPrivate(qMSECGMainWindow& object)
+msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   : q_ptr(&object)
 {
 }
 
 //-----------------------------------------------------------------------------
-void qMSECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
+void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 {
-  this->Ui_qMSECGMainWindow::setupUi(mainWindow);
+  this->Ui_msvQECGMainWindow::setupUi(mainWindow);
 }
 
 //-----------------------------------------------------------------------------
-// qMSECGMainWindow methods
+// msvQECGMainWindow methods
 
 //-----------------------------------------------------------------------------
-qMSECGMainWindow::qMSECGMainWindow(QWidget* parentWidget)
+msvQECGMainWindow::msvQECGMainWindow(QWidget* parentWidget)
   : Superclass(parentWidget)
-  , d_ptr(new qMSECGMainWindowPrivate(*this))
+  , d_ptr(new msvQECGMainWindowPrivate(*this))
 {
-  Q_D(qMSECGMainWindow);
+  Q_D(msvQECGMainWindow);
   d->setupUi(this);
 }
 
 //-----------------------------------------------------------------------------
-qMSECGMainWindow::~qMSECGMainWindow()
+msvQECGMainWindow::~msvQECGMainWindow()
 {
 }
