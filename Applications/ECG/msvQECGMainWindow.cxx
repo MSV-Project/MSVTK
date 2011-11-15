@@ -22,9 +22,12 @@
 
 // MSV includes
 #include "msvQECGMainWindow.h"
+#include "msvVTKFileSeriesReader.h"
 #include "ui_msvQECGMainWindow.h"
 
 // VTK includes
+#include "vtkNew.h"
+
 
 //-----------------------------------------------------------------------------
 class msvQECGMainWindowPrivate: public Ui_msvQECGMainWindow

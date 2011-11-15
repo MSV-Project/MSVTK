@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -18,31 +18,12 @@
 
 ==============================================================================*/
 
-#ifndef __msvECGMainWindow_h
-#define __msvECGMainWindow_h
+// STD includes
+#include <cstdlib>
+#include <iostream>
 
-// Qt includes
-#include <QMainWindow>
-
-// ECG includes
-#include "msvECGExport.h"
-
-class msvQECGMainWindowPrivate;
-
-class msvECG_EXPORT msvQECGMainWindow : public QMainWindow
+// -----------------------------------------------------------------------------
+int msvVTKFileSeriesReaderTest1(int argc, char * argv[])
 {
-  Q_OBJECT
-public:
-  typedef QMainWindow Superclass;
-  msvQECGMainWindow(QWidget *parent=0);
-  virtual ~msvQECGMainWindow();
-
-protected:
-  QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
-
-private:
-  Q_DECLARE_PRIVATE(msvQECGMainWindow);
-  Q_DISABLE_COPY(msvQECGMainWindow);
-};
-
-#endif
+  return EXIT_SUCCESS;
+}
