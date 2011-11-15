@@ -29,7 +29,7 @@
 
 class msvQECGMainWindowPrivate;
 
-class msvECG_EXPORT msvQECGMainWindow : public QMainWindow
+class MSV_ECG_EXPORT msvQECGMainWindow : public QMainWindow
 {
   Q_OBJECT
 public:
