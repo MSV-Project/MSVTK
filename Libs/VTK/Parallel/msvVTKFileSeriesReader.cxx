@@ -75,11 +75,16 @@ class msvVTKFileSeriesReaderTimeRanges
 public:
   void Reset();
   void AddTimeRange(int index, vtkInformation *srcInfo);
+  void SetTimeRange(int index, double* range);
+  void GetTimeRange(double timeRange[2]);
   int GetAggregateTimeInfo(vtkInformation *outInfo);
   int GetInputTimeInfo(int index, vtkInformation *outInfo);
   int GetIndexForTime(double time);
   vtkstd::set<int> ChooseInputs(vtkInformation *outInfo);
   vtkstd::vector<double> GetTimesForInput(int inputId, vtkInformation *outInfo);
+
+  void PrintRangeMap();
+  void ResetRangeMap(){this->RangeMap.clear();}
 private:
   static vtkInformationIntegerKey *INDEX();
   typedef vtkstd::map<double, vtkSmartPointer<vtkInformation> > RangeMapType;
@@ -137,6 +142,32 @@ void msvVTKFileSeriesReaderTimeRanges::AddTimeRange(int index,
 
   this->RangeMap[info->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[0]]
     = info;
+}
+
+//------------------------------------------------------------------------------
+void msvVTKFileSeriesReaderTimeRanges::SetTimeRange(int index,
+                                                    double* range)
+{
+  if (this->InputLookup.empty())
+    {
+    return;
+    }
+
+  vtkInformation* info;
+  info = this->InputLookup[index];
+  info->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), range, 2);
+  this->RangeMap[info->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[0]]
+    = info;
+}
+
+//------------------------------------------------------------------------------
+void msvVTKFileSeriesReaderTimeRanges::GetTimeRange(double timeRange[2])
+{
+  timeRange[0] = this->RangeMap.begin()->second
+                       ->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[0];
+  timeRange[1] = (--this->RangeMap.end())->second
+                       ->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[1];
 }
 
 //-----------------------------------------------------------------------------
@@ -806,6 +837,39 @@ void msvVTKFileSeriesReader::UpdateMetaData()
 
     this->MetaFileReadTime.Modified();
     }
+}
+
+//------------------------------------------------------------------------------
+void msvVTKFileSeriesReader::SetOutputTimeRange(double tMin, double tMax)
+{
+  int numFiles = static_cast<int>(this->GetNumberOfFileNames());
+  if (numFiles < 1)
+    {
+    return;
+    }
+
+  this->UpdateInformation(); // make sure the information is up to date
+  this->Internal->TimeRanges->ResetRangeMap();
+  double subTimeRange = (tMax-tMin) / static_cast<double>(numFiles);
+
+  for (int i = 0; i < numFiles; ++i)
+    {
+    double timeRange[2];
+    timeRange[0] = i*subTimeRange;
+    timeRange[1] = (i+1)*subTimeRange;
+    this->Internal->TimeRanges->SetTimeRange(i, timeRange);
+    }
+}
+
+//------------------------------------------------------------------------------
+void msvVTKFileSeriesReader::SetOutputTimeRange(double timeRange[2])
+{
+  this->SetOutputTimeRange(timeRange[0], timeRange[1]);
+}
+
+void msvVTKFileSeriesReader::GetOutputTimeRange(double timeRange[2])
+{
+  return this->Internal->TimeRanges->GetTimeRange(timeRange);
 }
 
 //-----------------------------------------------------------------------------

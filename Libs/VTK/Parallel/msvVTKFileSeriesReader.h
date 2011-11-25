@@ -151,6 +151,13 @@ public:
   vtkSetMacro(IgnoreReaderTime, int);
   vtkBooleanMacro(IgnoreReaderTime, int);
 
+  // Description:
+  // Get/Set the output time range. Map to the time steps if no time information
+  // by default.
+  virtual void SetOutputTimeRange(double, double);
+  virtual void SetOutputTimeRange(double range[2]);
+  virtual void GetOutputTimeRange(double range[2]);
+
 protected:
   msvVTKFileSeriesReader();
   ~msvVTKFileSeriesReader();
