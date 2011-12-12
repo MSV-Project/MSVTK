@@ -58,7 +58,7 @@ if(NOT DEFINED CTK_DIR)
 
   ExternalProject_Add(${proj}
     GIT_REPOSITORY "${git_protocol}://github.com/commontk/CTK.git"
-    GIT_TAG "35561f21f570dba22ea30f36798e15a29f485a1d"
+    GIT_TAG "bafec5879695c6385727035f897c9fe386408ca2"
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     CMAKE_GENERATOR ${gen}
@@ -79,7 +79,7 @@ if(NOT DEFINED CTK_DIR)
       -DVTK_DIR:PATH=${VTK_DIR}
       -DCTK_LIB_Widgets:BOOL=ON
       -DCTK_LIB_Visualization/VTK/Widgets:BOOL=ON
-      -DCTK_LIB_Visualization/VTK/Widgets_USE_TRANSFER_FUNCTION_CHARTS:BOOL=OFF
+      -DCTK_LIB_Visualization/VTK/Widgets_USE_TRANSFER_FUNCTION_CHARTS:BOOL=ON
       -DCTK_LIB_PluginFramework:BOOL=OFF
       -DCTK_PLUGIN_org.commontk.eventbus:BOOL=OFF
     INSTALL_COMMAND ""
