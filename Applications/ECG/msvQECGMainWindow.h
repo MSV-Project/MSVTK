@@ -37,7 +37,13 @@ public:
   msvQECGMainWindow(QWidget *parent=0);
   virtual ~msvQECGMainWindow();
 
+public slots:
+  void openData();
+  void closeData();
+  void updateView();
+
 protected:
+  void setupMenuActions();
   QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
 
 private:

@@ -2,17 +2,12 @@ set(KIT ECG)
 set(KIT_TEST_SRCS
   ecgTest1.cxx
   msvQECGMainWindowTest1.cxx
-  msvVTKECGCartoPointsReaderTest1.cxx
+  msvVTKECGButtonsManagerTest1.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
   ${KIT_TEST_SRCS}
   )
-
-#set(TestsToRun ${Tests})
-#list(REMOVE_ITEM TestsToRun ${KIT}CxxTests.cxx)
-
-add_definitions( -DDATA_TESTING_PATH="${PROJECT_SOURCE_DIR}/Testing/Data/" )
 
 set(LIBRARY_NAME msv${KIT})
 
@@ -32,4 +27,4 @@ endmacro()
 
 SIMPLE_TEST( ecgTest1 )
 SIMPLE_TEST( msvQECGMainWindowTest1 )
-SIMPLE_TEST( msvVTKECGCartoPointsReaderTest1 )
+SIMPLE_TEST( msvVTKECGButtonsManagerTest1 )
