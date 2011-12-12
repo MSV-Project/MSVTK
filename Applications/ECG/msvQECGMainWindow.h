@@ -43,7 +43,6 @@ public slots:
   void updateView();
 
 protected:
-  void setupMenuActions();
   QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
 
 private:

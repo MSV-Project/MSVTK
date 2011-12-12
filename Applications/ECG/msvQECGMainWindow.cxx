@@ -39,7 +39,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 class msvQECGMainWindowPrivate: public Ui_msvQECGMainWindow
 {
   Q_DECLARE_PUBLIC(msvQECGMainWindow);
@@ -76,9 +76,10 @@ public:
   static bool fileLessThan(const QString &, const QString &);
 };
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // msvQECGMainWindowPrivate methods
 
+//------------------------------------------------------------------------------
 msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   : q_ptr(&object)
 {
@@ -93,21 +94,25 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   this->cartoPointsReader->SetReader(this->polyDataReader);
 
   // Create Pipeline for the CartoPoints
-  this->cartoPointsMapper = vtkPolyDataMapper::New();
+  this->cartoPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   this->cartoPointsMapper->ScalarVisibilityOff();
   this->cartoPointsMapper->SetInputConnection(
     this->cartoPointsReader->GetOutputPort());
-  this->cartoPointsActor = vtkActor::New();
+  this->cartoPointsActor = vtkSmartPointer<vtkActor>::New();
   this->cartoPointsActor->SetMapper(this->cartoPointsMapper);
+
+  // Set the buttons manager
+  this->buttonsManager = vtkSmartPointer<msvVTKECGButtonsManager>::New();
+  this->buttonsManager->SetRenderer(this->threeDRenderer);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 msvQECGMainWindowPrivate::~msvQECGMainWindowPrivate()
 {
   this->clear();
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::clear()
 {
   this->timePlayerWidget->play(false);            // stop the player widget
@@ -118,19 +123,18 @@ void msvQECGMainWindowPrivate::clear()
   this->buttonsManager->Clear();                  // clean up the buttonsManager
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::setup(QMainWindow * mainWindow)
+{
+  this->setupUi(mainWindow);
+  this->setupView();
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 {
   Q_Q(msvQECGMainWindow);
 
-  this->setupUi(mainWindow);
-  this->setupView();
-  q->setupMenuActions();
-}
-
-//-----------------------------------------------------------------------------
-void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
-{
   this->Ui_msvQECGMainWindow::setupUi(mainWindow);
 
   // Connect Menu ToolBars actions
@@ -145,30 +149,33 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   this->timePlayerWidget->setFilter(this->cartoPointsMapper);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::setupView()
 {
   this->threeDView->GetRenderWindow()->AddRenderer(this->threeDRenderer);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::update()
 {
   this->updateUi();
   this->updateView();
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::updateUi()
-{}
+{
+}
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::updateView()
 {
+  this->buttonsManager->UpdateButtonWidgets(static_cast<vtkPolyData*>
+    (this->cartoPointsReader->GetOutput()));
   this->threeDView->GetRenderWindow()->Render();
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 {
   QDir dir(rootDirectory);
@@ -181,6 +188,9 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
   if (dir.cd(QString("CartoPoints")))
     this->readCartoPoints(dir);
 
+  // Link to the cartoPoints the buttons
+  this->polyDataReader->Update();
+  this->buttonsManager->Init(this->polyDataReader->GetOutput());
 
   // Render
   double extent[6];
@@ -188,9 +198,9 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
   this->cartoPointsActor->VisibilityOn();
   this->threeDRenderer->AddActor(this->cartoPointsActor);
   this->threeDRenderer->ResetCamera(extent);
-  this->update();
 }
 
+//------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::readCartoPoints(QDir& dir)
 {
   // Set file series patterns recognition
@@ -209,14 +219,15 @@ void msvQECGMainWindowPrivate::readCartoPoints(QDir& dir)
       dir.filePath(*constIt).toLocal8Bit().constData());
 
   // Create Instance of vtkDataObject for all outputs ports
-  // Call REQUEST_DATA_OBJECT && REQUEST_INFORMATION
+  // Calls REQUEST_DATA_OBJECT && REQUEST_INFORMATION
   this->cartoPointsReader->UpdateInformation();
   this->cartoPointsReader->SetOutputTimeRange(0,2500);
 
   // Update the Widget given the info provided
-  this->timePlayerWidget->updateTimeInformation();
+  this->timePlayerWidget->updateFromFilter();
 }
 
+//------------------------------------------------------------------------------
 bool msvQECGMainWindowPrivate::fileLessThan(const QString &s1, const QString &s2)
 {
   // Compare file by the index contained within.
@@ -231,10 +242,10 @@ bool msvQECGMainWindowPrivate::fileLessThan(const QString &s1, const QString &s2
   return fileA.toInt() < fileB.toInt();
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // msvQECGMainWindow methods
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 msvQECGMainWindow::msvQECGMainWindow(QWidget* parentWidget)
   : Superclass(parentWidget)
   , d_ptr(new msvQECGMainWindowPrivate(*this))
@@ -243,25 +254,12 @@ msvQECGMainWindow::msvQECGMainWindow(QWidget* parentWidget)
   d->setup(this);
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 msvQECGMainWindow::~msvQECGMainWindow()
-{}
-
-//-----------------------------------------------------------------------------
-void msvQECGMainWindow::setupMenuActions()
 {
-  Q_D(msvQECGMainWindow);
-
-  // Connect Menu ToolBars actions
-  this->connect(d->actionOpen, SIGNAL(triggered()), this, SLOT(openData()));
-  this->connect(d->actionClose, SIGNAL(triggered()), this, SLOT(closeData()));
-  this->connect(d->actionExit, SIGNAL(triggered()), this, SLOT(close()));
-
-  // Playback Controller
-  this->connect(d->timePlayerWidget, SIGNAL(timestepChanged()), this, SLOT(updateView()));
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindow::openData()
 {
   Q_D(msvQECGMainWindow);
@@ -270,7 +268,7 @@ void msvQECGMainWindow::openData()
     this, tr("Select root CartoData Folder"), QDir::homePath(),
     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-  if (dir.isNull())
+  if (dir.isEmpty())
     return;
 
   d->clear();             // Clean Up data and scene
@@ -278,7 +276,7 @@ void msvQECGMainWindow::openData()
   d->update();            // Update the Ui and the View
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindow::closeData()
 {
   Q_D(msvQECGMainWindow);
@@ -287,7 +285,7 @@ void msvQECGMainWindow::closeData()
   d->update();
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void msvQECGMainWindow::updateView()
 {
   Q_D(msvQECGMainWindow);
