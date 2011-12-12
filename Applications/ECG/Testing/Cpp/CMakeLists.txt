@@ -15,16 +15,20 @@ add_executable(${KIT}CxxTests ${Tests})
 target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
 
 macro(SIMPLE_TEST TESTNAME)
-  add_test(NAME ${TESTNAME} COMMAND ${Slicer_LAUNCH_COMMAND} $<TARGET_FILE:${KIT}CxxTests>
+  add_test(NAME ${TESTNAME} COMMAND $<TARGET_FILE:${KIT}CxxTests>
     ${TESTNAME}
-    ${ARGN}
-    -D "${PROJECT_SOURCE_DIR}/Testing/Data/")
+    ${ARGN})
 endmacro()
 
 #
 # Add Tests
 #
 
-SIMPLE_TEST( ecgTest1 )
+add_test(
+  NAME ecgTest1
+  COMMAND $<TARGET_FILE:${KIT}CxxTests> ecgTest1
+  --ecg $<TARGET_FILE_DIR:${KIT}CxxTests>
+)
+
 SIMPLE_TEST( msvQECGMainWindowTest1 )
 SIMPLE_TEST( msvVTKECGButtonsManagerTest1 )
