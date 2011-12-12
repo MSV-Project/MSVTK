@@ -36,6 +36,8 @@
 
 #include "ctkTest.h"
 
+Q_DECLARE_METATYPE(QVariant);
+
 // ----------------------------------------------------------------------------
 class msvQTimePlayerWidgetTester : public QObject
 {
