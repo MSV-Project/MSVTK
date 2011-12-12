@@ -1,0 +1,124 @@
+/*==============================================================================
+
+  Program: MSVTK
+
+  Copyright (c) Kitware Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0.txt
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+==============================================================================*/
+
+// MSVTK includes
+#include "msvVTKProp3DButtonRepresentation.h"
+
+// STD includes
+#include <cstdlib>
+#include <iostream>
+
+// VTK includes
+#include <vtkActor.h>
+#include <vtkButtonWidget.h>
+#include <vtkCubeSource.h>
+#include <vtkNew.h>
+#include <vtkPlatonicSolidSource.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProp3D.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+
+// -----------------------------------------------------------------------------
+int msvVTKProp3DButtonRepresentationTest1(int, char* [])
+{
+  // Create the RenderWindow and Renderer
+  vtkNew<vtkRenderer> render;
+  vtkNew<vtkRenderWindow> renWin;
+  renWin->AddRenderer(render.GetPointer());
+
+  vtkNew<vtkRenderWindowInteractor> iren;
+  iren->SetRenderWindow(renWin.GetPointer());
+
+  // Use of vtkButtonWidget through a msvVTKProp3DButtonRepresentation
+  vtkNew<vtkPlatonicSolidSource> tet;
+  tet->SetSolidTypeToTetrahedron();
+  vtkNew<vtkPolyDataMapper> tetMapper;
+  tetMapper->SetInputConnection(tet->GetOutputPort());
+  tetMapper->SetScalarRange(0,19);
+  vtkNew<vtkActor> tetActor;
+  tetActor->SetMapper(tetMapper.GetPointer());
+
+  vtkNew<vtkCubeSource> cube;
+  vtkNew<vtkPolyDataMapper> cubeMapper;
+  cubeMapper->SetInputConnection(cube->GetOutputPort());
+  cubeMapper->SetScalarRange(0,19);
+  vtkNew<vtkActor> cubeActor;
+  cubeActor->SetMapper(cubeMapper.GetPointer());
+
+  vtkNew<msvVTKProp3DButtonRepresentation> prop3DButtonRep;
+  prop3DButtonRep->SetNumberOfStates(2);
+  prop3DButtonRep->SetButtonProp(0,tetActor.GetPointer());
+  prop3DButtonRep->SetButtonProp(1,cubeActor.GetPointer());
+  prop3DButtonRep->SetButtonProp(4,cubeActor.GetPointer());
+  prop3DButtonRep->SetPlaceFactor(1);
+  prop3DButtonRep->SetState(0);
+
+  vtkProp3D* prop3D = prop3DButtonRep->GetButtonProp(4);
+  prop3D = prop3DButtonRep->GetButtonProp(1);
+  if (prop3D != cubeActor.GetPointer())
+    {
+    std::cerr << "Error: vtkProp3D retrieved not the one expected" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  double bounds1[6] = {-0.75, 0.75, -0.75, 0.75, -0.5, 0.75};
+  prop3DButtonRep->PlaceWidget(bounds1);
+  double * getBounds1 = prop3DButtonRep->GetBounds();
+
+  if (bounds1[0] != getBounds1[0] || bounds1[1] != getBounds1[1] ||
+      bounds1[2] != getBounds1[2] || bounds1[3] != getBounds1[3] ||
+      bounds1[4] != getBounds1[4] || bounds1[5] != getBounds1[5])
+    {
+    std::cerr << "Error: Unexpected bounds after calling PlaceWidget" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  double bounds2[6] = {0, 1.5, 0, 1.5, 0, 1.5};
+  prop3DButtonRep->PlaceWidget(bounds2);
+  double * getBounds2 = prop3DButtonRep->GetBounds();
+
+  if (bounds2[0] != getBounds2[0] || bounds2[1] != getBounds2[1] ||
+      bounds2[2] != getBounds2[2] || bounds2[3] != getBounds2[3] ||
+      bounds2[4] != getBounds2[4] || bounds2[5] != getBounds2[5])
+    {
+    std::cerr << "Error: Unexpected bounds after calling PlaceWidget" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  vtkNew<vtkButtonWidget> buttonWidget;
+  buttonWidget->SetInteractor(iren.GetPointer());
+  buttonWidget->SetRepresentation(prop3DButtonRep.GetPointer());
+
+  // Rendering
+  render->SetBackground(0.1, 0.2, 0.4);
+  renWin->SetSize(300, 300);
+
+  iren->Initialize();
+  renWin->Render();
+
+  buttonWidget->EnabledOn();
+  prop3DButtonRep->ComputeInteractionState(0,0);
+  prop3DButtonRep->ComputeInteractionState(299,299);
+
+  return EXIT_SUCCESS;
+}
