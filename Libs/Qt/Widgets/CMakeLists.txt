@@ -1,5 +1,5 @@
-project(msvVTKParallel)
-set(KIT VTK_PARALLEL)
+project(msvQtWidgets)
+set(KIT QT_WIDGETS)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.2)
@@ -28,6 +28,10 @@ endif()
 set(include_dirs
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${VTK_INCLUDE_DIRS}
+  ${CTK_INCLUDE_DIRS}
+  ${msvVTKParallel_INCLUDE_DIRS}
+  ${msvVTKWidgets_INCLUDE_DIRS}
   )
 include_directories(${include_dirs})
 
@@ -47,11 +51,25 @@ endif()
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(msvVTKParallel_SRCS
-  msvVTKFileSeriesReader.cxx
-  msvVTKPolyDataFileSeriesReader.cxx
+set(msvQtWidgets_SRCS
+  msvQTimePlayerWidget.cxx
   )
 
+set(msv${KIT}_MOC_SRCS
+  msvQTimePlayerWidget.h
+  )
+
+set(msv${KIT}_UI_SRCS
+  Resources/UI/msvQTimePlayerWidget.ui
+  )
+
+set(msv${KIT}_QRC
+  Resources/msvQWidgets.qrc
+  )
+
+QT4_WRAP_CPP(msv${KIT}_SRCS ${msv${KIT}_MOC_SRCS})
+QT4_WRAP_UI(msv${KIT}_UI_CXX ${msv${KIT}_UI_SRCS})
+QT4_ADD_RESOURCES(msv${KIT}_QRC_SRCS ${msv${KIT}_QRC})
 # Abstract/pure virtual classes
 
 #set_source_files_properties(
@@ -64,14 +82,21 @@ set(msvVTKParallel_SRCS
 # Build library
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
+set(srcs ${msvQtWidgets_SRCS})
 
-set(srcs ${msvVTKParallel_SRCS})
-add_library(${lib_name} ${srcs})
-
-set(libs
-    ${VTK_LIBRARIES}
+add_library(${lib_name} ${srcs}
+  ${msv${KIT}_SRCS}
+  ${msv${KIT}_UI_CXX}
+  ${msv${KIT}_QRC_SRCS}
   )
-target_link_libraries(${lib_name} ${libs})
+
+target_link_libraries(${lib_name}
+  ${QT_LIBRARIES}
+  ${CTK_LIBRARIES}
+  ${VTK_LIBRARIES}
+  msvVTKParallel
+  msvVTKWidgets
+  )
 
 # Apply user-defined properties to the library target.
 if(MSVTK_LIBRARY_PROPERTIES)

@@ -38,7 +38,7 @@ macro(msvMacroSetupQt)
     #set(QT_USE_QTSQL ON)
     set(QT_USE_QTOPENGL ON)
     #set(QT_USE_QTXML ON)
-    #set(QT_USE_QTTEST ${BUILD_TESTING})
+    set(QT_USE_QTTEST ${BUILD_TESTING})
     include(${QT_USE_FILE})
 
     # Set variable QT_INSTALLED_LIBRARY_DIR that will contains

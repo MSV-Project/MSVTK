@@ -7,6 +7,7 @@ project(msv${KIT})
 
 set(msv${KIT}_SRCS
   msvQECGMainWindow.cxx
+  msvVTKECGButtonsManager.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
@@ -36,6 +37,8 @@ set(include_dirs
   ${VTK_INCLUDE_DIRS}
   ${CTK_INCLUDE_DIRS}
   ${msvVTKParallel_INCLUDE_DIRS}
+  ${msvVTKWidgets_INCLUDE_DIRS}
+  ${msvQtWidgets_INCLUDE_DIRS}
   )
 
 include_directories(${include_dirs})
@@ -55,6 +58,8 @@ target_link_libraries(msv${KIT}
   ${CTK_LIBRARIES}
   ${VTK_LIBRARIES}
   msvVTKParallel
+  msvVTKWidgets
+  msvQtWidgets
   )
 
 

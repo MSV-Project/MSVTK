@@ -1,5 +1,5 @@
-project(msvVTKParallel)
-set(KIT VTK_PARALLEL)
+project(msvVTKWidgets)
+set(KIT VTK_WIDGETS)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.2)
@@ -47,9 +47,8 @@ endif()
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(msvVTKParallel_SRCS
-  msvVTKFileSeriesReader.cxx
-  msvVTKPolyDataFileSeriesReader.cxx
+set(msvVTKWidgets_SRCS
+  msvVTKProp3DButtonRepresentation.cxx
   )
 
 # Abstract/pure virtual classes
@@ -65,7 +64,7 @@ set(msvVTKParallel_SRCS
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
 
-set(srcs ${msvVTKParallel_SRCS})
+set(srcs ${msvVTKWidgets_SRCS})
 add_library(${lib_name} ${srcs})
 
 set(libs

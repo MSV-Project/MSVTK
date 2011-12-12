@@ -58,7 +58,7 @@ if(NOT DEFINED CTK_DIR)
 
   ExternalProject_Add(${proj}
     GIT_REPOSITORY "${git_protocol}://github.com/commontk/CTK.git"
-    GIT_TAG "5c6d3019fa97c389b34cff2178ee91e8929acace"
+    GIT_TAG "bafec5879695c6385727035f897c9fe386408ca2"
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     CMAKE_GENERATOR ${gen}
@@ -77,25 +77,11 @@ if(NOT DEFINED CTK_DIR)
       -DCTK_USE_GIT_PROTOCOL:BOOL=${MSVTK_USE_GIT_PROTOCOL}
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
       -DVTK_DIR:PATH=${VTK_DIR}
-#      -DITK_DIR:PATH=${ITK_DIR}
-#      -DPYTHON_LIBRARY:FILEPATH=${MSVTK_PYTHON_LIBRARY}
-#      -DPYTHON_INCLUDE_DIR:PATH=${MSVTK_PYTHON_INCLUDE}
-#      -DPYTHON_EXECUTABLE:FILEPATH=${MSVTK_PYTHON_EXECUTABLE}
       -DCTK_LIB_Widgets:BOOL=ON
       -DCTK_LIB_Visualization/VTK/Widgets:BOOL=ON
       -DCTK_LIB_Visualization/VTK/Widgets_USE_TRANSFER_FUNCTION_CHARTS:BOOL=ON
- #     -DCTK_LIB_ImageProcessing/ITK/Core:BOOL=ON
- #     -DCTK_LIB_Scripting/Python/Core:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_LIB_Scripting/Python/Core_PYTHONQT_USE_VTK:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTCORE:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTGUI:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTUITOOLS:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTNETWORK:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_LIB_Scripting/Python/Widgets:BOOL=${Slicer_USE_PYTHONQT}
- #     -DCTK_WRAP_PYTHONQT_LIGHT:BOOL=${Slicer_USE_PYTHONQT}
       -DCTK_LIB_PluginFramework:BOOL=OFF
       -DCTK_PLUGIN_org.commontk.eventbus:BOOL=OFF
- #     -DCTK_APP_ctkDICOM:BOOL=ON
     INSTALL_COMMAND ""
     DEPENDS
       ${CTK_DEPENDENCIES}

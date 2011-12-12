@@ -24,14 +24,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QToolButton" name="playToolButton">
-        <property name="text">
-         <string>&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="ctkSliderWidget" name="currentFrameSlider" native="true"/>
+       <widget class="msvQTimePlayerWidget" name="timePlayerWidget" native="true"/>
       </item>
      </layout>
     </item>
@@ -51,6 +44,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -119,19 +113,28 @@
    <property name="text">
     <string>Open...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>ctkSliderWidget</class>
-   <extends>QWidget</extends>
-   <header>ctkSliderWidget.h</header>
-  </customwidget>
   <customwidget>
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
@@ -142,6 +145,12 @@
    <class>ctkVTKChartView</class>
    <extends>QWidget</extends>
    <header>ctkVTKChartView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>msvQTimePlayerWidget</class>
+   <extends>QWidget</extends>
+   <header>msvQTimePlayerWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

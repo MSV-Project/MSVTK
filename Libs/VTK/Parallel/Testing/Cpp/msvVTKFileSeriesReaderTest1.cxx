@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -18,12 +18,204 @@
 
 ==============================================================================*/
 
+// MSVTK
+#include "msvVTKFileSeriesReader.h"
+
+// VTK includes
+#include "vtkNew.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPolyDataReader.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
+#include "vtkTestUtilities.h"
+
 // STD includes
 #include <cstdlib>
 #include <iostream>
+#include <string>
+
+// Define an implementation of the msvVTKFileSeriesReader
+class msvVTKTestPolyDataFileSeriesReader : public msvVTKFileSeriesReader
+{
+public:
+  vtkTypeMacro(msvVTKTestPolyDataFileSeriesReader, msvVTKFileSeriesReader);
+  static msvVTKTestPolyDataFileSeriesReader *New();
+  virtual void PrintSelf(ostream &os, vtkIndent indent)
+    {this->Superclass::PrintSelf(os, indent);}
+
+  virtual void SetReader(vtkAlgorithm* reader)
+    {this->Superclass::SetReader(vtkPolyDataReader::SafeDownCast(reader));}
+
+  virtual int CanReadFile(const char* filename)
+  {
+    if (!this->Reader)
+      {
+      return 0;
+      }
+
+    if (this->UseMetaFile)
+      {
+      // filename really points to a metafile.
+      vtkNew<vtkStringArray> dataFiles;
+      if (this->ReadMetaDataFile(filename, dataFiles.GetPointer(), 1))
+        {
+        if (dataFiles->GetNumberOfValues() > 0)
+          {
+          return msvVTKTestPolyDataFileSeriesReader::
+            CanReadFile(this->Reader,dataFiles->GetValue(0).c_str());
+          }
+        }
+      return 0;
+      }
+    else
+      {
+      return msvVTKTestPolyDataFileSeriesReader::CanReadFile(this->Reader,
+                                                             filename);
+      }
+  }
+  static int CanReadFile(vtkAlgorithm* algo, const char* filename)
+    {
+    vtkPolyDataReader* reader = vtkPolyDataReader::SafeDownCast(algo);
+    if(!reader || !filename)
+      {
+      return 0;
+      }
+
+    reader->SetFileName(filename);
+    return reader->IsFileValid("polydata");
+    }
+
+protected:
+  msvVTKTestPolyDataFileSeriesReader(){}
+  virtual ~msvVTKTestPolyDataFileSeriesReader(){}
+  virtual void SetReaderFileName(const char* fname)
+    {
+    vtkPolyDataReader* reader = vtkPolyDataReader::SafeDownCast(this->Reader);
+    if (reader)
+      {
+      // We want to suppress the modification time change in the Reader.  See
+      // msvVTKFileSeriesReader::GetMTime() for details on how this works.
+      this->SavedReaderModification = this->GetMTime();
+      reader->SetFileName(fname);
+      this->HiddenReaderModification = this->Reader->GetMTime();
+      }
+    this->SetCurrentFileName(fname);
+    }
+
+private:
+  msvVTKTestPolyDataFileSeriesReader(const msvVTKTestPolyDataFileSeriesReader&);
+  void operator=(const msvVTKTestPolyDataFileSeriesReader&);
+};
+vtkStandardNewMacro(msvVTKTestPolyDataFileSeriesReader);
 
 // -----------------------------------------------------------------------------
-int msvVTKFileSeriesReaderTest1(int argc, char * argv[])
+int msvVTKFileSeriesReaderTest1(int argc, char* argv[])
 {
+  // Get the data test files
+  const char* file0 =
+    vtkTestUtilities::ExpandDataFileName(argc,argv,"Polydata00.vtk");
+  const char* file1 =
+    vtkTestUtilities::ExpandDataFileName(argc,argv,"Polydata00.vtk");
+
+  // Create the fileSeriesReader
+  vtkNew<vtkPolyDataReader> polyDataReader;
+  vtkNew<msvVTKTestPolyDataFileSeriesReader> fileSeriesReader;
+
+  fileSeriesReader->SetReader(polyDataReader.GetPointer());
+
+  fileSeriesReader->GetMTime();
+  fileSeriesReader->RemoveAllFileNames();
+
+  fileSeriesReader->AddFileName(file0);
+  fileSeriesReader->AddFileName(file1);
+
+  if (fileSeriesReader->GetNumberOfFileNames() != 2)
+    {
+    std::cerr << "Error: NumberOfFileNames != to the number of file added"
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (fileSeriesReader->GetFileName(5))
+    {
+    std::cerr << "Error: retrieve a FileName out of range." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (strcmp(fileSeriesReader->GetFileName(1),file1) != 0)
+    {
+    std::cerr << "Error: GetFileName different than expected: " << std::endl
+              << "Expected fileName: " << file1 << std::endl
+              << "Filename retrived: " << fileSeriesReader->GetFileName(1)
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Set the default reader
+  fileSeriesReader->SetReader(0);
+  if (fileSeriesReader->CanReadFile(file1))
+    {
+    std::cerr << "CanReadFile return true without having a reader" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  fileSeriesReader->SetReader(polyDataReader.GetPointer());
+  if (!fileSeriesReader->CanReadFile(file1))
+    {
+    std::cerr << "CanReadFile return false on proper vtk file" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Requests without files
+  fileSeriesReader->RemoveAllFileNames();
+  vtkNew<vtkInformation> infoRequest;
+  infoRequest->Set(vtkStreamingDemandDrivenPipeline::REQUEST_INFORMATION());
+  fileSeriesReader->ProcessRequest(
+    infoRequest.GetPointer(), 0,
+    fileSeriesReader->GetExecutive()->GetOutputInformation());
+
+  // Repopulate the fileSerieReader
+  fileSeriesReader->AddFileName(file0);
+  fileSeriesReader->AddFileName(file1);
+
+  // Create instances of vtkDataObject for all outputsPorts
+  vtkNew<vtkInformation> dataObjRequest;
+  dataObjRequest->Set(vtkStreamingDemandDrivenPipeline::REQUEST_DATA_OBJECT());
+  fileSeriesReader->ProcessRequest(
+    dataObjRequest.GetPointer(), 0,
+    fileSeriesReader->GetExecutive()->GetOutputInformation());
+
+  // Provide/Generate information on the output data
+  vtkNew<vtkInformation> infoRequest1;
+  infoRequest1->Set(vtkStreamingDemandDrivenPipeline::REQUEST_INFORMATION());
+  fileSeriesReader->ProcessRequest(
+    infoRequest1.GetPointer(), 0,
+    fileSeriesReader->GetExecutive()->GetOutputInformation());
+
+  int numberOfTimeSteps = fileSeriesReader->GetExecutive()->
+    GetOutputInformation()->GetInformationObject(0)->
+    Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+  if (numberOfTimeSteps < 2)
+    {
+    std::cerr << "Error: Wrong Time Steps initialization." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Request for the Next frame
+  double time = 1;
+  vtkNew<vtkInformation> nextFrameReq;
+  nextFrameReq->Set(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT());
+  vtkNew<vtkInformation> nextFrameOutput;
+  nextFrameOutput->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
+    &time, 1);
+  vtkNew<vtkInformationVector> nextFrameOutputs;
+  nextFrameOutputs->Append(nextFrameOutput.GetPointer());
+
+  fileSeriesReader->ProcessRequest(
+    nextFrameReq.GetPointer(), 0, nextFrameOutputs.GetPointer());
+
   return EXIT_SUCCESS;
 }
