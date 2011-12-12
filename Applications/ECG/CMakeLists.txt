@@ -7,6 +7,7 @@ project(msv${KIT})
 
 set(msv${KIT}_SRCS
   msvQECGMainWindow.cxx
+  msvVTKECGCartoPointsReader.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
