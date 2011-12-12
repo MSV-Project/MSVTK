@@ -22,19 +22,13 @@
 #include <QApplication>
 #include <QIcon>
 #include <QRegExp>
+#include <QStyle>
 #include <QtTest/QTest>
+#include <QVariant>
 
 // MSVTK
 #include "msvQTimePlayerWidget.h"
 #include "msvVTKPolyDataFileSeriesReader.h"
-
-// VTK includes
-#include "vtkNew.h"
-#include "vtkObjectFactory.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkPolyDataReader.h"
-#include "vtkStringArray.h"
-//#include "vtkTestUtilities.h"
 
 // STD includes
 #include <cstdlib>
@@ -55,22 +49,27 @@ private slots:
 void msvQTimePlayerWidgetTester::testButtonProperties()
 {
   msvQTimePlayerWidget playerWidget;
-  std::cout << "GetIn Treatment" << std::endl;
 
   QFETCH(QString, Property);
   QFETCH(QVariant, InputPropertyValue);
   QFETCH(QVariant, ExpectedOuputPropertyValue);
 
   QRegExp rx("Icon");
+  // Specific test for icons
   if (rx.indexIn(Property) >= 0)
     {
-    std::cout << "Icon Treatment" << std::endl;
+    QVariant testIcon = QVariant::fromValue(
+      playerWidget.style()->QStyle::standardIcon(QStyle::SP_MediaPlay));
+
+    playerWidget.setProperty(Property.toUtf8(), testIcon);
+    QCOMPARE(
+      qvariant_cast<QIcon>(playerWidget.property(Property.toUtf8())).cacheKey(),
+      qvariant_cast<QIcon>(testIcon).cacheKey());
     }
   else
     {
-    std::cout << "Non IconTreadtment" << std::endl;
-    //playerWidget.setProperty(Property, InputPropertyValue);
-    //QCOMPARE(playerWidget.property(), ExpectedOuputPropertyValue);
+    playerWidget.setProperty(Property.toUtf8(), InputPropertyValue);
+    QCOMPARE(playerWidget.property(Property.toUtf8()), ExpectedOuputPropertyValue);
     }
 }
 
@@ -109,104 +108,85 @@ void msvQTimePlayerWidgetTester::testButtonProperties_data()
                               << QVariant::fromValue(0);
 
   // Visibility
-  /*QTest::newRow("playReverseVisibility") << "playReverseVisibility" << false << false;
-  QTest::newRow("boundFramesVisibility") << "boundFramesVisibility" << false << false;
-  QTest::newRow("seekFrameVisibility") << "seekFrameVisibility" << false << false;
-  QTest::newRow("timeSpinBoxVisibility") << "timeSpinBoxVisibility" << false << false;
-  QTest::newRow("playReverseVisibility") << "playReverseVisibility" << true << true;
-  QTest::newRow("boundFramesVisibility") << "boundFramesVisibility" << true << true;
-  QTest::newRow("seekFrameVisibility") << "seekFrameVisibility" << true << true;
-  QTest::newRow("timeSpinBoxVisibility") << "timeSpinBoxVisibility" << true << true;
+  QTest::newRow("playReverseVisibility") << "playReverseVisibility"
+                                         << QVariant::fromValue(false)
+                                         << QVariant::fromValue(false);
+  QTest::newRow("boundFramesVisibility") << "boundFramesVisibility"
+                                         << QVariant::fromValue(false)
+                                         << QVariant::fromValue(false);
+  QTest::newRow("seekFrameVisibility") << "seekFrameVisibility"
+                                       << QVariant::fromValue(false)
+                                       << QVariant::fromValue(false);
+  QTest::newRow("timeSpinBoxVisibility") << "timeSpinBoxVisibility"
+                                         << QVariant::fromValue(false)
+                                         << QVariant::fromValue(false);
+  QTest::newRow("playReverseVisibility") << "playReverseVisibility"
+                                         << QVariant::fromValue(true)
+                                         << QVariant::fromValue(true);
+  QTest::newRow("boundFramesVisibility") << "boundFramesVisibility"
+                                         << QVariant::fromValue(true)
+                                         << QVariant::fromValue(true);
+  QTest::newRow("seekFrameVisibility") << "seekFrameVisibility"
+                                       << QVariant::fromValue(true)
+                                       << QVariant::fromValue(true);
+  QTest::newRow("timeSpinBoxVisibility") << "timeSpinBoxVisibility"
+                                         << QVariant::fromValue(true)
+                                         << QVariant::fromValue(true);
 
   // Slider properties
-  QTest::newRow("sliderDecimals") << "sliderDecimals" << 2 << 2;
-  QTest::newRow("sliderPageStep") << "sliderPageStep" << 5. << 5.;
-  QTest::newRow("sliderSingleStep") << "sliderSingleStep" << 5. << 5.;
+  QTest::newRow("sliderDecimals") << "sliderDecimals"
+                                  << QVariant::fromValue(2)
+                                  << QVariant::fromValue(2);
+  QTest::newRow("sliderPageStep") << "sliderPageStep"
+                                  << QVariant::fromValue(5.)
+                                  << QVariant::fromValue(5.);
+  QTest::newRow("sliderSingleStep") << "sliderSingleStep"
+                                    << QVariant::fromValue(5.)
+                                    << QVariant::fromValue(5.);
   QTest::newRow("sliderSingleStep -> Autommatic mode correspounding to a frame")
-    << "sliderSingleStep" << -1. << 1.;
+    << "sliderSingleStep"
+    << QVariant::fromValue(-1.)
+    << QVariant::fromValue(1.);
 
   // Direction
   QTest::newRow("direction") << "direction"
-                             << static_cast<int>(QAbstractAnimation::Backward)
-                             << static_cast<int>(QAbstractAnimation::Backward);
+                             << QVariant::fromValue(static_cast<int>(
+                                  QAbstractAnimation::Backward))
+                             << QVariant::fromValue(
+                                  static_cast<int>(QAbstractAnimation::Backward));
   QTest::newRow("direction") << "direction"
-                             << static_cast<int>(QAbstractAnimation::Forward)
-                             << static_cast<int>(QAbstractAnimation::Forward);
+                             << QVariant::fromValue(
+                                  static_cast<int>(QAbstractAnimation::Forward))
+                             << QVariant::fromValue(
+                                  static_cast<int>(QAbstractAnimation::Forward));
 
   // Playback
-  QTest::newRow("repeat") << "repeat" << true << true;
-  QTest::newRow("repeat") << "repeat" << false << false;
-  QTest::newRow("sliderDecimals") << "sliderDecimals" << -1 << 0;
-  QTest::newRow("sliderDecimals") << "sliderDecimals" << 2 << 2;
-  QTest::newRow("maxFramerate") << "maxFramerate" << 30 << 30;
-  QTest::newRow("maxFramerate -> restoreDefault") << "maxFramerate" << 0 << 60;
-  QTest::newRow("maxFramerate -> restoreDefault") << "maxFramerate" << -1 << 60;
-  QTest::newRow("playSpeed") << "playSpeed" << 4 << 4;
-  QTest::newRow("playSpeed") << "playSpeed" << 0 << 1;
-  QTest::newRow("playSpeed") << "playSpeed" << -1 << 1;
-
-  QTest::newRow("currentTime") << "currentTime" << 1 << 1;
-  QTest::newRow("currentTime") << "currentTime" << -1 << 0;
-  QTest::newRow("currentTime") << "currentTime" << 5 << 2;*/
+  QTest::newRow("repeat") << "repeat"
+                          << QVariant::fromValue(false)
+                          << QVariant::fromValue(false);
+  QTest::newRow("repeat") << "repeat"
+                          << QVariant::fromValue(true)
+                          << QVariant::fromValue(true);
+  QTest::newRow("maxFramerate") << "maxFramerate"
+                                << QVariant::fromValue(1.5)
+                                << QVariant::fromValue(1.5);
+  QTest::newRow("maxFramerate -> restoreDefault") << "maxFramerate"
+                                                  << QVariant::fromValue(0.)
+                                                  << QVariant::fromValue(60.);
+  QTest::newRow("maxFramerate -> restoreDefault") << "maxFramerate"
+                                                  << QVariant::fromValue(-1.)
+                                                  << QVariant::fromValue(60.);
+  QTest::newRow("playSpeed") << "playSpeed"
+                             << QVariant::fromValue(4.)
+                             << QVariant::fromValue(4.);
+  QTest::newRow("playSpeed") << "playSpeed"
+                             << QVariant::fromValue(0.)
+                             << QVariant::fromValue(1.);
+  QTest::newRow("playSpeed") << "playSpeed"
+                             << QVariant::fromValue(-1.)
+                             << QVariant::fromValue(1.);
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 CTK_TEST_MAIN(msvQTimePlayerWidgetTest)
 #include "moc_msvQTimePlayerWidgetTest.cxx"
-
-// -----------------------------------------------------------------------------
-/*int msvQTimePlayerWidgetTest(int argc, char * argv[])
-{
-  QApplication app(argc, argv);
-
-  // Get the data test files
-  const char* file0 =
-    vtkTestUtilities::ExpandDataFileName(argc,argv,"Polydata00.vtk");
-  const char* file1 =
-    vtkTestUtilities::ExpandDataFileName(argc,argv,"Polydata01.vtk");
-
-  // Create the pipeline
-  vtkNew<vtkPolyDataReader> polyDataReader;
-  vtkNew<msvVTKPolyDataFileSeriesReader> fileSeriesReader;
-  fileSeriesReader->SetReader(polyDataReader.GetPointer());
-
-  vtkNew<vtkPolyDataMapper> polyMapper;
-  polyMapper->SetInputConnection(fileSeriesReader->GetOutputPort());
-
-  // Instantiate the widget & connect him to the mapper
-  msvQTimePlayerWidget* timePlayerWidget = new msvQTimePlayerWidget();
-  timePlayerWidget->setFilter(polyMapper.GetPointer());
-
-  if (timePlayerWidget->filter()!=polyMapper.GetPointer()) {
-    std::cerr << "TimePlayerWidget unablabe to set the fileSeriesReader"
-              << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  timePlayerWidget->play(true);
-
-  fileSeriesReader->AddFileName(file0);
-  fileSeriesReader->AddFileName(file1);
-
-  // Create Instance of vtkDataObject for all outputs ports
-  // Call REQUEST_DATA_OBJECT && REQUEST_INFORMATION
-  fileSeriesReader->UpdateInformation();
-
-  // Update the Widget given the info provided
-  timePlayerWidget->updateFromFilter();
-
-  // Use player
-  timePlayerWidget->goToNextFrame();
-  timePlayerWidget->goToPreviousFrame();
-  timePlayerWidget->goToLastFrame();
-  timePlayerWidget->setCurrentTime(1.);
-  timePlayerWidget->goToFirstFrame();
-  timePlayerWidget->play(false);
-  timePlayerWidget->play(true);
-
-  // Wait until the end of the player
-  //QTimer::singleShot(50, &app, SLOT(quit()));
-  app.exec();
-
-  //return EXIT_SUCCESS;
-}*/

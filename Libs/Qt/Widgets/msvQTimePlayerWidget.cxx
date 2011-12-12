@@ -538,6 +538,7 @@ void msvQTimePlayerWidget::setPlaySpeed(double speedFactor)
 {
   Q_D(msvQTimePlayerWidget);
   speedFactor = speedFactor <= 0. ? 1. : speedFactor;
+  d->speedFactorSpinBox->setValue(speedFactor);
 
   msvQTimePlayerWidgetPrivate::PipelineInfoType
     pipeInfo = d->retrievePipelineInfo();
@@ -683,25 +684,33 @@ void msvQTimePlayerWidget::setTimeSpinBoxVisibility(bool visible)
 bool msvQTimePlayerWidget::playReverseVisibility() const
 {
   Q_D(const msvQTimePlayerWidget);
-  return d->playReverseButton->isVisible();
+  return d->playReverseButton->isVisibleTo(
+    const_cast<msvQTimePlayerWidget*>(this));
 }
 //------------------------------------------------------------------------------
 bool msvQTimePlayerWidget::boundFramesVisibility() const
 {
   Q_D(const msvQTimePlayerWidget);
-  return (d->firstFrameButton->isVisible() && d->lastFrameButton->isVisible());
+  return (d->firstFrameButton->isVisibleTo(
+            const_cast<msvQTimePlayerWidget*>(this)) &&
+          d->lastFrameButton->isVisibleTo(
+            const_cast<msvQTimePlayerWidget*>(this)));
 }
 //------------------------------------------------------------------------------
 bool msvQTimePlayerWidget::seekFrameVisibility() const
 {
   Q_D(const msvQTimePlayerWidget);
-  return (d->previousFrameButton->isVisible() && d->nextFrameButton->isVisible());
+  return (d->previousFrameButton->isVisibleTo(
+            const_cast<msvQTimePlayerWidget*>(this)) &&
+          d->nextFrameButton->isVisibleTo(
+            const_cast<msvQTimePlayerWidget*>(this)));
 }
 //------------------------------------------------------------------------------
 bool msvQTimePlayerWidget::timeSpinBoxVisibility() const
 {
   Q_D(const msvQTimePlayerWidget);
-  return d->timeSlider->isVisible();
+  return d->timeSlider->spinBox()->isVisibleTo(
+    const_cast<msvQTimePlayerWidget*>(this));
 }
 
 //------------------------------------------------------------------------------
@@ -786,6 +795,8 @@ bool msvQTimePlayerWidget::repeat() const
 void msvQTimePlayerWidget::setMaxFramerate(double frameRate)
 {
   Q_D(msvQTimePlayerWidget);
+  // Clamp frameRate min value
+  frameRate = (frameRate <= 0) ? 60 : frameRate;
   d->maxFrameRate = frameRate;
 }
 
