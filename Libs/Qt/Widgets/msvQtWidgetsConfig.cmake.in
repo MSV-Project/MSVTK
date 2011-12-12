@@ -1,0 +1,3 @@
+set(msvQtWidgets_INCLUDE_DIRS "@msvQtWidgets_INCLUDE_DIRS@")
+set(msvQtWidgets_LIB_DIR "@CMAKE_BINARY_DIR@/bin" "@CMAKE_BINARY_DIR@")
+set(QT_DIR "@QT_DIR@")
