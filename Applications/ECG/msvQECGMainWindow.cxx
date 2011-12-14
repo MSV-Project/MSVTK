@@ -32,12 +32,14 @@
 
 // VTK includes
 #include "vtkActor.h"
+#include "vtkAxesActor.h"
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkCollection.h"
 #include "vtkDelimitedTextReader.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
+#include "vtkOrientationMarkerWidget.h"
 #include "vtkPlotBar.h"
 #include "vtkPlotLine.h"
 #include "vtkPolyData.h"
@@ -58,7 +60,10 @@ protected:
   void readCartoSignal(const QFileInfo& signalFile);
   void readCartoPoints(QDir pointsFilesDirectory);
 
-  vtkSmartPointer<vtkRenderer>        threeDRenderer;
+  // Scene Rendering
+  vtkSmartPointer<vtkRenderer> threeDRenderer;
+  vtkSmartPointer<vtkAxesActor> axes;
+  vtkSmartPointer<vtkOrientationMarkerWidget> orientationMarker;
 
   // CartoSignals
   vtkSmartPointer<vtkCollection> cartoSignals;
@@ -102,6 +107,13 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   // Renderer
   this->threeDRenderer = vtkSmartPointer<vtkRenderer>::New();
   this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
+  this->threeDRenderer->SetBackground2(0.2, 0.4, 0.8);
+  this->threeDRenderer->SetGradientBackground(true);
+
+  this->axes = vtkSmartPointer<vtkAxesActor>::New();
+  this->orientationMarker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+  this->orientationMarker->SetOutlineColor(0.9300, 0.5700, 0.1300);
+  this->orientationMarker->SetOrientationMarker(axes);
 
   // CartoSignals
   this->cartoSignals = vtkSmartPointer<vtkCollection>::New();
@@ -198,6 +210,12 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 void msvQECGMainWindowPrivate::setupView()
 {
   this->threeDView->GetRenderWindow()->AddRenderer(this->threeDRenderer);
+
+  // Marker annotation
+  this->orientationMarker->SetInteractor
+    (this->threeDRenderer->GetRenderWindow()->GetInteractor());
+  this->orientationMarker->SetEnabled(1);
+  this->orientationMarker->InteractiveOn();
 }
 
 //------------------------------------------------------------------------------
