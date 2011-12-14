@@ -32,12 +32,18 @@
 
 // VTK includes
 #include "vtkActor.h"
+#include "vtkAxis.h"
+#include "vtkChartXY.h"
+#include "vtkCollection.h"
+#include "vtkDelimitedTextReader.h"
 #include "vtkNew.h"
+#include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkTable.h"
 
 //------------------------------------------------------------------------------
 class msvQECGMainWindowPrivate: public Ui_msvQECGMainWindow
@@ -46,9 +52,15 @@ class msvQECGMainWindowPrivate: public Ui_msvQECGMainWindow
 protected:
   msvQECGMainWindow* const q_ptr;
 
-  void readCartoPoints(QDir&);
+  void readCartoSignals(QDir signalsFilesDirectory);
+  void readCartoSignal(const QFileInfo& signalFile);
+  void readCartoPoints(QDir pointsFilesDirectory);
 
   vtkSmartPointer<vtkRenderer>        threeDRenderer;
+
+  // CartoSignals
+  vtkSmartPointer<vtkCollection> cartoSignals;
+  vtkSmartPointer<vtkPlotLine> signalPlot;
 
   // CartoPoints Pipeline
   vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
@@ -86,6 +98,9 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   // Renderer
   this->threeDRenderer = vtkSmartPointer<vtkRenderer>::New();
   this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
+
+  // CartoSignals
+  this->cartoSignals = vtkSmartPointer<vtkCollection>::New();
 
   // CartoPoints Readers
   this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
@@ -136,6 +151,8 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   Q_Q(msvQECGMainWindow);
 
   this->Ui_msvQECGMainWindow::setupUi(mainWindow);
+  this->ecgReviewPanel->setVisible(false);
+  q->setStatusBar(0);
 
   // Connect Menu ToolBars actions
   q->connect(this->actionOpen, SIGNAL(triggered()), q, SLOT(openData()));
@@ -143,10 +160,22 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   q->connect(this->actionExit, SIGNAL(triggered()), q, SLOT(close()));
 
   // Playback Controller
-  q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)), q, SLOT(updateView()));
+  q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
+             q, SLOT(updateView()));
 
   // Associate the TimePlayerWidget to the sink (mapper)
   this->timePlayerWidget->setFilter(this->cartoPointsMapper);
+
+  q->qvtkConnect(this->buttonsManager, vtkCommand::InteractionEvent,
+                 q, SLOT(onPointSelected()));
+
+  // Initialize signal view
+  this->signalPlot = vtkSmartPointer<vtkPlotLine>::New();
+  this->signalPlot->SetWidth(1.);
+  this->signalPlot->SetColor(1., 0., 0.);
+  this->ecgView->chart()->GetAxis(vtkAxis::BOTTOM)->SetTitle("Time (ms)");
+  this->ecgView->chart()->GetAxis(vtkAxis::LEFT)->SetTitle("Voltage (mV)");
+  this->ecgView->addPlot(this->signalPlot);
 }
 
 //------------------------------------------------------------------------------
@@ -178,19 +207,25 @@ void msvQECGMainWindowPrivate::updateView()
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 {
+  Q_Q(msvQECGMainWindow);
   QDir dir(rootDirectory);
 
-  //if (dir.cd(QString("CartoSignals"))) {
-  //  this->readCartoSignals
-  //  dir.cd(QString(".."))
-  //}
+  if (dir.cd(QString("CartoSignals"))) {
+    this->readCartoSignals(dir);
+    dir.cdUp();
+  }
 
   if (dir.cd(QString("CartoPoints")))
     this->readCartoPoints(dir);
 
   // Link to the cartoPoints the buttons
   this->polyDataReader->Update();
+  this->buttonsManager->SetNumberOfButtonWidgets(
+    this->cartoSignals->GetNumberOfItems());
   this->buttonsManager->Init(this->polyDataReader->GetOutput());
+  // Should select the first point by default via the button manager.
+  //this->buttonsManager->SetCurrentPoint(0);
+  q->setCurrentSignal(0);
 
   // Render
   double extent[6];
@@ -201,7 +236,7 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 }
 
 //------------------------------------------------------------------------------
-void msvQECGMainWindowPrivate::readCartoPoints(QDir& dir)
+void msvQECGMainWindowPrivate::readCartoPoints(QDir dir)
 {
   // Set file series patterns recognition
   QStringList filters;
@@ -213,10 +248,10 @@ void msvQECGMainWindowPrivate::readCartoPoints(QDir& dir)
   qSort(files.begin(), files.end(), msvQECGMainWindowPrivate::fileLessThan);
 
   // Fill the FileSerieReader
-  QStringList::const_iterator constIt;
-  for (constIt = files.constBegin(); constIt != files.constEnd(); ++constIt)
+  foreach(const QString& file, files){
     this->cartoPointsReader->AddFileName(
-      dir.filePath(*constIt).toLocal8Bit().constData());
+      dir.filePath(file).toLatin1().constData());
+  }
 
   // Create Instance of vtkDataObject for all outputs ports
   // Calls REQUEST_DATA_OBJECT && REQUEST_INFORMATION
@@ -225,6 +260,37 @@ void msvQECGMainWindowPrivate::readCartoPoints(QDir& dir)
 
   // Update the Widget given the info provided
   this->timePlayerWidget->updateFromFilter();
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindowPrivate::readCartoSignals(QDir dir)
+{
+  // Set file series patterns recognition
+  QStringList signalFileFilters;
+  signalFileFilters << "*.csv";
+  dir.setNameFilters(signalFileFilters);
+  QStringList signalFiles = dir.entryList(QDir::Files,QDir::Name);
+
+  // Resort files using their index number
+  qSort(signalFiles.begin(), signalFiles.end(),
+        msvQECGMainWindowPrivate::fileLessThan);
+
+  // Fill the FileSerieReader
+  foreach(const QString& signalFile, signalFiles)
+    {
+    this->readCartoSignal(QFileInfo(dir, signalFile));
+    }
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindowPrivate::readCartoSignal(const QFileInfo& signalsFile)
+{
+  vtkNew<vtkDelimitedTextReader> reader;
+  reader->SetDetectNumericColumns(true);
+  reader->SetHaveHeaders(true);
+  reader->SetFileName(signalsFile.absoluteFilePath().toLatin1().constData());
+
+  this->cartoSignals->AddItem(reader.GetPointer());
 }
 
 //------------------------------------------------------------------------------
@@ -264,10 +330,10 @@ void msvQECGMainWindow::openData()
 {
   Q_D(msvQECGMainWindow);
 
-  QString dir = QFileDialog::getExistingDirectory(
-    this, tr("Select root CartoData Folder"), QDir::homePath(),
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-
+  //QString dir = QFileDialog::getExistingDirectory(
+  //  this, tr("Select root CartoData Folder"), QDir::homePath(),
+  //  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  QString dir("f:\\work\\data\\MSV\\CartoData\\CartoData");
   if (dir.isEmpty())
     return;
 
@@ -291,4 +357,28 @@ void msvQECGMainWindow::updateView()
   Q_D(msvQECGMainWindow);
 
   d->updateView();
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindow::setCurrentSignal(int pointId)
+{
+  Q_D(msvQECGMainWindow);
+  vtkTableAlgorithm* cartoSignalsTable = vtkTableAlgorithm::SafeDownCast(
+    d->cartoSignals->GetItemAsObject(pointId));
+  cartoSignalsTable->Update();
+  int xCol = 0;
+  int yCol = 1;
+  d->signalPlot->SetInput(cartoSignalsTable->GetOutput(), xCol, yCol);
+  d->signalPlot->Update();
+  d->ecgView->boundAxesToChartBounds();
+  d->ecgView->setAxesToChartBounds();
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindow::onPointSelected()
+{
+  Q_D(msvQECGMainWindow);
+  //int pointId = d->buttonsManager->GetSelectedPoint()
+  int pointId = rand() % d->buttonsManager->GetNumberOfButtonWidgets();
+  this->setCurrentSignal(pointId);
 }

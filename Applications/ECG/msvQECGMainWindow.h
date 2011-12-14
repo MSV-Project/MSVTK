@@ -24,6 +24,9 @@
 // Qt includes
 #include <QMainWindow>
 
+// CTK includes
+#include <ctkVTKObject.h>
+
 // ECG includes
 #include "msvECGExport.h"
 
@@ -32,6 +35,7 @@ class msvQECGMainWindowPrivate;
 class MSV_ECG_EXPORT msvQECGMainWindow : public QMainWindow
 {
   Q_OBJECT
+  QVTK_OBJECT
 public:
   typedef QMainWindow Superclass;
   msvQECGMainWindow(QWidget *parent=0);
@@ -41,6 +45,10 @@ public slots:
   void openData();
   void closeData();
   void updateView();
+  void setCurrentSignal(int pointId);
+
+protected slots:
+  void onPointSelected();
 
 protected:
   QScopedPointer<msvQECGMainWindowPrivate> d_ptr;

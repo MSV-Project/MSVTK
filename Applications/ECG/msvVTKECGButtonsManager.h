@@ -64,13 +64,13 @@ public:
                                    void *clientData,
                                    void *callData);
 
-  virtual void Init(vtkPolyData*);                // Initialize vtkButtonsWidget
+  virtual void Init(vtkPolyData* points);         // Initialize vtkButtonsWidget
   virtual void Clear();                           // Clear Buttons Manager
   virtual void UpdateButtonWidgets(vtkPolyData*); // Update from the vtkPolyData
 
 protected:
-  msvVTKECGButtonsManager(int n=5);
-  ~msvVTKECGButtonsManager();
+  msvVTKECGButtonsManager();
+  virtual ~msvVTKECGButtonsManager();
 
   int           NumberOfButtonWidgets;
   int           MaxNumberOfButtonWidgets;

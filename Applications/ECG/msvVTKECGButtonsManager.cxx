@@ -193,10 +193,11 @@ void msvVTKECGButtonsManager::vtkInternal::ClearButtons()
 // vtkMRMLSliceModelDisplayableManager methods
 
 //------------------------------------------------------------------------------
-msvVTKECGButtonsManager::msvVTKECGButtonsManager(int n):NumberOfButtonWidgets(n)
+msvVTKECGButtonsManager::msvVTKECGButtonsManager()
 {
   this->Internal = new vtkInternal(this);
 
+  this->NumberOfButtonWidgets = 0;
   this->MaxNumberOfButtonWidgets = 100;
   this->ButtonWidgetSize = 3,
   this->Renderer = 0;
@@ -289,8 +290,10 @@ void msvVTKECGButtonsManager::ProcessWidgetsEvents(vtkObject *caller,
     {
     widget->InvokeEvent(vtkCommand::InteractionEvent, NULL);
     }
+  self->InvokeEvent(vtkCommand::InteractionEvent);
 }
 
+//------------------------------------------------------------------------------
 void msvVTKECGButtonsManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os,indent);
