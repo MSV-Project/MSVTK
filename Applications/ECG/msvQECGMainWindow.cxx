@@ -36,7 +36,9 @@
 #include "vtkChartXY.h"
 #include "vtkCollection.h"
 #include "vtkDelimitedTextReader.h"
+#include "vtkDoubleArray.h"
 #include "vtkNew.h"
+#include "vtkPlotBar.h"
 #include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -61,6 +63,8 @@ protected:
   // CartoSignals
   vtkSmartPointer<vtkCollection> cartoSignals;
   vtkSmartPointer<vtkPlotLine> signalPlot;
+  vtkSmartPointer<vtkPlotLine> currentTimePlot;
+  vtkSmartPointer<vtkTable> currentTimeLine;
 
   // CartoPoints Pipeline
   vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
@@ -101,6 +105,18 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
 
   // CartoSignals
   this->cartoSignals = vtkSmartPointer<vtkCollection>::New();
+  this->currentTimeLine = vtkSmartPointer<vtkTable>::New();
+  vtkNew<vtkDoubleArray> xCoords;
+  xCoords->SetName("Time (ms)");
+  xCoords->InsertNextValue(-1.);
+  xCoords->InsertNextValue(-1.);
+  this->currentTimeLine->AddColumn(xCoords.GetPointer());
+
+  vtkNew<vtkDoubleArray> yCoords;
+  yCoords->SetName("Vertical bar");
+  yCoords->InsertNextValue(0.);
+  yCoords->InsertNextValue(1.);
+  this->currentTimeLine->AddColumn(yCoords.GetPointer());
 
   // CartoPoints Readers
   this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
@@ -161,7 +177,7 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   // Playback Controller
   q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
-             q, SLOT(updateView()));
+             q, SLOT(onCurrentTimeChanged(double)));
 
   // Associate the TimePlayerWidget to the sink (mapper)
   this->timePlayerWidget->setFilter(this->cartoPointsMapper);
@@ -176,6 +192,15 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   this->ecgView->chart()->GetAxis(vtkAxis::BOTTOM)->SetTitle("Time (ms)");
   this->ecgView->chart()->GetAxis(vtkAxis::LEFT)->SetTitle("Voltage (mV)");
   this->ecgView->addPlot(this->signalPlot);
+  // Vertical bar for current time
+  this->currentTimePlot = vtkSmartPointer<vtkPlotLine>::New();
+  this->currentTimePlot->SetInput(this->currentTimeLine, 0, 1);
+  // top right corner
+  this->ecgView->addPlot(this->currentTimePlot);
+  this->ecgView->chart()->SetPlotCorner(this->currentTimePlot, 2);
+  this->ecgView->chart()->GetAxis(vtkAxis::TOP)->SetVisible(false);
+  this->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetVisible(false);
+  this->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetRange(0., 1.);
 }
 
 //------------------------------------------------------------------------------
@@ -371,6 +396,13 @@ void msvQECGMainWindow::setCurrentSignal(int pointId)
   d->signalPlot->Update();
   d->ecgView->boundAxesToChartBounds();
   d->ecgView->setAxesToChartBounds();
+  d->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetMinimumLimit(0.);
+  d->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetMaximumLimit(1.);
+  d->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetRange(0., 1.);
+  d->ecgView->chart()->GetAxis(vtkAxis::TOP)->SetMinimumLimit(0.);
+  d->ecgView->chart()->GetAxis(vtkAxis::TOP)->SetMaximumLimit(2500.);
+  d->ecgView->chart()->GetAxis(vtkAxis::TOP)->SetRange(0., 2500.);
+  this->onCurrentTimeChanged(d->timePlayerWidget->currentTime());
 }
 
 //------------------------------------------------------------------------------
@@ -380,4 +412,19 @@ void msvQECGMainWindow::onPointSelected()
   //int pointId = d->buttonsManager->GetSelectedPoint()
   int pointId = rand() % d->buttonsManager->GetNumberOfButtonWidgets();
   this->setCurrentSignal(pointId);
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindow::onCurrentTimeChanged(double time)
+{
+  Q_D(msvQECGMainWindow);
+  // update signal chart
+  vtkDoubleArray* xCoords = vtkDoubleArray::SafeDownCast(
+    d->currentTimeLine->GetColumn(0));
+  xCoords->SetValue(0, time);
+  xCoords->SetValue(1, time);
+  d->currentTimeLine->Modified();
+  d->ecgView->update();
+  // update 3D view
+  this->updateView();
 }

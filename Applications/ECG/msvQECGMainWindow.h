@@ -49,6 +49,7 @@ public slots:
 
 protected slots:
   void onPointSelected();
+  void onCurrentTimeChanged(double);
 
 protected:
   QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
