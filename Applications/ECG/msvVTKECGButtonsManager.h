@@ -52,11 +52,16 @@ public:
   vtkSetMacro(MaxNumberOfButtonWidgets,int);
   vtkGetMacro(MaxNumberOfButtonWidgets,int);
 
-
   // Description:
   // Set / Get the number of widgetButtons in our scene.
   void SetNumberOfButtonWidgets(int);
   vtkGetMacro(NumberOfButtonWidgets,int);
+
+  // Description:
+  // Set / get the last selected buttonWidget
+  void SetLastSelectedButton(vtkIdType);
+  vtkIdType GetLastSelectedButton() const;
+  int GetIndexFromButtonId(vtkIdType) const;
 
   /// Callback using to process the widgets events
   static void ProcessWidgetsEvents(vtkObject *caller,

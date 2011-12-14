@@ -418,8 +418,8 @@ void msvQECGMainWindow::setCurrentSignal(int pointId)
 void msvQECGMainWindow::onPointSelected()
 {
   Q_D(msvQECGMainWindow);
-  //int pointId = d->buttonsManager->GetSelectedPoint()
-  int pointId = rand() % d->buttonsManager->GetNumberOfButtonWidgets();
+  int pointId = d->buttonsManager->GetIndexFromButtonId(
+    d->buttonsManager->GetLastSelectedButton());
   this->setCurrentSignal(pointId);
 }
 
