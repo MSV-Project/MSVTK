@@ -330,10 +330,9 @@ void msvQECGMainWindow::openData()
 {
   Q_D(msvQECGMainWindow);
 
-  //QString dir = QFileDialog::getExistingDirectory(
-  //  this, tr("Select root CartoData Folder"), QDir::homePath(),
-  //  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-  QString dir("f:\\work\\data\\MSV\\CartoData\\CartoData");
+  QString dir = QFileDialog::getExistingDirectory(
+    this, tr("Select root CartoData Folder"), QDir::homePath(),
+    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
   if (dir.isEmpty())
     return;
 
