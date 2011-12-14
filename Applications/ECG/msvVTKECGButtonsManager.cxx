@@ -123,6 +123,7 @@ void msvVTKECGButtonsManager::vtkInternal::CreateButtonWidgets()
   // Define the callback
   vtkSmartPointer<vtkCallbackCommand> widgetCallback =
     vtkSmartPointer<vtkCallbackCommand>::New();
+  widgetCallback->SetClientData(this->External);
   widgetCallback->SetCallback(msvVTKECGButtonsManager::ProcessWidgetsEvents);
 
   // Main loop instantiation
