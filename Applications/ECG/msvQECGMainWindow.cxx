@@ -185,22 +185,13 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   q->qvtkConnect(this->buttonsManager, vtkCommand::InteractionEvent,
                  q, SLOT(onPointSelected()));
 
-  // Initialize signal view
-  this->signalPlot = vtkSmartPointer<vtkPlotLine>::New();
-  this->signalPlot->SetWidth(1.);
-  this->signalPlot->SetColor(1., 0., 0.);
+  this->ecgView->chart()->SetAutoAxes(false);
   this->ecgView->chart()->GetAxis(vtkAxis::BOTTOM)->SetTitle("Time (ms)");
   this->ecgView->chart()->GetAxis(vtkAxis::LEFT)->SetTitle("Voltage (mV)");
-  this->ecgView->addPlot(this->signalPlot);
-  // Vertical bar for current time
-  this->currentTimePlot = vtkSmartPointer<vtkPlotLine>::New();
-  this->currentTimePlot->SetInput(this->currentTimeLine, 0, 1);
-  // top right corner
-  this->ecgView->addPlot(this->currentTimePlot);
-  this->ecgView->chart()->SetPlotCorner(this->currentTimePlot, 2);
   this->ecgView->chart()->GetAxis(vtkAxis::TOP)->SetVisible(false);
   this->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetVisible(false);
-  this->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetRange(0., 1.);
+  this->ecgView->chart()->GetAxis(vtkAxis::TOP)->SetBehavior(vtkAxis::CUSTOM);
+  this->ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetBehavior(vtkAxis::CUSTOM);
 }
 
 //------------------------------------------------------------------------------
@@ -387,6 +378,24 @@ void msvQECGMainWindow::updateView()
 void msvQECGMainWindow::setCurrentSignal(int pointId)
 {
   Q_D(msvQECGMainWindow);
+  d->ecgView->removeAllPlots();
+
+  if (pointId < 0)
+    {
+    return;
+    }
+  // Initialize signal view
+  d->signalPlot = vtkSmartPointer<vtkPlotLine>::New();
+  d->signalPlot->SetWidth(1.);
+  d->signalPlot->SetColor(1., 0., 0.);
+  d->ecgView->addPlot(d->signalPlot);
+  // Vertical bar for current time
+  d->currentTimePlot = vtkSmartPointer<vtkPlotLine>::New();
+  d->currentTimePlot->SetInput(d->currentTimeLine, 0, 1);
+  // top right corner
+  d->ecgView->addPlot(d->currentTimePlot);
+  d->ecgView->chart()->SetPlotCorner(d->currentTimePlot, 2);
+
   vtkTableAlgorithm* cartoSignalsTable = vtkTableAlgorithm::SafeDownCast(
     d->cartoSignals->GetItemAsObject(pointId));
   cartoSignalsTable->Update();
