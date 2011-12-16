@@ -57,7 +57,7 @@ class MSV_QT_WIDGETS_EXPORT msvQTimePlayerWidget : public QWidget
   /// Enable/Disable the visibility of the firstFrame and lastFrame buttons.
   Q_PROPERTY(bool boundFramesVisibility READ boundFramesVisibility WRITE setBoundFramesVisibility)
   /// Enable/Disable the visibility of the seekBackward and seekForward buttons.
-  Q_PROPERTY(bool seekFramesVisibility READ seekFrameVisibility WRITE setSeekFrameVisibility)
+  Q_PROPERTY(bool goToVisibility READ goToVisibility WRITE setGoToVisibility)
   /// Enable/Disable the visibility of time spinBox
   Q_PROPERTY(bool timeSpinBoxVisibility READ timeSpinBoxVisibility WRITE setTimeSpinBoxVisibility)
 
@@ -93,10 +93,6 @@ public:
   void setFilter(vtkAlgorithm* algo);
   vtkAlgorithm* filter() const;
 
-  // Description
-  // Get the timeSliderWidget.
-  ctkSliderWidget* timeSliderWidget();
-
   // Icons accessors
   void setfirstFrameIcon(const QIcon&);
   QIcon firstFrameIcon() const;
@@ -118,8 +114,8 @@ public:
   bool playReverseVisibility() const;
   void setBoundFramesVisibility(bool visible);
   bool boundFramesVisibility() const;
-  void setSeekFrameVisibility(bool visible);
-  bool seekFrameVisibility() const;
+  void setGoToVisibility(bool visible);
+  bool goToVisibility() const;
   void setTimeSpinBoxVisibility(bool visible);
   bool timeSpinBoxVisibility() const;
 
@@ -149,21 +145,24 @@ public slots:
   virtual void goToNextFrame();
   virtual void goToLastFrame();
 
-  void play(bool playPause);
   virtual void play();
   virtual void pause();
+  void play(bool playPause);
+  void onPlay(bool);
+  void onPlayReverse(bool);
   void stop();
 
   virtual void updateFromFilter();
 
 protected slots:
   virtual void onTick();
-  virtual void onPlay(bool);
-  virtual void onPlayReverse(bool);
 
 signals:
   // emitted when the time has been changed
   void currentTimeChanged(double);
+
+  // emitted when the internal timer send a timeout
+  void onTimeout();
 
   // emitted with playing(true) when play begins and
   // playing(false) when play ends.

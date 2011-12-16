@@ -76,12 +76,11 @@ public:
     double timePreviousFrame() const; // Get the time corresponding to the previous frame.
     };
   PipelineInfoType retrievePipelineInfo();            // Get pipeline information.
-  virtual void requestData(double);                   // Request Data by time
   virtual void processRequest(double);                // Request Data and Update
   virtual bool isConnected();                         // Check if the pipeline is ready
-  virtual void processRequest(const PipelineInfoType&, double);
-  virtual void requestData(const PipelineInfoType&, double);
-  virtual void updateUi(const PipelineInfoType&);
+  virtual void processRequest(const PipelineInfoType&, double); // Request Data and Update
+  virtual void requestData(const PipelineInfoType&, double);    // Request Data by time
+  virtual void updateUi(const PipelineInfoType&);               // Update the widget giving pipeline statut
 };
 
 //------------------------------------------------------------------------------
@@ -242,13 +241,6 @@ void msvQTimePlayerWidgetPrivate::updateUi(const PipelineInfoType& pipeInfo)
 }
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidgetPrivate::requestData(double time)
-{
-  PipelineInfoType pipeInfo = this->retrievePipelineInfo();
-  this->requestData(pipeInfo, time);
-}
-
-//------------------------------------------------------------------------------
 void msvQTimePlayerWidgetPrivate::requestData(const PipelineInfoType& pipeInfo,
                                               double time)
 {
@@ -341,13 +333,6 @@ void msvQTimePlayerWidget::updateFromFilter()
 }
 
 //------------------------------------------------------------------------------
-ctkSliderWidget* msvQTimePlayerWidget::timeSliderWidget()
-{
-  Q_D(msvQTimePlayerWidget);
-  return d->timeSlider;
-}
-
-//------------------------------------------------------------------------------
 void msvQTimePlayerWidget::goToFirstFrame()
 {
   Q_D(msvQTimePlayerWidget);
@@ -422,6 +407,13 @@ void msvQTimePlayerWidget::play()
       d->playReverseButton->setChecked(false);
       d->playReverseButton->blockSignals(false);
 
+      // Use when set the play by script
+      if (!d->playButton->isChecked()) {
+        d->playButton->blockSignals(true);
+        d->playButton->setChecked(true);
+        d->playButton->blockSignals(false);
+      }
+
     // We reset the Slider to the initial value if we play from the end
     if (pipeInfo.lastTimeRequest == pipeInfo.timeRange[1])
       d->timeSlider->setValue(pipeInfo.timeRange[0]);
@@ -431,7 +423,14 @@ void msvQTimePlayerWidget::play()
       d->playButton->setChecked(false);
       d->playButton->blockSignals(false);
 
-    // We reset the Slider to the initial value if we play from the end
+      // Use when set the play by script
+      if (!d->playReverseButton->isChecked()) {
+        d->playReverseButton->blockSignals(true);
+        d->playReverseButton->setChecked(true);
+        d->playReverseButton->blockSignals(false);
+      }
+
+    // We reset the Slider to the initial value if we play from the beginning
     if (pipeInfo.lastTimeRequest == pipeInfo.timeRange[0])
       d->timeSlider->setValue(pipeInfo.timeRange[1]);
   }
@@ -487,6 +486,9 @@ void msvQTimePlayerWidget::onTick()
 {
   Q_D(msvQTimePlayerWidget);
 
+  // Forward the internal timer timeout signal
+  emit this->onTimeout();
+
   // Fetch pipeline information
   msvQTimePlayerWidgetPrivate::PipelineInfoType
     pipeInfo = d->retrievePipelineInfo();
@@ -524,7 +526,6 @@ void msvQTimePlayerWidget::onTick()
 
   d->processRequest(pipeInfo, timeRequest);
 }
-
 
 //------------------------------------------------------------------------------
 void msvQTimePlayerWidget::setCurrentTime(double time)
@@ -666,7 +667,7 @@ void msvQTimePlayerWidget::setBoundFramesVisibility(bool visible)
   d->lastFrameButton->setVisible(visible);
 }
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::setSeekFrameVisibility(bool visible)
+void msvQTimePlayerWidget::setGoToVisibility(bool visible)
 {
   Q_D(msvQTimePlayerWidget);
 
@@ -697,7 +698,7 @@ bool msvQTimePlayerWidget::boundFramesVisibility() const
             const_cast<msvQTimePlayerWidget*>(this)));
 }
 //------------------------------------------------------------------------------
-bool msvQTimePlayerWidget::seekFrameVisibility() const
+bool msvQTimePlayerWidget::goToVisibility() const
 {
   Q_D(const msvQTimePlayerWidget);
   return (d->previousFrameButton->isVisibleTo(

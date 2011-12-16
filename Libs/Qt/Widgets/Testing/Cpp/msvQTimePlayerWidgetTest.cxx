@@ -116,7 +116,7 @@ void msvQTimePlayerWidgetTester::testButtonProperties_data()
   QTest::newRow("boundFramesVisibility") << "boundFramesVisibility"
                                          << QVariant::fromValue(false)
                                          << QVariant::fromValue(false);
-  QTest::newRow("seekFrameVisibility") << "seekFrameVisibility"
+  QTest::newRow("goToVisibility") << "goToVisibility"
                                        << QVariant::fromValue(false)
                                        << QVariant::fromValue(false);
   QTest::newRow("timeSpinBoxVisibility") << "timeSpinBoxVisibility"

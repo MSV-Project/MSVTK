@@ -20,6 +20,7 @@
 
 // QT includes
 #include <QApplication>
+#include <QEventLoop>
 #include <QTimer>
 
 // MSVTK
@@ -100,18 +101,73 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
     return EXIT_FAILURE;
     }
 
-  // Use player
+  // Use player basics
   timePlayerWidget->goToNextFrame();
   timePlayerWidget->goToPreviousFrame();
   timePlayerWidget->goToLastFrame();
   timePlayerWidget->setCurrentTime(1.);
   timePlayerWidget->goToFirstFrame();
   timePlayerWidget->play(false);
-  timePlayerWidget->play(true);
+  timePlayerWidget->onPlay(true);
+  timePlayerWidget->onPlayReverse(true);
+  timePlayerWidget->pause();
+  timePlayerWidget->stop();
+
+  // We reset the Slider to the initial value if we play from the end
+  timePlayerWidget->goToLastFrame();
+  timePlayerWidget->onPlay(true);
+
+  QEventLoop* loop = new QEventLoop();
+  QObject::connect(timePlayerWidget, SIGNAL(onTimeout()), loop, SLOT(quit()));
+
+  // When the time arrives at the end of the range, it stops itself
+  // when it plays in the forward direction.
+  timePlayerWidget->goToFirstFrame();
+  timePlayerWidget->setRepeat(false);
+  timePlayerWidget->onPlay(true);
+  loop->exec();
+  loop->exec();
+  if (timePlayerWidget->currentTime() != 1) {
+    std::cerr << "The timer has not stopped at the end as expected."
+              << std::endl;
+    }
+
+  // When the time arrives at the beginning of the range, it stops itself
+  // when it plays in the backward direction.
+  timePlayerWidget->goToLastFrame();
+  timePlayerWidget->onPlayReverse(true);
+  loop->exec();
+  loop->exec();
+  if (timePlayerWidget->currentTime() != 0) {
+    std::cerr << "The timer has not stopped at the beginning as expected."
+              << std::endl;
+    }
+
+  // When the time arrives at the end of the range, it loops
+  // when it plays in the forward direction.
+  timePlayerWidget->goToFirstFrame();
+  timePlayerWidget->setRepeat(true);
+  timePlayerWidget->onPlay(true);
+  loop->exec();
+  loop->exec();
+  if (timePlayerWidget->currentTime() != 0) {
+    std::cerr << "The timer has stopped, instead of looping."
+              << std::endl;
+  }
+
+  // When the time arrives at the beginning of the range, it loops
+  // when it plays in the backward direction.
+  timePlayerWidget->goToLastFrame();
+  timePlayerWidget->setRepeat(true);
+  timePlayerWidget->onPlayReverse(true);
+  loop->exec();
+  loop->exec();
+  if (timePlayerWidget->currentTime() != 1) {
+    std::cerr << "The timer has stopped, instead of looping."
+              << std::endl;
+  }
 
   // Wait until the end of the player
   QTimer::singleShot(50, &app, SLOT(quit()));
-  app.exec();
-
-  return EXIT_SUCCESS;
+  return app.exec();
 }
