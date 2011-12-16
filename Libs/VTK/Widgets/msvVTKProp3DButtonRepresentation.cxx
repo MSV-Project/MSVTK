@@ -213,9 +213,9 @@ void msvVTKProp3DButtonRepresentation::PlaceWidget(double bds[6])
 
     // Calcul of the translation
     double translation[3];
-    translation[0] = center[0] - (aBds[0]+aBds[1]) / 2.0;
-    translation[1] = center[1] - (aBds[2]+aBds[3]) / 2.0;
-    translation[2] = center[2] - (aBds[4]+aBds[5]) / 2.0;
+    translation[0] = center[0] - aCenter[0];
+    translation[1] = center[1] - aCenter[1];
+    translation[2] = center[2] - aCenter[2];
 
     vtkNew<vtkTransform> transform;
     transform->PostMultiply();

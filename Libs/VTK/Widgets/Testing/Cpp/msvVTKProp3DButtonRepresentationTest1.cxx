@@ -66,6 +66,22 @@ int msvVTKProp3DButtonRepresentationTest1(int, char* [])
   cubeActor->SetMapper(cubeMapper.GetPointer());
 
   vtkNew<msvVTKProp3DButtonRepresentation> prop3DButtonRep;
+
+  double* initBounds = prop3DButtonRep->GetBounds();
+  if (initBounds)
+    {
+    std::cerr << "Error: bounds retrieved from an empty representation."
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Check rendering on an empty representation.
+  prop3DButtonRep->RenderVolumetricGeometry(render.GetPointer());
+  prop3DButtonRep->RenderOpaqueGeometry(render.GetPointer());
+  prop3DButtonRep->RenderTranslucentPolygonalGeometry(render.GetPointer());
+  prop3DButtonRep->HasTranslucentPolygonalGeometry();
+
+  // Initialize
   prop3DButtonRep->SetNumberOfStates(2);
   prop3DButtonRep->SetButtonProp(0,tetActor.GetPointer());
   prop3DButtonRep->SetButtonProp(1,cubeActor.GetPointer());
