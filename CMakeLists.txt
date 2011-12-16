@@ -190,12 +190,18 @@ if(BUILD_TESTING)
   include(CTest)
   set(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
+  # DashBoard
+  configure_file(
+    ${MSVTK_SOURCE_DIR}/CTestConfig.cmake
+    ${MSVTK_BINARY_DIR}/CTestConfig.cmake
+    COPYONLY)
+
   # Setup file for setting custom ctest vars
-  #CONFIGURE_FILE(
-  #  CMake/CTestCustom.cmake.in
-  #  ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
-  #  @ONLY
-  #  )
+  CONFIGURE_FILE(
+    CMake/CTestCustom.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
+    @ONLY
+    )
 
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "
