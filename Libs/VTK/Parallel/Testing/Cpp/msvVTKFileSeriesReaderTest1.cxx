@@ -50,6 +50,7 @@ public:
 
   virtual int CanReadFile(const char* filename)
   {
+    //this->Superclass::CanReadFile(filename);
     if (!this->Reader)
       {
       return 0;
@@ -123,7 +124,29 @@ int msvVTKFileSeriesReaderTest1(int argc, char* argv[])
   vtkNew<vtkPolyDataReader> polyDataReader;
   vtkNew<msvVTKTestPolyDataFileSeriesReader> fileSeriesReader;
 
+  if (fileSeriesReader->CanReadFile(file0))
+    {
+    std::cerr << "Error: method CanReadFile must return 0 when no reader set."
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
   fileSeriesReader->SetReader(polyDataReader.GetPointer());
+  if (fileSeriesReader->GetReader() != polyDataReader.GetPointer())
+    {
+    std::cerr << "Error: internal reader is not the one expected." << std::endl;
+    return EXIT_FAILURE;
+    }
+  if (msvVTKFileSeriesReader::CanReadFile(polyDataReader.GetPointer(), file0))
+    {
+    std::cerr << "Error: static method CanReadFile must return 0." << std::endl;
+    return EXIT_FAILURE;
+    }
+  if (fileSeriesReader->GetFileNameMethod())
+    {
+    std::cerr << "Error: FileNameMethod must not be set." << std::endl;
+    return EXIT_FAILURE;
+    }
 
   fileSeriesReader->GetMTime();
   fileSeriesReader->RemoveAllFileNames();
@@ -135,6 +158,53 @@ int msvVTKFileSeriesReaderTest1(int argc, char* argv[])
     {
     std::cerr << "Error: NumberOfFileNames != to the number of file added"
               << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (fileSeriesReader->GetMetaFileName())
+    {
+    std::cerr << "Error: return a metafileName when none set." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  fileSeriesReader->SetUseMetaFile(true);
+  if (!fileSeriesReader->GetUseMetaFile())
+    {
+    std::cerr << "Error: UseMetaFile true not set." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (fileSeriesReader->CanReadFile(file0))
+    {
+    std::cerr << "Error: filename doesn not really points to a metafile, "
+              << "must return 0" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  fileSeriesReader->UseMetaFileOff();
+  if (fileSeriesReader->GetUseMetaFile())
+    {
+    std::cerr << "Error: UseMetaFile boolean not set." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (!fileSeriesReader->CanReadFile(file0))
+    {
+    std::cerr << "Error: reader must be able to read the file." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  fileSeriesReader->SetIgnoreReaderTime(false);
+  if (fileSeriesReader->GetIgnoreReaderTime())
+    {
+    std::cerr << "Error: IgnoreReaderTime false not set." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  fileSeriesReader->IgnoreReaderTimeOn();
+  if (!fileSeriesReader->GetIgnoreReaderTime())
+    {
+    std::cerr << "Error: IgnoreReaderTime boolean not set." << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -198,6 +268,16 @@ int msvVTKFileSeriesReaderTest1(int argc, char* argv[])
     GetOutputInformation()->GetInformationObject(0)->
     Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
+  if (strcmp(fileSeriesReader->GetCurrentFileName(), file1))
+    {
+    std::cerr << "Error: GetCurrentFileName different than expected: "
+              << std::endl
+              << "Expected fileName: " << file1 << std::endl
+              << "Filename retrived: " << fileSeriesReader->GetCurrentFileName()
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
   if (numberOfTimeSteps < 2)
     {
     std::cerr << "Error: Wrong Time Steps initialization." << std::endl;
@@ -216,6 +296,21 @@ int msvVTKFileSeriesReaderTest1(int argc, char* argv[])
 
   fileSeriesReader->ProcessRequest(
     nextFrameReq.GetPointer(), 0, nextFrameOutputs.GetPointer());
+
+  double timeOutputTimeRange[2] = {0,250};
+  fileSeriesReader->SetOutputTimeRange(timeOutputTimeRange[0],
+                                       timeOutputTimeRange[1]);
+  double getTimeOutputTimeRange[2];
+  fileSeriesReader->GetOutputTimeRange(getTimeOutputTimeRange);
+  fileSeriesReader->Update();
+  if (timeOutputTimeRange[0] != getTimeOutputTimeRange[0] ||
+      timeOutputTimeRange[1] != getTimeOutputTimeRange[1])
+    {
+    std::cerr << "Error: when setting the timeRange." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  fileSeriesReader->Print(std::cout);
 
   return EXIT_SUCCESS;
 }

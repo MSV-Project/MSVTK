@@ -52,11 +52,16 @@ public:
   vtkSetMacro(MaxNumberOfButtonWidgets,int);
   vtkGetMacro(MaxNumberOfButtonWidgets,int);
 
-
   // Description:
   // Set / Get the number of widgetButtons in our scene.
   void SetNumberOfButtonWidgets(int);
   vtkGetMacro(NumberOfButtonWidgets,int);
+
+  // Description:
+  // Set / get the last selected buttonWidget
+  void SetLastSelectedButton(vtkIdType);
+  vtkIdType GetLastSelectedButton() const;
+  int GetIndexFromButtonId(vtkIdType) const;
 
   /// Callback using to process the widgets events
   static void ProcessWidgetsEvents(vtkObject *caller,
@@ -64,13 +69,13 @@ public:
                                    void *clientData,
                                    void *callData);
 
-  virtual void Init(vtkPolyData*);                // Initialize vtkButtonsWidget
+  virtual void Init(vtkPolyData* points);         // Initialize vtkButtonsWidget
   virtual void Clear();                           // Clear Buttons Manager
   virtual void UpdateButtonWidgets(vtkPolyData*); // Update from the vtkPolyData
 
 protected:
-  msvVTKECGButtonsManager(int n=5);
-  ~msvVTKECGButtonsManager();
+  msvVTKECGButtonsManager();
+  virtual ~msvVTKECGButtonsManager();
 
   int           NumberOfButtonWidgets;
   int           MaxNumberOfButtonWidgets;

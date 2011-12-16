@@ -34,6 +34,7 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3D.h>
+#include <vtkPropCollection.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -66,21 +67,56 @@ int msvVTKProp3DButtonRepresentationTest1(int, char* [])
   cubeActor->SetMapper(cubeMapper.GetPointer());
 
   vtkNew<msvVTKProp3DButtonRepresentation> prop3DButtonRep;
+
+  double* initBounds = prop3DButtonRep->GetBounds();
+  if (initBounds)
+    {
+    std::cerr << "Error: bounds retrieved from an empty representation."
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Check rendering on an empty representation.
+  prop3DButtonRep->RenderVolumetricGeometry(render.GetPointer());
+  prop3DButtonRep->RenderOpaqueGeometry(render.GetPointer());
+  prop3DButtonRep->RenderTranslucentPolygonalGeometry(render.GetPointer());
+  prop3DButtonRep->HasTranslucentPolygonalGeometry();
+
+  // Initialize
   prop3DButtonRep->SetNumberOfStates(2);
-  prop3DButtonRep->SetButtonProp(0,tetActor.GetPointer());
+  prop3DButtonRep->SetButtonProp(-1,tetActor.GetPointer());
   prop3DButtonRep->SetButtonProp(1,cubeActor.GetPointer());
   prop3DButtonRep->SetButtonProp(4,cubeActor.GetPointer());
   prop3DButtonRep->SetPlaceFactor(1);
   prop3DButtonRep->SetState(0);
 
+  // Representations
   vtkProp3D* prop3D = prop3DButtonRep->GetButtonProp(4);
   prop3D = prop3DButtonRep->GetButtonProp(1);
   if (prop3D != cubeActor.GetPointer())
     {
-    std::cerr << "Error: vtkProp3D retrieved not the one expected" << std::endl;
+    std::cerr << "Error: vtkProp3D retrieved not the one expected [cubeActor]"
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+  prop3D = prop3DButtonRep->GetButtonProp(-1);
+  if (prop3D != tetActor.GetPointer())
+    {
+    std::cerr << "Error: vtkProp3D retrieved not the one expected [tetActor]"
+              << std::endl;
     return EXIT_FAILURE;
     }
 
+  vtkNew<vtkPropCollection> pc;
+  prop3DButtonRep->GetActors(pc.GetPointer());
+  if (pc->GetNumberOfItems() != 1) // Number of actors of the current vtkProp
+    {
+    std::cerr << "Error: Number of actors retrieved different than expected."
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Bound and PlaceWidget method
   double bounds1[6] = {-0.75, 0.75, -0.75, 0.75, -0.5, 0.75};
   prop3DButtonRep->PlaceWidget(bounds1);
   double * getBounds1 = prop3DButtonRep->GetBounds();
@@ -89,22 +125,25 @@ int msvVTKProp3DButtonRepresentationTest1(int, char* [])
       bounds1[2] != getBounds1[2] || bounds1[3] != getBounds1[3] ||
       bounds1[4] != getBounds1[4] || bounds1[5] != getBounds1[5])
     {
-    std::cerr << "Error: Unexpected bounds after calling PlaceWidget" << std::endl;
+    std::cerr << "Error: Unexpected bounds after calling PlaceWidget"
+              << std::endl;
     return EXIT_FAILURE;
     }
 
   double bounds2[6] = {0, 1.5, 0, 1.5, 0, 1.5};
   prop3DButtonRep->PlaceWidget(bounds2);
+  prop3DButtonRep->PlaceWidget(bounds2); // Must not recompute the bounds
   double * getBounds2 = prop3DButtonRep->GetBounds();
-
   if (bounds2[0] != getBounds2[0] || bounds2[1] != getBounds2[1] ||
       bounds2[2] != getBounds2[2] || bounds2[3] != getBounds2[3] ||
       bounds2[4] != getBounds2[4] || bounds2[5] != getBounds2[5])
     {
-    std::cerr << "Error: Unexpected bounds after calling PlaceWidget" << std::endl;
+    std::cerr << "Error: Unexpected bounds after calling PlaceWidget method"
+              << std::endl;
     return EXIT_FAILURE;
     }
 
+  // Create Widget
   vtkNew<vtkButtonWidget> buttonWidget;
   buttonWidget->SetInteractor(iren.GetPointer());
   buttonWidget->SetRepresentation(prop3DButtonRep.GetPointer());
@@ -115,10 +154,36 @@ int msvVTKProp3DButtonRepresentationTest1(int, char* [])
 
   iren->Initialize();
   renWin->Render();
-
   buttonWidget->EnabledOn();
-  prop3DButtonRep->ComputeInteractionState(0,0);
+
+  // Compute Rendering on the representation
+  prop3DButtonRep->ComputeInteractionState(150,150);
+  prop3DButtonRep->RenderVolumetricGeometry(render.GetPointer());
+  prop3DButtonRep->RenderOpaqueGeometry(render.GetPointer());
+  prop3DButtonRep->RenderTranslucentPolygonalGeometry(render.GetPointer());
+  prop3DButtonRep->HasTranslucentPolygonalGeometry();
   prop3DButtonRep->ComputeInteractionState(299,299);
+
+  // Compute Rendering on the representation when following the camera
+  prop3DButtonRep->FollowCameraOn();
+  if (prop3DButtonRep->GetFollowCamera() != true)
+    {
+    std::cerr << "Error: FollowCameraOn method is not effective" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  prop3DButtonRep->ComputeInteractionState(150,150);
+  prop3DButtonRep->RenderVolumetricGeometry(render.GetPointer());
+  prop3DButtonRep->RenderOpaqueGeometry(render.GetPointer());
+  prop3DButtonRep->RenderTranslucentPolygonalGeometry(render.GetPointer());
+  prop3DButtonRep->HasTranslucentPolygonalGeometry();
+  prop3DButtonRep->ComputeInteractionState(299,299);
+  prop3DButtonRep->GetBounds();
+
+  // Test toolkit methods
+  vtkNew<msvVTKProp3DButtonRepresentation> prop3DButtonRepCopy;
+  prop3DButtonRepCopy->ShallowCopy(prop3DButtonRep.GetPointer());
+  prop3DButtonRep->Print(std::cout);
 
   return EXIT_SUCCESS;
 }

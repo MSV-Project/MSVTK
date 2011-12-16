@@ -97,7 +97,6 @@ public:
 
   // Description:
   // CanReadFile is forwarded to the internal reader if it supports it.
-  virtual int CanReadFile(const char* filename);
   static int CanReadFile(vtkAlgorithm* vtkNotUsed(reader),
                          const char* vtkNotUsed(filename)){return 0;}
 
@@ -157,6 +156,12 @@ public:
   virtual void SetOutputTimeRange(double, double);
   virtual void SetOutputTimeRange(double range[2]);
   virtual void GetOutputTimeRange(double range[2]);
+
+  // Description
+  // Update TimeRange linearly for each file when user set a
+  // valid time range (tMax >= tMin).
+  // Otherwise, it makes a one-one mapping by default.
+  void UpdateOutputTimeRange();
 
 protected:
   msvVTKFileSeriesReader();

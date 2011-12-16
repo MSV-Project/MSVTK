@@ -17,7 +17,8 @@ add_executable(${KIT}CxxTests ${Tests})
 target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
 
 macro(SIMPLE_TEST TESTNAME)
-  add_test(NAME ${TESTNAME} COMMAND ${Slicer_LAUNCH_COMMAND} $<TARGET_FILE:${KIT}CxxTests> ${TESTNAME} ${ARGN})
+  add_test(NAME ${TESTNAME} COMMAND $<TARGET_FILE:${KIT}CxxTests> ${TESTNAME}
+  ${ARGN})
 endmacro()
 
 #

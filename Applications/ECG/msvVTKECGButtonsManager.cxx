@@ -49,8 +49,7 @@ public:
   vtkInternal(msvVTKECGButtonsManager* external);
   ~vtkInternal();
 
-  void CreateButtonWidgets();
-  void SetupButtonWidgets(vtkPolyData*);
+  void CreateButtonWidgets(vtkPolyData* poly);
   void ClearButtons();
 
   struct ButtonProp : vtkObjectBase
@@ -67,14 +66,17 @@ public:
     {
     ButtonHandleReprensentation();
 
+    vtkSmartPointer<vtkButtonWidget> ButtonWidget;
     vtkSmartPointer<ButtonProp> PropButton;
-    vtkIdType LinkedPointID;
     };
 
-  typedef std::map<vtkSmartPointer<vtkButtonWidget>,
-    vtkSmartPointer<ButtonHandleReprensentation> > HandleButtonWidgetsType;
+  typedef std::map<vtkIdType, vtkSmartPointer<ButtonHandleReprensentation> >
+    HandleButtonWidgetsType;
   HandleButtonWidgetsType   HandleButtonWidgets;
   msvVTKECGButtonsManager*  External;
+
+  // Keep time track of last button which has been in interaction.
+  vtkIdType LastSelectedButton;
 };
 
 //------------------------------------------------------------------------------
@@ -84,6 +86,7 @@ public:
 msvVTKECGButtonsManager::vtkInternal::vtkInternal(msvVTKECGButtonsManager* ext)
 {
   this->External = ext;
+  this->LastSelectedButton = -1;
 }
 
 //------------------------------------------------------------------------------
@@ -107,22 +110,28 @@ msvVTKECGButtonsManager::vtkInternal::ButtonProp::ButtonProp()
 msvVTKECGButtonsManager::vtkInternal::
 ButtonHandleReprensentation::ButtonHandleReprensentation()
 {
+  this->ButtonWidget = 0;
   this->PropButton = new ButtonProp();
-  LinkedPointID = 0;
 }
 
 //------------------------------------------------------------------------------
-void msvVTKECGButtonsManager::vtkInternal::CreateButtonWidgets()
+void msvVTKECGButtonsManager::vtkInternal::CreateButtonWidgets(vtkPolyData* poly)
 {
   if (this->External->NumberOfButtonWidgets < 1 ||
-     !this->External->Renderer || !this->External->Renderer->GetRenderWindow())
+     !this->External->Renderer || !this->External->Renderer->GetRenderWindow()
+     || poly->GetNumberOfPoints() < this->External->NumberOfButtonWidgets)
     {
     return;
     }
 
+  // Associate random point from the polydata
+  int numberOfPoints = poly->GetNumberOfPoints();
+  int step = numberOfPoints / this->External->NumberOfButtonWidgets;
+
   // Define the callback
   vtkSmartPointer<vtkCallbackCommand> widgetCallback =
     vtkSmartPointer<vtkCallbackCommand>::New();
+  widgetCallback->SetClientData(this->External);
   widgetCallback->SetCallback(msvVTKECGButtonsManager::ProcessWidgetsEvents);
 
   // Main loop instantiation
@@ -138,7 +147,7 @@ void msvVTKECGButtonsManager::vtkInternal::CreateButtonWidgets()
     rep->SetButtonProp(0, buttonHandle->PropButton->CubeActor);
     rep->SetPlaceFactor(1);
     rep->SetDragable(0);
-    rep->SetFollowCamera(1);
+    rep->SetFollowCamera(0);
 
     // The Manager has to manage the destruction of the widgets
     vtkNew<vtkButtonWidget> buttonWidget;
@@ -151,34 +160,18 @@ void msvVTKECGButtonsManager::vtkInternal::CreateButtonWidgets()
     buttonWidget->AddObserver(vtkCommand::StateChangedEvent, widgetCallback);
 
     // Insert the ButtonWidget with his associated HandleReprensentations in map
-    this->HandleButtonWidgets.insert(std::pair<vtkSmartPointer<vtkButtonWidget>,
+    buttonHandle->ButtonWidget = buttonWidget.GetPointer();
+    this->HandleButtonWidgets.insert(std::pair<vtkIdType,
       vtkSmartPointer<ButtonHandleReprensentation> >
-      (buttonWidget.GetPointer(), buttonHandle.GetPointer()));
-    }
-}
-
-//------------------------------------------------------------------------------
-void msvVTKECGButtonsManager::vtkInternal::SetupButtonWidgets(vtkPolyData* poly)
-{
-  if (poly->GetNumberOfPoints() < this->External->NumberOfButtonWidgets)
-    {
-    return;
-    }
-
-  int index = 0;
-  int numberOfPoints = poly->GetNumberOfPoints();
-  int step = numberOfPoints / this->External->NumberOfButtonWidgets;
-
-  for(HandleButtonWidgetsType::iterator it = this->HandleButtonWidgets.begin();
-       it != this->HandleButtonWidgets.end(); ++it , ++index )
-    {
-    it->second->LinkedPointID = index * step;
+      (static_cast<vtkIdType>(i*step), buttonHandle.GetPointer()));
     }
 }
 
 //------------------------------------------------------------------------------
 void msvVTKECGButtonsManager::vtkInternal::ClearButtons()
 {
+  this->LastSelectedButton = 0;
+
   // We Have to first delete the HandleReprensentation of each vtkButtonWidget
   for (HandleButtonWidgetsType::iterator it = this->HandleButtonWidgets.begin();
        it != this->HandleButtonWidgets.end(); ++it )
@@ -193,10 +186,11 @@ void msvVTKECGButtonsManager::vtkInternal::ClearButtons()
 // vtkMRMLSliceModelDisplayableManager methods
 
 //------------------------------------------------------------------------------
-msvVTKECGButtonsManager::msvVTKECGButtonsManager(int n):NumberOfButtonWidgets(n)
+msvVTKECGButtonsManager::msvVTKECGButtonsManager()
 {
   this->Internal = new vtkInternal(this);
 
+  this->NumberOfButtonWidgets = 0;
   this->MaxNumberOfButtonWidgets = 100;
   this->ButtonWidgetSize = 3,
   this->Renderer = 0;
@@ -228,8 +222,8 @@ void msvVTKECGButtonsManager::Init(vtkPolyData* polyData)
     return;
     }
 
-  this->Internal->CreateButtonWidgets();
-  this->Internal->SetupButtonWidgets(polyData);
+  this->Internal->ClearButtons();
+  this->Internal->CreateButtonWidgets(polyData);
 }
 
 //------------------------------------------------------------------------------
@@ -238,7 +232,7 @@ void msvVTKECGButtonsManager::UpdateButtonWidgets(vtkPolyData* polyData)
   if (!polyData ||
       this->Internal->HandleButtonWidgets.empty() ||
       polyData->GetNumberOfPoints() <
-      this->Internal->HandleButtonWidgets.rbegin()->second->LinkedPointID
+      this->Internal->HandleButtonWidgets.rbegin()->first
       )
     {
     return;
@@ -250,9 +244,9 @@ void msvVTKECGButtonsManager::UpdateButtonWidgets(vtkPolyData* polyData)
   for (it = this->Internal->HandleButtonWidgets.begin();
        it != this->Internal->HandleButtonWidgets.end(); ++it)
     {
-    it->first->GetRepresentation()->VisibilityOn();
+    it->second->ButtonWidget->GetRepresentation()->VisibilityOn();
 
-    polyData->GetPoint(it->second->LinkedPointID,center);
+    polyData->GetPoint(it->first,center);
     double bounds[6] = {bounds[0] = center[0] - size / 2,
                         bounds[1] = center[0] + size / 2,
                         bounds[2] = center[1] - size / 2,
@@ -260,7 +254,7 @@ void msvVTKECGButtonsManager::UpdateButtonWidgets(vtkPolyData* polyData)
                         bounds[4] = center[2] - size / 2,
                         bounds[5] = center[2] + size / 2};
 
-    it->first->GetRepresentation()->PlaceWidget(bounds);
+    it->second->ButtonWidget->GetRepresentation()->PlaceWidget(bounds);
     }
 }
 
@@ -279,18 +273,46 @@ void msvVTKECGButtonsManager::ProcessWidgetsEvents(vtkObject *caller,
     }
 
   msvVTKECGButtonsManager::vtkInternal::HandleButtonWidgetsType::iterator it;
-  it = self->Internal->HandleButtonWidgets.find(widget);
-  if (it != self->Internal->HandleButtonWidgets.end())
+  for (it = self->Internal->HandleButtonWidgets.begin();
+       it != self->Internal->HandleButtonWidgets.end(); ++it)
     {
-    vtkIdType id = it->second->LinkedPointID;
-    widget->InvokeEvent(vtkCommand::InteractionEvent, &id);
+    if (it->second->ButtonWidget.GetPointer() == widget)
+      {
+      vtkIdType id = it->first;
+      self->Internal->LastSelectedButton = id;
+      self->InvokeEvent(vtkCommand::InteractionEvent, &id);
+      return;
+      }
     }
-  else
-    {
-    widget->InvokeEvent(vtkCommand::InteractionEvent, NULL);
-    }
+
+  self->InvokeEvent(vtkCommand::InteractionEvent, NULL);
 }
 
+//------------------------------------------------------------------------------
+void msvVTKECGButtonsManager::SetLastSelectedButton(vtkIdType id)
+{
+  this->Internal->LastSelectedButton = id;
+}
+
+//------------------------------------------------------------------------------
+vtkIdType msvVTKECGButtonsManager::GetLastSelectedButton() const
+{
+  return this->Internal->LastSelectedButton;
+}
+
+int msvVTKECGButtonsManager::GetIndexFromButtonId(vtkIdType id) const
+{
+  msvVTKECGButtonsManager::vtkInternal::HandleButtonWidgetsType::iterator it;
+  it = this->Internal->HandleButtonWidgets.find(id);
+  if (it == this->Internal->HandleButtonWidgets.end())
+    {
+    return -1;
+    }
+
+  return std::distance(this->Internal->HandleButtonWidgets.begin(), it);
+}
+
+//------------------------------------------------------------------------------
 void msvVTKECGButtonsManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os,indent);
