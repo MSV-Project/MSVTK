@@ -289,8 +289,8 @@ void msvQECGMainWindowPrivate::readCartoPoints(QDir dir)
 
   // Create Instance of vtkDataObject for all outputs ports
   // Calls REQUEST_DATA_OBJECT && REQUEST_INFORMATION
-  this->cartoPointsReader->UpdateInformation();
   this->cartoPointsReader->SetOutputTimeRange(0,2500);
+  this->cartoPointsReader->Update();
 
   // Update the Widget given the info provided
   this->timePlayerWidget->updateFromFilter();

@@ -42,6 +42,19 @@ int msvVTKPolyDataFileSeriesReaderTest1(int argc, char* argv[])
   vtkNew<vtkPolyDataReader> polyDataReader;
   vtkNew<msvVTKPolyDataFileSeriesReader> polyDataFileSeriesReader;
 
+  if (polyDataFileSeriesReader->CanReadFile(file0))
+    {
+    std::cerr << "Error: method CanReadFile must return 0 when no reader set."
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+  if (polyDataFileSeriesReader->CanReadFile(polyDataReader.GetPointer(),0))
+    {
+    std::cerr << "Error: method CanReadFile must return 0 when no file set."
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
   polyDataFileSeriesReader->SetReader(polyDataReader.GetPointer());
 
   polyDataFileSeriesReader->GetMTime();
@@ -70,6 +83,22 @@ int msvVTKPolyDataFileSeriesReaderTest1(int argc, char* argv[])
   // Set the default reader
   polyDataFileSeriesReader->CanReadFile(file1);
   polyDataFileSeriesReader->SetReader(polyDataReader.GetPointer());
+
+  polyDataFileSeriesReader->SetUseMetaFile(true);
+  if (!polyDataFileSeriesReader->GetUseMetaFile())
+    {
+    std::cerr << "Error: UseMetaFile true not set." << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (polyDataFileSeriesReader->CanReadFile(file0))
+    {
+    std::cerr << "Error: filename doesn not really points to a metafile, "
+              << "must return 0" << std::endl;
+    return EXIT_FAILURE;
+    }
+  polyDataFileSeriesReader->UseMetaFileOff();
+
   polyDataFileSeriesReader->GetMTime();
 
   if (!polyDataFileSeriesReader->CanReadFile(file1))
@@ -78,5 +107,6 @@ int msvVTKPolyDataFileSeriesReaderTest1(int argc, char* argv[])
     return EXIT_FAILURE;
     }
 
+  polyDataFileSeriesReader->Print(std::cout);
   return EXIT_SUCCESS;
 }
