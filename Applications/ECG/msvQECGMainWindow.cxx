@@ -158,12 +158,16 @@ msvQECGMainWindowPrivate::~msvQECGMainWindowPrivate()
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::clear()
 {
+  Q_Q(msvQECGMainWindow);
+
+
   this->timePlayerWidget->play(false);            // stop the player widget
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
   this->cartoPointsReader->RemoveAllFileNames();  // clean up the reader
   this->cartoPointsMapper->Update();              // update the pipeline
   this->timePlayerWidget->updateFromFilter();     // update the player widget
   this->buttonsManager->Clear();                  // clean up the buttonsManager
+  q->setCurrentSignal(-1);
 }
 
 //------------------------------------------------------------------------------
@@ -246,6 +250,7 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 
   if (dir.cd(QString("CartoSignals"))) {
     this->readCartoSignals(dir);
+    q->setCurrentSignal(0);
     dir.cdUp();
   }
 
@@ -257,9 +262,6 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
   this->buttonsManager->SetNumberOfButtonWidgets(
     this->cartoSignals->GetNumberOfItems());
   this->buttonsManager->Init(this->polyDataReader->GetOutput());
-  // Should select the first point by default via the button manager.
-  //this->buttonsManager->SetCurrentPoint(0);
-  q->setCurrentSignal(0);
 
   // Render
   double extent[6];

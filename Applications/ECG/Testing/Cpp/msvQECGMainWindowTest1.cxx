@@ -20,6 +20,7 @@
 
 // Qt includes
 #include <QApplication>
+#include <QTimer>
 
 // ECG includes
 #include "msvQECGMainWindow.h"
@@ -35,5 +36,7 @@ int msvQECGMainWindowTest1(int argc, char * argv[] )
   msvQECGMainWindow mainWindow;
   mainWindow.show();
 
+  // Wait until the end of the player
+  QTimer::singleShot(50, &app, SLOT(quit()));
   return app.exec();
 }
