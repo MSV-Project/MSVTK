@@ -30,8 +30,8 @@
 int ecgTest1(int argc, char * argv[])
 {
   QCoreApplication app(argc, argv);
-  QString path = (argc > 2) ? (QString(argv[2]) + "/") : "";
-  QString command = QString(path + "ecg");
+  QString path = (argc > 2) ? ("\"" + QString(argv[2]) + "/") : "";
+  QString command = QString(path + "ecg\"");
   QProcess process;
   process.start(command);
   bool res = process.waitForStarted();
