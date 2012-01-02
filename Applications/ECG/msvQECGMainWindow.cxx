@@ -29,6 +29,7 @@
 #include "msvVTKECGButtonsManager.h"
 #include "msvVTKPolyDataFileSeriesReader.h"
 #include "ui_msvQECGMainWindow.h"
+#include "msvQECGAboutDialog.h"
 
 // VTK includes
 #include "vtkActor.h"
@@ -190,10 +191,20 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   q->connect(this->actionOpen, SIGNAL(triggered()), q, SLOT(openData()));
   q->connect(this->actionClose, SIGNAL(triggered()), q, SLOT(closeData()));
   q->connect(this->actionExit, SIGNAL(triggered()), q, SLOT(close()));
+  q->connect(this->actionAboutECGApplication, SIGNAL(triggered()), q,
+             SLOT(aboutApplication()));
 
   // Playback Controller
   q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
              q, SLOT(onCurrentTimeChanged(double)));
+
+  // Customize QAction icons with standard pixmaps
+  QIcon dirIcon = q->style()->standardIcon(QStyle::SP_DirIcon);
+  QIcon informationIcon = q->style()->standardIcon(
+    QStyle::SP_MessageBoxInformation);
+
+  this->actionOpen->setIcon(dirIcon);
+  this->actionAboutECGApplication->setIcon(informationIcon);
 
   // Associate the TimePlayerWidget to the sink (mapper)
   this->timePlayerWidget->setFilter(this->cartoPointsMapper);
@@ -384,6 +395,13 @@ void msvQECGMainWindow::closeData()
 
   d->clear();
   d->update();
+}
+
+//------------------------------------------------------------------------------
+void msvQECGMainWindow::aboutApplication()
+{
+  msvQECGAboutDialog about(this);
+  about.exec();
 }
 
 //------------------------------------------------------------------------------

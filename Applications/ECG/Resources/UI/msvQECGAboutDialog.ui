@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>msvQECGAboutDialog</class>
+ <widget class="QDialog" name="msvQECGAboutDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>595</width>
+    <height>518</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About MSV ECG Application</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="msvQECGLabel">
+     <property name="pixmap">
+      <pixmap resource="../msvQECG.qrc">:/Logo/msv-logo.png</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="CreditsTextEdit">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MSVTK Library&lt;br /&gt;Copyright (c) Kitware Inc. &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;VTK &lt;a href=&quot;http://www.vtk.org/copyright.php&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.vtk.org/copyright.php&lt;/span&gt;&lt;/a&gt; &lt;br /&gt;CTK &lt;a href=&quot;https://github.com/commontk/CTK/blob/master/LICENSE&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/commontk/CTK/blob/master/LICENSE&lt;/span&gt;&lt;/a&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The application has been written by Michael Jeulin-Lagarrigue and Julien Finet.&lt;br /&gt;Funding for this work comes from the European Commission within the MSV project (FP7-IST-248032)&lt;br /&gt;Different spatial scales (Challenge #Ch1), heterogeneous data type (Challenge #Ch5) and time varying issues(Challenge #Ch9) are handled by the application.&lt;br /&gt;It uses Electro-physiological dataset structured as the following: &lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoPoints: collection of .vtk files describing sparse 3D points localized on the heart surface for each time step. &lt;/li&gt;
+&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoSignals: collection of .csv files corresponding to the entire ECG of a subset of points with each parameter being I, II, III, AvR, AvL, AvF, V1, V2, V3, V4, V5 and V6 derivations. &lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It makes the usage of the new VTK pipeline architecture and its temporal pipeline extensions through new modules and widgets added in MSVTK. It also shows and implements the vtkButtons and vtkCharts widgets. &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The VTK (&amp;gt;5.0) pipeline architecture is needed in order to have time support. Utility classes have been added to MSVTK to ease the use of time in VTK. vtkButtons and vtkCharts widgets are also demo-ed. &lt;br /&gt;Time is represented differently depending on the data type: 3D point clouds are displayed in the VTK render window and animated depending on the ECG coupled time, while the ECGs are represented in a separate VTK chart view(s) as static representations. &lt;br /&gt;3D points for which ECG measurements are recorded are clickable through vtkButtons. vtkButtons are displayed in the VTK render window as cube and linked to the point cloud. Buttons are the connection between the 3D points and the ECG. They are used to display the ECG chart corresponding to the clicked point. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../msvQECG.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>msvQECGAboutDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>msvQECGAboutDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

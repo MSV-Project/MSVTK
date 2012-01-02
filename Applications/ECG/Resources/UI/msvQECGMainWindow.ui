@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
-    <height>409</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>421</width>
+     <width>800</width>
      <height>25</height>
     </rect>
    </property>
@@ -47,7 +47,14 @@
     <addaction name="actionClose"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAboutECGApplication"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="ecgReviewPanel">
@@ -79,7 +86,7 @@
           <x>0</x>
           <y>0</y>
           <width>79</width>
-          <height>295</height>
+          <height>422</height>
          </rect>
         </property>
        </widget>
@@ -123,6 +130,9 @@
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionExit">
    <property name="text">
@@ -138,6 +148,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionAboutECGApplication">
+   <property name="text">
+    <string>About ECG Application</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

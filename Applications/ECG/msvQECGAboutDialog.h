@@ -18,46 +18,33 @@
 
 ==============================================================================*/
 
-#ifndef __msvECGMainWindow_h
-#define __msvECGMainWindow_h
+#ifndef __msvQECGAboutDialog_h
+#define __msvQECGAboutDialog_h
 
 // Qt includes
-#include <QMainWindow>
+#include <QDialog>
 
 // CTK includes
-#include <ctkVTKObject.h>
+#include <ctkPimpl.h>
 
 // ECG includes
 #include "msvECGExport.h"
 
-class msvQECGMainWindowPrivate;
+class msvQECGAboutDialogPrivate;
 
-class MSV_ECG_EXPORT msvQECGMainWindow : public QMainWindow
+class MSV_ECG_EXPORT msvQECGAboutDialog : public QDialog
 {
   Q_OBJECT
-  QVTK_OBJECT
 public:
-  typedef QMainWindow Superclass;
-  msvQECGMainWindow(QWidget *parent=0);
-  virtual ~msvQECGMainWindow();
-
-public slots:
-  void openData();
-  void closeData();
-  void aboutApplication();
-  void updateView();
-  void setCurrentSignal(int pointId);
-
-protected slots:
-  void onPointSelected();
-  void onCurrentTimeChanged(double);
+  msvQECGAboutDialog(QWidget* parentWidget = 0);
+  virtual ~msvQECGAboutDialog();
 
 protected:
-  QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
+  QScopedPointer<msvQECGAboutDialogPrivate> d_ptr;
 
 private:
-  Q_DECLARE_PRIVATE(msvQECGMainWindow);
-  Q_DISABLE_COPY(msvQECGMainWindow);
+  Q_DECLARE_PRIVATE(msvQECGAboutDialog);
+  Q_DISABLE_COPY(msvQECGAboutDialog);
 };
 
 #endif
