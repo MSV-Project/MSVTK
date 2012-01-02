@@ -450,6 +450,11 @@ foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Add MSVTK examples subdirectories
+#
+add_subdirectory(Examples)
+
+#-----------------------------------------------------------------------------
 # Style Checking configuration
 #
 if(MSVTK_USE_KWSTYLE)
