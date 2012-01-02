@@ -8,14 +8,17 @@ project(msv${KIT})
 set(msv${KIT}_SRCS
   msvQECGMainWindow.cxx
   msvVTKECGButtonsManager.cxx
+  msvQECGAboutDialog.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
   msvQECGMainWindow.h
+  msvQECGAboutDialog.h
   )
 
 set(msv${KIT}_UI_SRCS
   Resources/UI/msvQECGMainWindow.ui
+  Resources/UI/msvQECGAboutDialog.ui
   )
 
 set(msv${KIT}_QRC
