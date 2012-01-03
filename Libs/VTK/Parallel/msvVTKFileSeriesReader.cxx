@@ -884,7 +884,7 @@ void msvVTKFileSeriesReader::UpdateOutputTimeRange()
     {
     double timeRange[2];
     timeRange[0] = i*subTimeRange + outputTimeRange[0];
-    timeRange[1] = (i+1)*subTimeRange + outputTimeRange[0];
+    timeRange[1] = (i+1)*subTimeRange + outputTimeRange[0] - 1e-15;
     this->Internal->TimeRanges->SetTimeRange(i, timeRange);
     }
 }
