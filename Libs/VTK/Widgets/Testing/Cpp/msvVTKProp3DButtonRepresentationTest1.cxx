@@ -166,7 +166,7 @@ int msvVTKProp3DButtonRepresentationTest1(int, char* [])
 
   // Compute Rendering on the representation when following the camera
   prop3DButtonRep->FollowCameraOn();
-  if (prop3DButtonRep->GetFollowCamera() != true)
+  if (prop3DButtonRep->GetFollowCamera() != static_cast<int>(true))
     {
     std::cerr << "Error: FollowCameraOn method is not effective" << std::endl;
     return EXIT_FAILURE;

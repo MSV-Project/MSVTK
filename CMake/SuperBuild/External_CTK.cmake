@@ -61,7 +61,7 @@ if(NOT DEFINED CTK_DIR)
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
     GIT_REPOSITORY "${git_protocol}://github.com/commontk/CTK.git"
-    GIT_TAG "f57077ea855a614373b7a0dc398902650d71f14f"
+    GIT_TAG "e5ab18826af7a60b031684fd692ec3e19c14ce59"
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
