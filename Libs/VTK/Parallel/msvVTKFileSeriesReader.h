@@ -151,16 +151,18 @@ public:
   vtkBooleanMacro(IgnoreReaderTime, int);
 
   // Description:
-  // Get/Set the output time range. Map to the time steps if no time information
-  // by default.
+  // Get/Set the output time range.
+  // It lets you specifying you own time range if
+  // the reader does not manage this information. It linearly associates
+  // each step to an interval of time.
+  // By default the range do a 1:1 mapping between the
+  // Time_Range and the Time_Steps.
   virtual void SetOutputTimeRange(double, double);
   virtual void SetOutputTimeRange(double range[2]);
   virtual void GetOutputTimeRange(double range[2]);
 
   // Description
-  // Update TimeRange linearly for each file when user set a
-  // valid time range (tMax >= tMin).
-  // Otherwise, it makes a one-one mapping by default.
+  // Update TimeRange linearly for each file when user has set one.
   void UpdateOutputTimeRange();
 
 protected:
