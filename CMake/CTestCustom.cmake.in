@@ -47,15 +47,15 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # vtk suppressions
   "vtkfreetype"
   "Utilities.vtktiff"
-  "VTK.*IO.vtkMySQLQuery.cxx"
-  "VTK.*Utilities.vtkexodus2"
-  "VTK.*Utilities.vtklibproj"
-  "VTK.*Utilities.vtksqlite"
-  "VTK.*Utilities.vtkmetaio"
-  "VTK.*warn_unused_result"
-  "VTK.*Filtering.*cxx"
-  "VTK.*IO.*cxx"
-  "VTK.*Infovis.*cxx"
+  "[Vv][Tt][Kk].*[Uu]tilities.vtkexodus2"
+  "[Vv][Tt][Kk].*[Uu]tilities.vtklibproj"
+  "[Vv][Tt][Kk].*[Uu]tilities.vtksqlite"
+  "[Vv][Tt][Kk].*[Uu]tilities.vtkmetaio"
+  "[Vv][Tt][Kk].*warn_unused_result"
+  "[Vv][Tt][Kk].*[Ff]iltering.*cxx"
+  "[Vv][Tt][Kk].*[Ii][Oo].*cxx"
+  "[Vv][Tt][Kk].*[Ww]idgets.*cxx"
+  "[Vv][Tt][Kk].*[Ii]nfovis.*cxx"
 
   # qt suppressions from vtk...
   # Some VTK dashboards include building bits of Qt which produce lots of
@@ -75,5 +75,8 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "ld: warning: duplicate dylib.*"
 
   # Visual studio spurious warnings...
+  "Microsoft SDKs."
+  "VC.include."
   "The following environment variables were not found"
+  "This function or variable may be unsafe. Consider using strcpy_s instead."
   )

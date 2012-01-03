@@ -308,7 +308,7 @@ if(MSVC)
   set(MSVTK_CXX_FLAGS "${MSVTK_CXX_FLAGS} ${msvc_suppressed_warnings}")
 endif()
 
-add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE)
 
 #-----------------------------------------------------------------------------
 # QT
