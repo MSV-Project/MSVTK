@@ -52,10 +52,9 @@ int main(int argc, char * argv[])
 
   // Get the data test files
   // The two files are two point clouds in ".vtk" format.
-  const char* file0 =
-    vtkTestUtilities::ExpandDataFileName(argc,argv,"Polydata00.vtk");
-  const char* file1 =
-    vtkTestUtilities::ExpandDataFileName(argc,argv,"Polydata01.vtk");
+  std::string dataPath = DATA_TESTING_PATH;
+  std::string file0  = dataPath + "Polydata00.vtk";
+  std::string file1  = dataPath + "Polydata01.vtk";
 
   // Create the pipeline:
   // A polydata reader is instantiated and associated to
@@ -66,6 +65,7 @@ int main(int argc, char * argv[])
 
   // A vtkPolyDataMapper is then connected to the output of the file series
   // reader to represent the current point cloud in the VTK 3D render view.
+  // In order to get a final visualization we would create a vtkActor then.
   vtkNew<vtkPolyDataMapper> polyMapper;
   polyMapper->SetInputConnection(fileSeriesReader->GetOutputPort());
 
@@ -77,8 +77,8 @@ int main(int argc, char * argv[])
 
   // Populate the pipeline:
   // Once we have instantiated the fileSeries reader, we can add the files.
-  fileSeriesReader->AddFileName(file0);
-  fileSeriesReader->AddFileName(file1);
+  fileSeriesReader->AddFileName(file0.c_str());
+  fileSeriesReader->AddFileName(file1.c_str());
 
   // Create Instance of vtkDataObject for all outputs ports
   // Call REQUEST_DATA_OBJECT && REQUEST_INFORMATION

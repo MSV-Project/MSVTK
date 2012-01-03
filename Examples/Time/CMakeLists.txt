@@ -14,7 +14,12 @@ set(include_dirs
 
 include_directories(${include_dirs})
 
+add_definitions( -DDATA_TESTING_PATH="${PROJECT_SOURCE_DIR}/../Data/" )
+
+# msvQTimePlayerWidget
 add_executable(TimePlayerWidget msvQTimePlayerWidget.cxx)
 target_link_libraries(TimePlayerWidget msvQtWidgets)
 
-set(MyTests msvQTimePlayerWidget.cxx)
+# msvVTKFileSeriesReader
+add_executable(FileSeriesReader msvVTKFileSeriesReader.cxx)
+target_link_libraries(FileSeriesReader msvVTKParallel)
