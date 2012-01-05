@@ -50,6 +50,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "[Vv][Tt][Kk].*[Uu]tilities.vtkexodus2"
   "[Vv][Tt][Kk].*[Uu]tilities.vtklibproj"
   "[Vv][Tt][Kk].*[Uu]tilities.vtksqlite"
+  "[Vv][Tt][Kk].*[Uu]tilities.*[Ll][Ss][Dd]yna"
   "[Vv][Tt][Kk].*[Uu]tilities.vtkmetaio"
   "[Vv][Tt][Kk].*warn_unused_result"
   "[Vv][Tt][Kk].*[Ff]iltering.*cxx"
