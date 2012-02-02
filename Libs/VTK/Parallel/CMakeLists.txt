@@ -48,6 +48,8 @@ endif()
 # Sources
 # --------------------------------------------------------------------------
 set(msvVTKParallel_SRCS
+  #msvVTKCompositeFileSeriesReader.cxx
+  msvVTKXMLMultiblockLODReader.cxx
   msvVTKFileSeriesReader.cxx
   msvVTKPolyDataFileSeriesReader.cxx
   )
