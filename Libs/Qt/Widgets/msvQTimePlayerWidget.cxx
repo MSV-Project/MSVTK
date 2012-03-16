@@ -253,10 +253,21 @@ void msvQTimePlayerWidgetPrivate::requestData(const PipelineInfoType& pipeInfo,
   if (!pipeInfo.isConnected || time == pipeInfo.lastTimeRequest)
     return;
 
-  vtkStreamingDemandDrivenPipeline* sdd = vtkStreamingDemandDrivenPipeline::
-    SafeDownCast(this->filter->GetInputConnection(0,0)->GetProducer()->GetExecutive());
+  for (int portIndex = 0;
+       portIndex < this->filter->GetNumberOfInputPorts();
+       ++portIndex)
+    {
+    for (int connectionIndex = 0;
+         connectionIndex < this->filter->GetNumberOfInputConnections(portIndex);
+         ++connectionIndex)
+      {
+      vtkStreamingDemandDrivenPipeline* sdd = vtkStreamingDemandDrivenPipeline::
+        SafeDownCast(this->filter->GetInputConnection(portIndex, connectionIndex)
+                     ->GetProducer()->GetExecutive());
 
-  sdd->SetUpdateTimeStep(0, time);  // Request a time update
+      sdd->SetUpdateTimeStep(portIndex, time);  // Request a time update
+      }
+    }
   emit q->currentTimeChanged(time); // Emit the change
 }
 

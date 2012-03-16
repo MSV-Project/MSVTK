@@ -34,10 +34,13 @@
 
 // VTK includes
 #include "vtkActor.h"
+#include "vtkAppendFilter.h"
 #include "vtkAxesActor.h"
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkCollection.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkDelaunay3D.h"
 #include "vtkDelimitedTextReader.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
@@ -46,6 +49,7 @@
 #include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
@@ -78,6 +82,13 @@ protected:
   vtkSmartPointer<vtkPolyDataReader>              polyDataReader;
   vtkSmartPointer<vtkPolyDataMapper>              cartoPointsMapper;
   vtkSmartPointer<vtkActor>                       cartoPointsActor;
+
+  vtkSmartPointer<vtkDelaunay3D>                  delaunayFilter;
+  vtkSmartPointer<vtkDataSetSurfaceFilter>        surfaceFilter;
+  vtkSmartPointer<vtkPolyDataMapper>              cartoSurfaceMapper;
+  vtkSmartPointer<vtkActor>                       cartoSurfaceActor;
+
+  vtkSmartPointer<vtkAppendFilter>                mergedMapper;
 
   // buttonsManager
   vtkSmartPointer<msvVTKECGButtonsManager> buttonsManager;
@@ -138,6 +149,23 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
     vtkSmartPointer<msvVTKPolyDataFileSeriesReader>::New();
   this->cartoPointsReader->SetReader(this->polyDataReader);
 
+  this->delaunayFilter = vtkSmartPointer<vtkDelaunay3D>::New();
+  this->delaunayFilter->SetInputConnection(
+    this->cartoPointsReader->GetOutputPort());
+  this->surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+  this->surfaceFilter->SetInputConnection(this->delaunayFilter->GetOutputPort());
+
+  // Create Pipeline for the CartoPoints
+  this->cartoSurfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  this->cartoSurfaceMapper->ScalarVisibilityOff();
+  this->cartoSurfaceMapper->SetInputConnection(
+    this->surfaceFilter->GetOutputPort());
+  this->cartoSurfaceActor = vtkSmartPointer<vtkActor>::New();
+  this->cartoSurfaceActor->GetProperty()->SetOpacity(0.66);
+  this->cartoSurfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
+  this->cartoSurfaceActor->GetProperty()->BackfaceCullingOn();
+  this->cartoSurfaceActor->SetMapper(this->cartoSurfaceMapper);
+
   // Create Pipeline for the CartoPoints
   this->cartoPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   this->cartoPointsMapper->ScalarVisibilityOff();
@@ -145,6 +173,11 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
     this->cartoPointsReader->GetOutputPort());
   this->cartoPointsActor = vtkSmartPointer<vtkActor>::New();
   this->cartoPointsActor->SetMapper(this->cartoPointsMapper);
+
+  this->mergedMapper = vtkSmartPointer<vtkAppendFilter>::New();
+  this->mergedMapper->MergePointsOn();
+  this->mergedMapper->AddInputConnection(this->cartoPointsReader->GetOutputPort());
+  this->mergedMapper->AddInputConnection(this->cartoSurfaceMapper->GetInputConnection(0,0));
 
   // Set the buttons manager
   this->buttonsManager = vtkSmartPointer<msvVTKECGButtonsManager>::New();
@@ -166,7 +199,7 @@ void msvQECGMainWindowPrivate::clear()
   this->timePlayerWidget->play(false);            // stop the player widget
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
   this->cartoPointsReader->RemoveAllFileNames();  // clean up the reader
-  this->cartoPointsMapper->Update();              // update the pipeline
+  this->mergedMapper->Update();                   // update the pipeline
   this->timePlayerWidget->updateFromFilter();     // update the player widget
   this->buttonsManager->Clear();                  // clean up the buttonsManager
   q->setCurrentSignal(-1);
@@ -208,7 +241,7 @@ void msvQECGMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   this->actionAboutECGApplication->setIcon(informationIcon);
 
   // Associate the TimePlayerWidget to the sink (mapper)
-  this->timePlayerWidget->setFilter(this->cartoPointsMapper);
+  this->timePlayerWidget->setFilter(this->mergedMapper);
 
   q->qvtkConnect(this->buttonsManager, vtkCommand::InteractionEvent,
                  q, SLOT(onPointSelected()));
@@ -279,6 +312,7 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
   double extent[6];
   this->cartoPointsMapper->GetBounds(extent);
   this->threeDRenderer->AddActor(this->cartoPointsActor);
+  this->threeDRenderer->AddActor(this->cartoSurfaceActor);
   this->threeDRenderer->ResetCamera(extent);
 }
 
