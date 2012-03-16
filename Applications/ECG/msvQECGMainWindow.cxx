@@ -19,9 +19,10 @@
 ==============================================================================*/
 
 // Qt includes
-#include "QFileDialog"
-#include "QRegExp"
-#include "QString"
+#include <QDebug>
+#include <QFileDialog>
+#include <QRegExp>
+#include <QString>
 
 // MSV includes
 #include "msvQECGMainWindow.h"
@@ -261,13 +262,13 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 
   if (dir.cd(QString("CartoSignals"))) {
     this->readCartoSignals(dir);
-    q->setCurrentSignal(0);
+    q->setCurrentSignal(this->cartoSignals->GetNumberOfItems() ? 0 : -1);
     dir.cdUp();
   }
 
-  if (dir.cd(QString("CartoPoints")))
+  if (dir.cd(QString("CartoPoints"))) {
     this->readCartoPoints(dir);
-
+  }
   // Link to the cartoPoints the buttons
   this->polyDataReader->Update();
   this->buttonsManager->SetNumberOfButtonWidgets(
@@ -277,7 +278,6 @@ void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
   // Render
   double extent[6];
   this->cartoPointsMapper->GetBounds(extent);
-  this->cartoPointsActor->VisibilityOn();
   this->threeDRenderer->AddActor(this->cartoPointsActor);
   this->threeDRenderer->ResetCamera(extent);
 }
@@ -317,6 +317,10 @@ void msvQECGMainWindowPrivate::readCartoSignals(QDir dir)
   signalFileFilters << "*.csv";
   dir.setNameFilters(signalFileFilters);
   QStringList signalFiles = dir.entryList(QDir::Files,QDir::Name);
+
+  if (signalFiles.size() == 0){
+    qWarning() << "No carto signals in" << dir;
+  }
 
   // Resort files using their index number
   qSort(signalFiles.begin(), signalFiles.end(),
@@ -436,6 +440,11 @@ void msvQECGMainWindow::setCurrentSignal(int pointId)
 
   vtkTableAlgorithm* cartoSignalsTable = vtkTableAlgorithm::SafeDownCast(
     d->cartoSignals->GetItemAsObject(pointId));
+  if (!cartoSignalsTable)
+    {
+    qWarning() << "No signal at index " << pointId;
+    return;
+    }
   cartoSignalsTable->Update();
   int xCol = 0;
   int yCol = 1;
