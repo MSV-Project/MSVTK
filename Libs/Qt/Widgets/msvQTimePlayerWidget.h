@@ -20,7 +20,7 @@
 
 // It encapsulates the animation control functionality and provides
 // slots and signals to manage all the animation process.
-// The widget connect himself to a *vtkFilter*, typically at the output of the
+// The widget connect itself to a *vtkFilter*, typically at the output of the
 // vtk Pipeline (i.e. on a *vtkMapper*) and proceed to the requests.
 
 #ifndef __msvQTimePlayerWidget_h

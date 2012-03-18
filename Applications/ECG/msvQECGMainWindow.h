@@ -23,6 +23,7 @@
 
 // Qt includes
 #include <QMainWindow>
+class QListWidgetItem;
 
 // CTK includes
 #include <ctkVTKObject.h>
@@ -51,6 +52,9 @@ public slots:
 protected slots:
   void onPointSelected();
   void onCurrentTimeChanged(double);
+  void onECGSelectionChanged();
+  void onCurrentItemChanged(QListWidgetItem* current,
+                            QListWidgetItem* previous);
 
 protected:
   QScopedPointer<msvQECGMainWindowPrivate> d_ptr;

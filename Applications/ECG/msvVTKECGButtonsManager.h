@@ -63,6 +63,8 @@ public:
   vtkIdType GetLastSelectedButton() const;
   int GetIndexFromButtonId(vtkIdType) const;
 
+  void SetColors(const double (*colors)[3], unsigned int colorCount);
+
   /// Callback using to process the widgets events
   static void ProcessWidgetsEvents(vtkObject *caller,
                                    unsigned long event,

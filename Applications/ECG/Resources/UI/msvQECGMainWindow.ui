@@ -36,7 +36,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -53,7 +53,13 @@
     </property>
     <addaction name="actionAboutECGApplication"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -70,26 +76,10 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QScrollArea" name="scrollArea">
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+      <widget class="QListWidget" name="ecgReviewListWidget">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
        </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>79</width>
-          <height>422</height>
-         </rect>
-        </property>
-       </widget>
       </widget>
      </item>
     </layout>
@@ -111,7 +101,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="ctkVTKChartView" name="ecgView" native="true">
+      <widget class="ctkVTKChartView" name="ecgView">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -161,15 +151,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QVTKWidget</class>
-   <extends>QWidget</extends>
-   <header>QVTKWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ctkVTKChartView</class>
    <extends>QWidget</extends>
    <header>ctkVTKChartView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVTKWidget</class>
+   <extends>QWidget</extends>
+   <header>QVTKWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
