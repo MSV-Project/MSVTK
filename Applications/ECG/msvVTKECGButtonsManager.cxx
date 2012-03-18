@@ -28,6 +28,7 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DButtonRepresentation.h>
+#include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkWidgetEvent.h>
@@ -77,6 +78,10 @@ public:
 
   // Keep time track of last button which has been in interaction.
   vtkIdType LastSelectedButton;
+
+  const double(* Colors)[3];
+  unsigned int  ColorCount;
+  int           CurrentColor;
 };
 
 //------------------------------------------------------------------------------
@@ -87,6 +92,9 @@ msvVTKECGButtonsManager::vtkInternal::vtkInternal(msvVTKECGButtonsManager* ext)
 {
   this->External = ext;
   this->LastSelectedButton = -1;
+  this->Colors = NULL;
+  this->ColorCount = 0;
+  this->CurrentColor = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -145,6 +153,14 @@ void msvVTKECGButtonsManager::vtkInternal::CreateButtonWidgets(vtkPolyData* poly
     vtkNew<msvVTKProp3DButtonRepresentation> rep;
     rep->SetNumberOfStates(1);
     rep->SetButtonProp(0, buttonHandle->PropButton->CubeActor);
+    if (this->ColorCount > 0)
+      {
+      buttonHandle->PropButton->CubeActor->GetProperty()->SetColor(
+        this->Colors[this->CurrentColor][0],
+        this->Colors[this->CurrentColor][1],
+        this->Colors[this->CurrentColor][2]);
+      this->CurrentColor = (this->CurrentColor + 1) % this->ColorCount;
+      }
     rep->SetPlaceFactor(1);
     rep->SetDragable(0);
     rep->SetFollowCamera(0);
@@ -206,6 +222,13 @@ msvVTKECGButtonsManager::~msvVTKECGButtonsManager()
 void msvVTKECGButtonsManager::SetNumberOfButtonWidgets(int number)
 {
   this->NumberOfButtonWidgets = std::min(number,this->MaxNumberOfButtonWidgets);
+}
+
+//------------------------------------------------------------------------------
+void msvVTKECGButtonsManager::SetColors(const double (*colors)[3], unsigned int colorCount)
+{
+  this->Internal->Colors = colors;
+  this->Internal->ColorCount = colorCount;
 }
 
 //------------------------------------------------------------------------------
