@@ -28,11 +28,11 @@
 #include <ctkVTKObject.h>
 
 // ECG includes
-//#include "msvHAIxport.h"
+#include "msvHAIExport.h"
 
 class msvQHAIMainWindowPrivate;
 
-class msvQHAIMainWindow : public QMainWindow
+class MSV_HAI_EXPORT msvQHAIMainWindow : public QMainWindow
 {
   Q_OBJECT
   QVTK_OBJECT
@@ -42,7 +42,10 @@ public:
   virtual ~msvQHAIMainWindow();
 
 public slots:
+  void addData();
+  void clearData();
   void aboutApplication();
+  void setDefaultLOD(int lod);
 
 protected slots:
 

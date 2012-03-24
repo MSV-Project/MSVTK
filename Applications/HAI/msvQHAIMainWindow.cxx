@@ -19,35 +19,30 @@
 ==============================================================================*/
 
 // Qt includes
-#include "QFileDialog"
-#include "QRegExp"
-#include "QString"
+#include <QFileDialog>
 
 // MSV includes
 #include "msvQHAIMainWindow.h"
-#include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKXMLMultiblockLODReader.h"
 #include "ui_msvQHAIMainWindow.h"
 #include "msvQHAIAboutDialog.h"
 
 // VTK includes
-#include "vtkActor.h"
 #include "vtkAxesActor.h"
 #include "vtkAxis.h"
-#include "vtkChartXY.h"
 #include "vtkCollection.h"
-#include "vtkDelimitedTextReader.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositePolyDataMapper.h"
 #include "vtkDoubleArray.h"
+#include "vtkInformation.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkOrientationMarkerWidget.h"
-#include "vtkPlotBar.h"
-#include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
-#include "vtkTable.h"
 
 //------------------------------------------------------------------------------
 class msvQHAIMainWindowPrivate: public Ui_msvQHAIMainWindow
@@ -56,28 +51,30 @@ class msvQHAIMainWindowPrivate: public Ui_msvQHAIMainWindow
 protected:
   msvQHAIMainWindow* const q_ptr;
 
+  void setupView();
+  void updateItem(QTreeWidgetItem* item, vtkDataObject* dataObject);
+
   // Scene Rendering
   vtkSmartPointer<vtkRenderer> threeDRenderer;
   vtkSmartPointer<vtkAxesActor> axes;
   vtkSmartPointer<vtkOrientationMarkerWidget> orientationMarker;
 
-  // CartoPoints Pipeline
-  vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
-  vtkSmartPointer<vtkPolyDataReader>              polyDataReader;
-  vtkSmartPointer<vtkPolyDataMapper>              cartoPointsMapper;
-  vtkSmartPointer<vtkActor>                       cartoPointsActor;
+  // Pipeline
+  vtkSmartPointer<msvVTKXMLMultiblockLODReader> lodReader;
+  vtkSmartPointer<vtkCompositePolyDataMapper> lodMapper;
+  vtkSmartPointer<vtkActor> lodActor;
 
 public:
   msvQHAIMainWindowPrivate(msvQHAIMainWindow& object);
   ~msvQHAIMainWindowPrivate();
 
-  virtual void setup(QMainWindow*);
   virtual void setupUi(QMainWindow*);
-  virtual void setupView();
-  virtual void update();
-  virtual void updateUi();
+  void update();
+  void updateUi();
 
-  virtual void clear();
+  void readCompositeFile(const QString& fileName);
+
+  void clear();
 };
 
 //------------------------------------------------------------------------------
@@ -98,19 +95,17 @@ msvQHAIMainWindowPrivate::msvQHAIMainWindowPrivate(msvQHAIMainWindow& object)
   this->orientationMarker->SetOutlineColor(0.9300, 0.5700, 0.1300);
   this->orientationMarker->SetOrientationMarker(axes);
 
-  // CartoPoints Readers
-  this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
-  this->cartoPointsReader =
-    vtkSmartPointer<msvVTKPolyDataFileSeriesReader>::New();
-  this->cartoPointsReader->SetReader(this->polyDataReader);
+  // Create the reader
+  this->lodReader = vtkSmartPointer<msvVTKXMLMultiblockLODReader>::New();
 
-  // Create Pipeline for the CartoPoints
-  this->cartoPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->cartoPointsMapper->ScalarVisibilityOff();
-  this->cartoPointsMapper->SetInputConnection(
-    this->cartoPointsReader->GetOutputPort());
-  this->cartoPointsActor = vtkSmartPointer<vtkActor>::New();
-  this->cartoPointsActor->SetMapper(this->cartoPointsMapper);
+  // Pipeline
+  this->lodMapper = vtkSmartPointer<vtkCompositePolyDataMapper>::New();
+  this->lodMapper->SetInputConnection(
+    this->lodReader->GetOutputPort());
+
+  this->lodActor = vtkSmartPointer<vtkActor>::New();
+  this->lodActor->SetMapper(lodMapper.GetPointer());
+  this->threeDRenderer->AddActor(lodActor);
 }
 
 //------------------------------------------------------------------------------
@@ -124,16 +119,8 @@ void msvQHAIMainWindowPrivate::clear()
 {
   Q_Q(msvQHAIMainWindow);
 
-  this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
-  this->cartoPointsReader->RemoveAllFileNames();  // clean up the reader
-  this->cartoPointsMapper->Update();              // update the pipeline
-}
-
-//------------------------------------------------------------------------------
-void msvQHAIMainWindowPrivate::setup(QMainWindow * mainWindow)
-{
-  this->setupUi(mainWindow);
-  this->setupView();
+  this->lodReader->SetFileName("");  // clean up the reader
+  this->update(); // update the pipeline
 }
 
 //------------------------------------------------------------------------------
@@ -142,19 +129,16 @@ void msvQHAIMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   Q_Q(msvQHAIMainWindow);
 
   this->Ui_msvQHAIMainWindow::setupUi(mainWindow);
-  //this->HAIReviewPanel->setVisible(false);
-  q->setStatusBar(0);
+  this->organsTreeWidget->setColumnCount(2);
 
   // Connect Menu ToolBars actions
-  q->connect(this->actionOpen, SIGNAL(triggered()), q, SLOT(openData()));
-  q->connect(this->actionClose, SIGNAL(triggered()), q, SLOT(closeData()));
+  q->connect(this->actionOpen, SIGNAL(triggered()), q, SLOT(addData()));
+  q->connect(this->actionClose, SIGNAL(triggered()), q, SLOT(clearData()));
   q->connect(this->actionExit, SIGNAL(triggered()), q, SLOT(close()));
-  q->connect(this->actionAboutHAIApplication, SIGNAL(triggered()), q,
-             SLOT(aboutApplication()));
-
-  // Playback Controller
-  q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
-             q, SLOT(onCurrentTimeChanged(double)));
+  q->connect(this->actionAboutHAIApplication, SIGNAL(triggered()),
+             q, SLOT(aboutApplication()));
+  q->connect(this->lodComboBox, SIGNAL(currentIndexChanged(int)),
+             q, SLOT(setDefaultLOD(int)));
 
   // Customize QAction icons with standard pixmaps
   QIcon dirIcon = q->style()->standardIcon(QStyle::SP_DirIcon);
@@ -164,8 +148,7 @@ void msvQHAIMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   this->actionOpen->setIcon(dirIcon);
   this->actionAboutHAIApplication->setIcon(informationIcon);
 
-  // Associate the TimePlayerWidget to the sink (mapper)
-  this->timePlayerWidget->setFilter(this->cartoPointsMapper);
+  this->setupView();
 }
 
 //------------------------------------------------------------------------------
@@ -174,8 +157,8 @@ void msvQHAIMainWindowPrivate::setupView()
   this->threeDView->GetRenderWindow()->AddRenderer(this->threeDRenderer);
 
   // Marker annotation
-  this->orientationMarker->SetInteractor
-    (this->threeDRenderer->GetRenderWindow()->GetInteractor());
+  this->orientationMarker->SetInteractor(
+    this->threeDRenderer->GetRenderWindow()->GetInteractor());
   this->orientationMarker->SetEnabled(1);
   this->orientationMarker->InteractiveOn();
 }
@@ -183,15 +166,98 @@ void msvQHAIMainWindowPrivate::setupView()
 //------------------------------------------------------------------------------
 void msvQHAIMainWindowPrivate::update()
 {
+  this->threeDRenderer->ResetCamera();
+  this->threeDView->GetRenderWindow()->Render();
   this->updateUi();
-  //this->updateView();
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindowPrivate::readCompositeFile(const QString& fileName)
+{
+  this->lodReader->SetFileName(fileName.toLatin1());
+  this->update();
 }
 
 //------------------------------------------------------------------------------
 void msvQHAIMainWindowPrivate::updateUi()
 {
+  this->organsTreeWidget->clear();
+  vtkMultiBlockDataSet* dataSet = vtkMultiBlockDataSet::SafeDownCast(
+    this->lodReader->GetOutput());
+  if (!dataSet)
+    {
+    return;
+    }
+
+//  dataSet->Print(std::cout);
+
+  QTreeWidgetItem* rootItem = new QTreeWidgetItem();
+  rootItem->setText(0, QFileInfo(this->lodReader->GetFileName()).baseName());
+  this->organsTreeWidget->addTopLevelItem(rootItem);
+  this->updateItem(rootItem, dataSet);
 }
 
+//------------------------------------------------------------------------------
+void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* dataObject)
+{
+  if (!dataObject)
+    {
+    item->setText(1, "not loaded");
+    }
+  if (vtkCompositeDataSet::SafeDownCast(dataObject))
+    {
+    vtkCompositeDataSet* compositeDataSet =
+      vtkCompositeDataSet::SafeDownCast(dataObject);
+    QString type;
+    if (item->parent() == 0)
+      {
+      type = "Piece";
+      }
+    else
+      {
+      type = "LOD";
+      }
+    vtkCompositeDataIterator* it = compositeDataSet->NewIterator();
+    it->SetVisitOnlyLeaves(0);
+    it->SetTraverseSubTree(0);
+    it->SetSkipEmptyNodes(0);
+    unsigned int childIndex = 0;
+    for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+      {
+      vtkDataObject* childObject = it->GetCurrentDataObject();
+      QTreeWidgetItem* childItem = new QTreeWidgetItem();
+      item->addChild(childItem);
+      childItem->setText(0, QString("%1 #%2").arg(type).arg(childIndex++));
+      this->updateItem(childItem, childObject);
+      }
+    item->setText(1, QString("%1 %2s").arg(childIndex).arg(type));
+    }
+  else if (vtkPolyData::SafeDownCast(dataObject))
+    {
+    vtkPolyData* polyData = vtkPolyData::SafeDownCast(dataObject);
+    item->setText(1, QString::number(polyData->GetNumberOfPolys()));
+    }
+
+  /*--------------------------------------------------------------------------*/
+  // CompositeDataIterator
+  /*--------------------------------------------------------------------------
+  vtkCompositeDataIterator* it = dataSet->NewIterator();
+  it->InitTraversal ();
+  if (!it)
+    {
+    std::cerr << "Error: vtkMultiBlockDataSet = null"
+              << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  while ( it->IsDoneWithTraversal() == 0 )
+    {
+    std::cout << "Active Data [FlatIndex]: "
+              << it->GetCurrentFlatIndex() << std::endl;
+    it->GoToNextItem();
+    }
+  */
+}
 //------------------------------------------------------------------------------
 // msvQHAIMainWindow methods
 
@@ -201,7 +267,7 @@ msvQHAIMainWindow::msvQHAIMainWindow(QWidget* parentWidget)
   , d_ptr(new msvQHAIMainWindowPrivate(*this))
 {
   Q_D(msvQHAIMainWindow);
-  d->setup(this);
+  d->setupUi(this);
 }
 
 //------------------------------------------------------------------------------
@@ -214,4 +280,32 @@ void msvQHAIMainWindow::aboutApplication()
 {
   msvQHAIAboutDialog about(this);
   about.exec();
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::addData()
+{
+  Q_D(msvQHAIMainWindow);
+
+  QString file = QFileDialog::getOpenFileName(
+    this, tr("Select Anatomy file (.xml)"));
+  if (file.isEmpty())
+    return;
+
+  d->readCompositeFile(file);
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::clearData()
+{
+  Q_D(msvQHAIMainWindow);
+  d->clear();
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::setDefaultLOD(int lod)
+{
+  Q_D(msvQHAIMainWindow);
+  d->lodReader->SetDefaultLOD(lod);
+  d->update();
 }

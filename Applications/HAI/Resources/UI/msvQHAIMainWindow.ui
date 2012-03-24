@@ -14,19 +14,12 @@
    <string>HAI - Multi Scale Visualization Toolkit</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+   <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
     <property name="margin">
      <number>0</number>
     </property>
     <item>
      <widget class="QVTKWidget" name="threeDView" native="true"/>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="msvQTimePlayerWidget" name="timePlayerWidget" native="true"/>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
@@ -36,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -56,7 +49,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="haiReviewPanel">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -70,54 +62,31 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QScrollArea" name="scrollArea">
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>79</width>
-          <height>422</height>
-         </rect>
+      <widget class="QComboBox" name="lodComboBox">
+       <item>
+        <property name="text">
+         <string>LOD #0</string>
         </property>
-       </widget>
+       </item>
+       <item>
+        <property name="text">
+         <string>LOD #1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>LOD #2</string>
+        </property>
+       </item>
       </widget>
      </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="haiPanel">
-   <property name="floating">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <property name="margin">
-      <number>0</number>
-     </property>
      <item>
-      <widget class="ctkVTKChartView" name="haiView" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>80</height>
-        </size>
-       </property>
+      <widget class="QTreeWidget" name="organsTreeWidget">
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
       </widget>
      </item>
     </layout>
@@ -164,18 +133,6 @@
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
    <header>QVTKWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkVTKChartView</class>
-   <extends>QWidget</extends>
-   <header>ctkVTKChartView.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>msvQTimePlayerWidget</class>
-   <extends>QWidget</extends>
-   <header>msvQTimePlayerWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
