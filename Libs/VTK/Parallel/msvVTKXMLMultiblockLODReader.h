@@ -42,7 +42,7 @@ public:
 
   // Get / Set the level of details by default for the whole composite dataset
   // The SetDefaultLOD method restore each piece to the DefaultLOD.
-  vtkGetMacro(DefaultLOD, int);
+  unsigned int GetDefaultLOD();
   void SetDefaultLOD(unsigned int lod);
 
   // Restore each piece to the LOD by default
@@ -75,9 +75,6 @@ protected:
   // Given the inorder index for a leaf node, this method tells if the current
   // process should get read the dataset within the composite.
   bool ShouldGetDataSet(int datasetIndex, vtkXMLDataElement* node);
-
-  int DefaultLOD;          // The level of detail by default.
-  int CurrentLODTreeLevel; // At which level the node are considered as LOD.
 
 private:
   msvVTKXMLMultiblockLODReader(const msvVTKXMLMultiblockLODReader&);  // Not implemented.

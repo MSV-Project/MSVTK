@@ -66,6 +66,7 @@ public:
   msvVTKXMLMultiblockLODReaderInternal();
   ~msvVTKXMLMultiblockLODReaderInternal();
 
+  void InitListUpdateNodes(vtkXMLDataElement* rootElement);
   void InitListUpdateNodes(vtkXMLDataElement* root,
                            unsigned int lodTreeLevel,
                            unsigned int defaultLOD,
@@ -85,8 +86,6 @@ public:
   // bool ShouldReadNode(vtkXMLDataElement* node, int CurrentLODTreeLevel);
 
   vtkXMLReader* GetReaderOfType(const char* type);
-  bool RequestUpdateInformation;
-  unsigned int CurrentFlatIndex;
 
   // The information is stocked in this vector is as the follow:
   // The index of the vector corresponds to the flatIndex of the tree.
@@ -101,6 +100,12 @@ public:
   };
   typedef std::vector<NodeInfos> NodesInfosType;
   NodesInfosType NodesInfos;
+
+  bool RequestUpdateInformation;
+  unsigned int CurrentFlatIndex;
+
+  int DefaultLOD;          // The level of detail by default.
+  int CurrentLODTreeLevel; // At which level the node are considered as LOD.
 };
 
 //------------------------------------------------------------------------------
@@ -127,6 +132,11 @@ msvVTKXMLMultiblockLODReaderInternal()
 {
   this->RequestUpdateInformation = true;
   this->CurrentFlatIndex = 0;
+
+  // Read Only the low level of resolution by default
+  this->DefaultLOD = 0;
+  // By default the LOD definition are in the second level of the tree
+  this->CurrentLODTreeLevel = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -137,12 +147,33 @@ msvVTKXMLMultiblockLODReaderInternal::
 }
 
 //------------------------------------------------------------------------------
+void msvVTKXMLMultiblockLODReaderInternal::InitListUpdateNodes(vtkXMLDataElement* primaryElement)
+{
+  unsigned int numberOfNodes = msvVTKXMLMultiblockLODReaderInternal::
+    CountNumberOfNodes(primaryElement);
+
+  // Default values
+  msvVTKXMLMultiblockLODReaderInternal::NodeInfos nodeInfos = {-1,0};
+  this->NodesInfos.assign(numberOfNodes, nodeInfos);
+  this->CurrentFlatIndex = 0; // We reset the flatIndex
+  this->InitListUpdateNodes(primaryElement,
+                            this->CurrentLODTreeLevel,
+                            this->DefaultLOD);
+  this->RequestUpdateInformation = false;
+}
+
+//------------------------------------------------------------------------------
 void msvVTKXMLMultiblockLODReaderInternal::InitListUpdateNodes(
   vtkXMLDataElement* element,
   unsigned int lodTreeLevel,
   unsigned int defaultLOD,
   int parent)
 {
+  if (element == 0)
+    {
+    return;
+    }
+
   const char* tag = element->GetName();
   if (strcmp(tag, "vtkMultiBlockDataSet") != 0 &&
         strcmp(tag, "Block") != 0 && strcmp(tag, "Piece") != 0)
@@ -199,6 +230,10 @@ void msvVTKXMLMultiblockLODReaderInternal::UpdateNodesFromDefaultLOD(
   unsigned int lod,
   int pieceIndex)
 {
+  if (element == 0)
+    {
+    return;
+    }
   const char* tag = element->GetName();
   if (strcmp(tag, "vtkMultiBlockDataSet") != 0 &&
         strcmp(tag, "Block") != 0 && strcmp(tag, "Piece") != 0)
@@ -248,6 +283,11 @@ void msvVTKXMLMultiblockLODReaderInternal::UpdateNodesFromDefaultLOD(
 unsigned int msvVTKXMLMultiblockLODReaderInternal::
 CountNumberOfNodes(vtkXMLDataElement* node)
 {
+  if (node == 0)
+    {
+    return 0;
+    }
+
   const char* tagName = node->GetName();
   if (strcmp(tagName, "DataSet") == 0)
     {
@@ -315,11 +355,6 @@ vtkStandardNewMacro(msvVTKXMLMultiblockLODReader);
 msvVTKXMLMultiblockLODReader::msvVTKXMLMultiblockLODReader()
 {
   this->Internal = new msvVTKXMLMultiblockLODReaderInternal;
-
-  // Read Only the low level of resolution by default
-  this->DefaultLOD = 0;
-  // By default the LOD definition are in the second level of the tree
-  this->CurrentLODTreeLevel = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -343,21 +378,12 @@ RequestData(vtkInformation* request,
             vtkInformationVector** inputVector,
             vtkInformationVector* outputVector)
 {
-  // Use if the XML is modified outside of the applcation || the first time.
-  if (this->Internal->RequestUpdateInformation)
+  // Use if the XML is modified outside of the application or the first time.
+  // TODO: set RequestUpdateInformation to true when modified
+  if (this->Internal->RequestUpdateInformation ||
+      this->Internal->NodesInfos.size() == 0)
     {
-    unsigned int numberOfNodes = msvVTKXMLMultiblockLODReaderInternal::
-      CountNumberOfNodes(this->GetPrimaryElement());
-
-    // Default values
-    msvVTKXMLMultiblockLODReaderInternal::NodeInfos nodeInfos = {-1,0};
-    this->Internal->NodesInfos.assign(numberOfNodes, nodeInfos);
-
-    this->Internal->CurrentFlatIndex = 0; // We reset the flatIndex
-    this->Internal->InitListUpdateNodes(this->GetPrimaryElement(),
-                                        this->CurrentLODTreeLevel,
-                                        this->DefaultLOD);
-    this->Internal->RequestUpdateInformation = false;
+    this->Internal->InitListUpdateNodes(this->GetPrimaryElement());
     }
 
   this->Internal->CurrentFlatIndex = 0;
@@ -552,7 +578,7 @@ bool msvVTKXMLMultiblockLODReader::ShouldGetDataSet(int dataSetIndex,
   vtkXMLDataElement* father = node->GetParent();
   int currentLOD =
       this->Internal->GetFatherLOD(this->Internal->CurrentFlatIndex);
-  if (nodeLevel != this->CurrentLODTreeLevel ||
+  if (nodeLevel != this->Internal->CurrentLODTreeLevel ||
       node == father->GetNestedElement(currentLOD))
     {
     return true;
@@ -585,13 +611,19 @@ void msvVTKXMLMultiblockLODReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //------------------------------------------------------------------------------
+unsigned int  msvVTKXMLMultiblockLODReader::GetDefaultLOD()
+{
+  return this->Internal->DefaultLOD;
+}
+
+//------------------------------------------------------------------------------
 void msvVTKXMLMultiblockLODReader::SetDefaultLOD(unsigned int lod)
 {
   this->Internal->CurrentFlatIndex = 0;
   this->Internal->UpdateNodesFromDefaultLOD(this->GetPrimaryElement(),
-                                            this->CurrentLODTreeLevel, lod);
+                                            this->Internal->CurrentLODTreeLevel, lod);
 
-  this->DefaultLOD = lod;
+  this->Internal->DefaultLOD = lod;
   this->Modified();
 }
 
@@ -600,7 +632,7 @@ void msvVTKXMLMultiblockLODReader::SetPieceLOD(int pieceIndex, unsigned int lod)
 {
   this->Internal->CurrentFlatIndex = 0;
   this->Internal->UpdateNodesFromDefaultLOD(this->GetPrimaryElement(),
-                                            this->CurrentLODTreeLevel,
+                                            this->Internal->CurrentLODTreeLevel,
                                             lod,
                                             pieceIndex);
 
@@ -610,5 +642,5 @@ void msvVTKXMLMultiblockLODReader::SetPieceLOD(int pieceIndex, unsigned int lod)
 //------------------------------------------------------------------------------
 void msvVTKXMLMultiblockLODReader::RestoreDefaultLOD()
 {
-  this->SetDefaultLOD(this->DefaultLOD);
+  this->SetDefaultLOD(this->Internal->DefaultLOD);
 }
