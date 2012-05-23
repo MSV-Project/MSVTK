@@ -48,7 +48,10 @@ endif()
 # Sources
 # --------------------------------------------------------------------------
 set(msvVTKWidgets_SRCS
+  msvVTKLODWidget.cxx
+  msvVTKLODWidget.h
   msvVTKProp3DButtonRepresentation.cxx
+  msvVTKProp3DButtonRepresentation.h
   msvVTKSliderFixedRepresentation2D.cxx
   )
 

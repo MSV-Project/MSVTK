@@ -30,6 +30,7 @@
 // ECG includes
 #include "msvHAIExport.h"
 
+class QTreeWidgetItem;
 class msvQHAIMainWindowPrivate;
 
 class MSV_HAI_EXPORT msvQHAIMainWindow : public QMainWindow
@@ -48,7 +49,7 @@ public slots:
   void setDefaultLOD(int lod);
 
 protected slots:
-
+  void updateLODFromItem(QTreeWidgetItem* item);
 protected:
   QScopedPointer<msvQHAIMainWindowPrivate> d_ptr;
 

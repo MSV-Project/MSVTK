@@ -26,13 +26,15 @@
 #include "msvVTKXMLMultiblockLODReader.h"
 #include "ui_msvQHAIMainWindow.h"
 #include "msvQHAIAboutDialog.h"
+#include "msvVTKLODWidget.h"
+#include "msvVTKProp3DButtonRepresentation.h"
 
 // VTK includes
 #include "vtkAxesActor.h"
 #include "vtkAxis.h"
 #include "vtkCollection.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkCompositePolyDataMapper.h"
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
@@ -40,6 +42,7 @@
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
@@ -61,9 +64,10 @@ protected:
 
   // Pipeline
   vtkSmartPointer<msvVTKXMLMultiblockLODReader> lodReader;
-  vtkSmartPointer<vtkCompositePolyDataMapper> lodMapper;
+  vtkSmartPointer<vtkCompositePolyDataMapper2> lodMapper;
   vtkSmartPointer<vtkActor> lodActor;
 
+  vtkSmartPointer<msvVTKLODWidget> lodWidget;
 public:
   msvQHAIMainWindowPrivate(msvQHAIMainWindow& object);
   ~msvQHAIMainWindowPrivate();
@@ -99,13 +103,22 @@ msvQHAIMainWindowPrivate::msvQHAIMainWindowPrivate(msvQHAIMainWindow& object)
   this->lodReader = vtkSmartPointer<msvVTKXMLMultiblockLODReader>::New();
 
   // Pipeline
-  this->lodMapper = vtkSmartPointer<vtkCompositePolyDataMapper>::New();
+  this->lodMapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
   this->lodMapper->SetInputConnection(
     this->lodReader->GetOutputPort());
 
   this->lodActor = vtkSmartPointer<vtkActor>::New();
   this->lodActor->SetMapper(lodMapper.GetPointer());
   this->threeDRenderer->AddActor(lodActor);
+
+  // Depth peeling
+  //this->threeDRenderer->SetUseDepthPeeling(1);
+  //this->threeDRenderer->SetMaximumNumberOfPeels(200);
+  //this->threeDRenderer->SetOcclusionRatio(0.1);
+
+  //this->lodActor->GetProperty()->SetOpacity(0.5);
+  //this->lodActor->GetProperty()->SetBackfaceCulling(1);
+  //this->lodActor->GetProperty()->SetFrontfaceCulling(0);
 }
 
 //------------------------------------------------------------------------------
@@ -139,6 +152,8 @@ void msvQHAIMainWindowPrivate::setupUi(QMainWindow * mainWindow)
              q, SLOT(aboutApplication()));
   q->connect(this->lodComboBox, SIGNAL(currentIndexChanged(int)),
              q, SLOT(setDefaultLOD(int)));
+  q->connect(this->organsTreeWidget, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
+             q, SLOT(updateLODFromItem(QTreeWidgetItem*)));
 
   // Customize QAction icons with standard pixmaps
   QIcon dirIcon = q->style()->standardIcon(QStyle::SP_DirIcon);
@@ -161,6 +176,12 @@ void msvQHAIMainWindowPrivate::setupView()
     this->threeDRenderer->GetRenderWindow()->GetInteractor());
   this->orientationMarker->SetEnabled(1);
   this->orientationMarker->InteractiveOn();
+
+  vtkRenderWindowInteractor* iren =
+    this->threeDView->GetRenderWindow()->GetInteractor();
+  lodWidget = vtkSmartPointer<msvVTKLODWidget>::New();
+  lodWidget->SetInteractor(iren);
+  lodWidget->SetEnabled(1);
 }
 
 //------------------------------------------------------------------------------
@@ -194,7 +215,10 @@ void msvQHAIMainWindowPrivate::updateUi()
   QTreeWidgetItem* rootItem = new QTreeWidgetItem();
   rootItem->setText(0, QFileInfo(this->lodReader->GetFileName()).baseName());
   this->organsTreeWidget->addTopLevelItem(rootItem);
+  this->organsTreeWidget->blockSignals(true);
   this->updateItem(rootItem, dataSet);
+  this->organsTreeWidget->blockSignals(false);
+  this->organsTreeWidget->expandItem(rootItem);
 }
 
 //------------------------------------------------------------------------------
@@ -222,6 +246,7 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
     it->SetTraverseSubTree(0);
     it->SetSkipEmptyNodes(0);
     unsigned int childIndex = 0;
+    int usedLODIndex = -1;
     for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
       {
       vtkDataObject* childObject = it->GetCurrentDataObject();
@@ -229,8 +254,20 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
       item->addChild(childItem);
       childItem->setText(0, QString("%1 #%2").arg(type).arg(childIndex++));
       this->updateItem(childItem, childObject);
+      if (childObject != 0)
+        {
+        usedLODIndex = childIndex -1;
+        }
       }
-    item->setText(1, QString("%1 %2s").arg(childIndex).arg(type));
+    if (childIndex == 3)
+      {
+      item->setData(1, Qt::DisplayRole, QVariant(usedLODIndex));
+      item->setFlags(item->flags() | Qt::ItemIsEditable);
+      }
+    else
+      {
+      item->setText(1, QString("%1 %2s").arg(childIndex).arg(type));
+      }
     }
   else if (vtkPolyData::SafeDownCast(dataObject))
     {
@@ -258,6 +295,7 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
     }
   */
 }
+
 //------------------------------------------------------------------------------
 // msvQHAIMainWindow methods
 
@@ -307,5 +345,20 @@ void msvQHAIMainWindow::setDefaultLOD(int lod)
 {
   Q_D(msvQHAIMainWindow);
   d->lodReader->SetDefaultLOD(lod);
+  d->update();
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::updateLODFromItem(QTreeWidgetItem* item)
+{
+  Q_D(msvQHAIMainWindow);
+  QTreeWidgetItem* parent = item ? item->parent() : 0;
+  if (!parent)
+    {
+    return;
+    }
+  int index = parent->indexOfChild(item);
+  Q_ASSERT(index >= 0);
+  d->lodReader->SetPieceLOD(index, item->data(1,Qt::DisplayRole).toInt());
   d->update();
 }
