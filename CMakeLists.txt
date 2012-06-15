@@ -361,7 +361,8 @@ set(MSVTK_PLUGINS_SUBDIRS )
 set(MSVTK_APPLICATIONS_SUBDIRS )
 
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkButtons" ON)
-list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
+option(MSVTK_APP_VTKBUTTONS "vtkButtons application to demonstrate vtkButtons" ON)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG VTKBUTTONS)
 
 #-----------------------------------------------------------------------------
 # Prerequisites
