@@ -109,19 +109,6 @@ msvToolVTKButtons::msvToolVTKButtons() : QObject(), m_ShowLabel(true), m_FlyTo(t
     VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
     rep->SetNumberOfStates(1);
     
-    //Load image only the first time
-    
-    QImage image;
-    QString iconType = "/Users/dannox/Pictures/testIcon.png";
-    image.load(iconType);
-    VTK_CREATE(vtkQImageToImageSource, imageToVTK);
-    imageToVTK->SetQImage(&image);
-    imageToVTK->Update();
-    rep->SetButtonTexture(0, imageToVTK->GetOutput());
-    
-    int size[2]; size[0] = 16; size[1] = 16;
-    rep->GetBalloon()->SetImageSize(size);
-
     buttonCallback = vtkButtonCallback::New();
     buttonCallback->toolButton = this;
     
@@ -151,6 +138,20 @@ void msvToolVTKButtons::setCurrentRenderer(vtkRenderer *renderer) {
         buttonCallback->renderer = NULL;
         m_ButtonWidget->EnabledOff();
     }
+}
+
+void msvToolVTKButtons::setIconFileName(QString &iconFileName) {
+    m_IconFileName = iconFileName;
+    QImage image;
+    image.load(m_IconFileName);
+    VTK_CREATE(vtkQImageToImageSource, imageToVTK);
+    imageToVTK->SetQImage(&image);
+    imageToVTK->Update();
+    vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(m_ButtonWidget->GetRepresentation());
+    rep->SetButtonTexture(0, imageToVTK->GetOutput());
+    
+    int size[2]; size[0] = 16; size[1] = 16;
+    rep->GetBalloon()->SetImageSize(size);
 }
 
 void msvToolVTKButtons::setBounds(double b[6]) {

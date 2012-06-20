@@ -47,6 +47,9 @@ public:
 
     /// Allow to show/hide label
     void setShowLabel(bool show);
+    
+    /// set the icon path
+    void setIconFileName(QString &iconFileName);
 
     /// Return showLabel flag
     bool showLabel() const;

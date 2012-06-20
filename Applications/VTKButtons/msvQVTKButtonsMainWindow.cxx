@@ -285,6 +285,8 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 void msvQVTKButtonsMainWindowPrivate::addVTKButton() {
     msvToolVTKButtons *toolButton = new msvToolVTKButtons();
     QString name("TestData");
+    QString iconFileName("/Users/dannox/Pictures/testIcon.png");
+    toolButton->setIconFileName(iconFileName);
     toolButton->setLabel(name);
 
     toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
