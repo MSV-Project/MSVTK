@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef __msvECGMainWindow_h
-#define __msvECGMainWindow_h
+#ifndef __msvVTKBUTTONSMainWindow_h
+#define __msvVTKBUTTONSMainWindow_h
 
 // Qt includes
 #include <QMainWindow>

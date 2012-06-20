@@ -33,6 +33,8 @@
 #include "msvQVTKButtonsAboutDialog.h"
 
 // VTK includes
+#include "vtkAlgorithmOutput.h"
+#include "vtkInformation.h"
 #include "vtkActor.h"
 #include "vtkAppendFilter.h"
 #include "vtkAxesActor.h"
@@ -53,7 +55,7 @@
 #include "msvToolVTKButtons.h"
 #include <vtkEllipticalButtonSource.h>
 #include <vtkTexturedButtonRepresentation.h>
-#include <vtkPNGReader.h>
+#include <vtkDataSetReader.h>
 #include <vtkButtonWidget.h>
 
 #define VTK_CREATE(type, name) \
@@ -89,8 +91,7 @@ protected:
   vtkSmartPointer<vtkTable> currentTimeLine;
 
   // CartoPoints Pipeline
-  vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
-  vtkSmartPointer<vtkPolyDataReader>              polyDataReader;
+  vtkSmartPointer<vtkDataSetReader>              polyDataReader;
 
   vtkSmartPointer<vtkPolyDataMapper>              surfaceMapper;
   vtkSmartPointer<vtkActor>                       surfaceActor;
@@ -150,7 +151,7 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
   this->currentTimeLine->AddColumn(yCoords.GetPointer());
 
   // CartoPoints Readers
-  this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
+  this->polyDataReader    = vtkSmartPointer<vtkDataSetReader>::New();
 
   // Create Pipeline for the CartoPoints
   this->surfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -265,22 +266,29 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
     polyDataReader->SetFileName(filePath.toAscii().data());
     polyDataReader->Update();
     
-    // render data into the scene
-    this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
-    this->threeDRenderer->AddActor(this->surfaceActor);
+    int type = polyDataReader->ReadOutputType();
     
-    addVTKButton();
+    if(type == 0) {
+        // render data into the scene
+        this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
+        this->threeDRenderer->AddActor(this->surfaceActor);
     
-    this->threeDRenderer->ResetCamera();
+        addVTKButton();
+    
+        this->threeDRenderer->ResetCamera();
+    } else {
+        qWarning() << "Current Data is not a polydata";
+    }
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::addVTKButton() {
     msvToolVTKButtons *toolButton = new msvToolVTKButtons();
-    toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
-    //renderize button
-    toolButton->setCurrentRenderer(this->threeDRenderer);
+    QString name("TestData");
+    toolButton->setLabel(name);
 
+    toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
+    toolButton->setCurrentRenderer(this->threeDRenderer);
 }
 
 //------------------------------------------------------------------------------

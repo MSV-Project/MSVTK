@@ -28,11 +28,8 @@ class MSV_VTKButtons_EXPORT msvToolVTKButtons : public QObject {
     Q_OBJECT
     
 public Q_SLOTS:
-    /// Called when the graphic object has been initialized ready to use
-    /*virtual*/ void graphicObjectInitialized();
-
     /// Allow to execute and update the pipeline when something change.
-    /*virtual*/ void updatePipe(double t = -1);
+    /*virtual*/ void update();
 
 public:
      /// Object constructor.
@@ -53,6 +50,8 @@ public:
 
     /// Return showLabel flag
     bool showLabel() const;
+    
+    void setLabel(QString &text);
 
     /// Allow to activate FlyTo animation
     void setFlyTo(bool active);
@@ -90,7 +89,8 @@ private:
     vtkButtonCallback *buttonCallback; ///< Callback called by picking on vtkButton
     vtkButtonHighLightCallback *highlightCallback; ///< Callback called by hovering over the button.
     
-    QString m_IconFileName; ///< File name of the imahe to be applied to the button.
+    QString m_Label; ///< label of the button
+    QString m_IconFileName; ///< File name of the image to be applied to the button.
     bool m_ShowButton; ///< Flag to show/hide button
     bool m_ShowLabel; ///< Flag to show/hide label
     bool m_FlyTo; ///< Flag to activate FlyTo animation
@@ -132,6 +132,10 @@ inline void msvToolVTKButtons::setOnCenter(bool onCenter) {
 
 inline bool msvToolVTKButtons::OnCenter() const {
     return m_OnCenter;
+}
+
+inline void msvToolVTKButtons::setLabel(QString &text) {
+    m_Label = text;
 }
 
 
