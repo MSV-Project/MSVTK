@@ -37,17 +37,9 @@
 #include "vtkAppendFilter.h"
 #include "vtkAxesActor.h"
 #include "vtkAxis.h"
-#include "vtkBrush.h"
-#include "vtkChartXY.h"
-#include "vtkCollection.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkDelaunay3D.h"
-#include "vtkDelimitedTextReader.h"
 #include "vtkDoubleArray.h"
 #include "vtkNew.h"
 #include "vtkOrientationMarkerWidget.h"
-#include "vtkPlotBar.h"
-#include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
@@ -56,6 +48,16 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
+
+//new
+#include "msvToolVTKButtons.h"
+#include <vtkEllipticalButtonSource.h>
+#include <vtkTexturedButtonRepresentation.h>
+#include <vtkPNGReader.h>
+#include <vtkButtonWidget.h>
+
+#define VTK_CREATE(type, name) \
+vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 const unsigned int colorCount = 8;
 const double colors[colorCount][3] = { {0.925490196,  0.17254902, 0.2},
@@ -74,10 +76,9 @@ class msvQVTKButtonsMainWindowPrivate: public Ui_msvQVTKButtonsMainWindow
 protected:
   msvQVTKButtonsMainWindow* const q_ptr;
 
-  void readCartoSignals(QDir signalsFilesDirectory);
-  void readCartoSignal(const QFileInfo& signalFile);
-  void readCartoPoints(QDir pointsFilesDirectory);
-
+  void importVTKData(QString &filePath);
+  void addVTKButton();
+    
   // Scene Rendering
   vtkSmartPointer<vtkRenderer> threeDRenderer;
   vtkSmartPointer<vtkAxesActor> axes;
@@ -90,15 +91,9 @@ protected:
   // CartoPoints Pipeline
   vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
   vtkSmartPointer<vtkPolyDataReader>              polyDataReader;
-  vtkSmartPointer<vtkPolyDataMapper>              cartoPointsMapper;
-  vtkSmartPointer<vtkActor>                       cartoPointsActor;
 
-  vtkSmartPointer<vtkDelaunay3D>                  delaunayFilter;
-  vtkSmartPointer<vtkDataSetSurfaceFilter>        surfaceFilter;
-  vtkSmartPointer<vtkPolyDataMapper>              cartoSurfaceMapper;
-  vtkSmartPointer<vtkActor>                       cartoSurfaceActor;
-
-  vtkSmartPointer<vtkAppendFilter>                mergedMapper;
+  vtkSmartPointer<vtkPolyDataMapper>              surfaceMapper;
+  vtkSmartPointer<vtkActor>                       surfaceActor;
 
   // buttonsManager
   vtkSmartPointer<msvVTKButtonsManager> buttonsManager;
@@ -118,14 +113,6 @@ public:
 
   virtual void clear();
 
-  virtual void readCartoData(const QString&);
-  void addCartoSignal(vtkDelimitedTextReader* signal);
-  void updateVTKButtonsView(ctkVTKChartView* ecgView,
-                     vtkTableAlgorithm* signal);
-  void addSignalPlot(ctkVTKChartView* ecgView, vtkPlot* signalPlot);
-  void updateVTKButtonsItem(QListWidgetItem * item);
-
-  static bool fileLessThan(const QString &, const QString &);
 };
 
 //------------------------------------------------------------------------------
@@ -164,39 +151,15 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
 
   // CartoPoints Readers
   this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
-  this->cartoPointsReader =
-    vtkSmartPointer<msvVTKPolyDataFileSeriesReader>::New();
-  this->cartoPointsReader->SetReader(this->polyDataReader);
-
-  this->delaunayFilter = vtkSmartPointer<vtkDelaunay3D>::New();
-  this->delaunayFilter->SetInputConnection(
-    this->cartoPointsReader->GetOutputPort());
-  this->surfaceFilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-  this->surfaceFilter->SetInputConnection(this->delaunayFilter->GetOutputPort());
 
   // Create Pipeline for the CartoPoints
-  this->cartoSurfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->cartoSurfaceMapper->ScalarVisibilityOff();
-  this->cartoSurfaceMapper->SetInputConnection(
-    this->surfaceFilter->GetOutputPort());
-  this->cartoSurfaceActor = vtkSmartPointer<vtkActor>::New();
-  this->cartoSurfaceActor->GetProperty()->SetOpacity(0.66);
-  this->cartoSurfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
-  this->cartoSurfaceActor->GetProperty()->BackfaceCullingOn();
-  this->cartoSurfaceActor->SetMapper(this->cartoSurfaceMapper);
-
-  // Create Pipeline for the CartoPoints
-  this->cartoPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->cartoPointsMapper->ScalarVisibilityOff();
-  this->cartoPointsMapper->SetInputConnection(
-    this->cartoPointsReader->GetOutputPort());
-  this->cartoPointsActor = vtkSmartPointer<vtkActor>::New();
-  this->cartoPointsActor->SetMapper(this->cartoPointsMapper);
-
-  this->mergedMapper = vtkSmartPointer<vtkAppendFilter>::New();
-  this->mergedMapper->MergePointsOn();
-  this->mergedMapper->AddInputConnection(this->cartoPointsReader->GetOutputPort());
-  this->mergedMapper->AddInputConnection(this->cartoSurfaceMapper->GetInputConnection(0,0));
+  this->surfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  this->surfaceMapper->ScalarVisibilityOff();
+  this->surfaceActor = vtkSmartPointer<vtkActor>::New();
+  this->surfaceActor->GetProperty()->SetOpacity(0.66);
+  this->surfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
+  this->surfaceActor->GetProperty()->BackfaceCullingOn();
+  this->surfaceActor->SetMapper(this->surfaceMapper);
 
   // Set the buttons manager
   this->buttonsManager = vtkSmartPointer<msvVTKButtonsManager>::New();
@@ -215,14 +178,10 @@ void msvQVTKButtonsMainWindowPrivate::clear()
 {
   Q_Q(msvQVTKButtonsMainWindow);
 
-
   this->timePlayerWidget->play(false);            // stop the player widget
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
-  this->cartoPointsReader->RemoveAllFileNames();  // clean up the reader
-  this->mergedMapper->Update();                   // update the pipeline
   this->timePlayerWidget->updateFromFilter();     // update the player widget
   this->buttonsManager->Clear();                  // clean up the buttonsManager
-  q->setCurrentSignal(-1);
 }
 
 //------------------------------------------------------------------------------
@@ -267,18 +226,6 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   this->actionOpen->setIcon(dirIcon);
   this->actionAboutVTKButtonsApplication->setIcon(informationIcon);
-
-  // Associate the TimePlayerWidget to the sink (mapper)
-  this->timePlayerWidget->setFilter(this->mergedMapper);
-
-  q->qvtkConnect(this->buttonsManager, vtkCommand::InteractionEvent,
-                 q, SLOT(onPointSelected()));
-
-  q->connect(this->ecgReviewListWidget, SIGNAL(itemSelectionChanged()),
-             q, SLOT(onVTKButtonsSelectionChanged()));
-  q->connect(this->ecgReviewListWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-             q, SLOT(onCurrentItemChanged(QListWidgetItem*,QListWidgetItem*)));
-
 }
 
 //------------------------------------------------------------------------------
@@ -308,233 +255,32 @@ void msvQVTKButtonsMainWindowPrivate::updateUi()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::updateView()
 {
-  this->buttonsManager->UpdateButtonWidgets(static_cast<vtkPolyData*>
-    (this->cartoPointsReader->GetOutput()));
   this->threeDView->GetRenderWindow()->Render();
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::readCartoData(const QString& rootDirectory)
+void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 {
-  Q_Q(msvQVTKButtonsMainWindow);
-  QDir dir(rootDirectory);
-
-  if (dir.cd(QString("CartoSignals"))) {
-    this->readCartoSignals(dir);
-    dir.cdUp();
-  }
-
-  if (dir.cd(QString("CartoPoints"))) {
-    this->readCartoPoints(dir);
-  }
-  // Link to the cartoPoints the buttons
-  this->polyDataReader->Update();
-  this->buttonsManager->SetNumberOfButtonWidgets(
-    this->ecgReviewListWidget->count());
-  this->buttonsManager->Init(this->polyDataReader->GetOutput());
-
-  // Render
-  double extent[6];
-  this->cartoPointsMapper->GetBounds(extent);
-  this->threeDRenderer->AddActor(this->cartoPointsActor);
-  this->threeDRenderer->AddActor(this->cartoSurfaceActor);
-  this->threeDRenderer->ResetCamera(extent);
+    //import VTK Data
+    polyDataReader->SetFileName(filePath.toAscii().data());
+    polyDataReader->Update();
+    
+    // render data into the scene
+    this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
+    this->threeDRenderer->AddActor(this->surfaceActor);
+    
+    addVTKButton();
+    
+    this->threeDRenderer->ResetCamera();
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::readCartoPoints(QDir dir)
-{
-  // Set file series patterns recognition
-  QStringList filters;
-  filters << "*.vtk";
-  dir.setNameFilters(filters);
-  QStringList files = dir.entryList(QDir::Files,QDir::Name);
+void msvQVTKButtonsMainWindowPrivate::addVTKButton() {
+    msvToolVTKButtons *toolButton = new msvToolVTKButtons();
+    toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
+    //renderize button
+    toolButton->setCurrentRenderer(this->threeDRenderer);
 
-  // Resort files using the index number
-  qSort(files.begin(), files.end(), msvQVTKButtonsMainWindowPrivate::fileLessThan);
-
-  // Fill the FileSerieReader
-  foreach(const QString& file, files){
-    this->cartoPointsReader->AddFileName(
-      dir.filePath(file).toLatin1().constData());
-  }
-
-  // Create Instance of vtkDataObject for all outputs ports
-  // Calls REQUEST_DATA_OBJECT && REQUEST_INFORMATION
-  this->cartoPointsReader->SetOutputTimeRange(0,2500);
-  this->cartoPointsReader->Update();
-
-  // Update the Widget given the info provided
-  this->timePlayerWidget->updateFromFilter();
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::readCartoSignals(QDir dir)
-{
-  // Set file series patterns recognition
-  QStringList signalFileFilters;
-  signalFileFilters << "*.csv";
-  dir.setNameFilters(signalFileFilters);
-  QStringList signalFiles = dir.entryList(QDir::Files,QDir::Name);
-
-  if (signalFiles.size() == 0){
-    qWarning() << "No carto signals in" << dir;
-  }
-
-  // Resort files using their index number
-  qSort(signalFiles.begin(), signalFiles.end(),
-        msvQVTKButtonsMainWindowPrivate::fileLessThan);
-
-  // Fill the FileSerieReader
-  foreach(const QString& signalFile, signalFiles)
-    {
-    this->readCartoSignal(QFileInfo(dir, signalFile));
-    }
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::readCartoSignal(const QFileInfo& signalsFile)
-{
-  vtkNew<vtkDelimitedTextReader> reader;
-  reader->SetDetectNumericColumns(true);
-  reader->SetHaveHeaders(true);
-  reader->SetFileName(signalsFile.absoluteFilePath().toLatin1().constData());
-
-  this->addCartoSignal(reader.GetPointer());
-}
-
-//------------------------------------------------------------------------------
-bool msvQVTKButtonsMainWindowPrivate::fileLessThan(const QString &s1, const QString &s2)
-{
-  // Compare file by the index contained within.
-  QString fileA, fileB;
-  QRegExp indexExp("(\\d+)");
-
-  int pos = indexExp.indexIn(s1);
-  fileA = (pos > -1) ? indexExp.cap() : "0";
-  pos = indexExp.indexIn(s2);
-  fileB = (pos > -1) ? indexExp.cap() : "0";
-
-  return fileA.toInt() < fileB.toInt();
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::addCartoSignal(vtkDelimitedTextReader* signal)
-{
-  Q_Q(msvQVTKButtonsMainWindow);
-
-  ctkVTKChartView* ecgView = new ctkVTKChartView;
-  ecgView->setMinimumSize(QSize(100, 80));
-  ecgView->setFocusPolicy(Qt::NoFocus);
-
-  QListWidgetItem* ecgItem = new QListWidgetItem;
-  ecgItem->setSizeHint(QSize(100, 80));
-  this->ecgReviewListWidget->addItem(ecgItem);
-  this->ecgReviewListWidget->setItemWidget(ecgItem, ecgView);
-  this->updateVTKButtonsView(ecgView, vtkTableAlgorithm::SafeDownCast(signal));
-
-  ecgView->setEnabled(false);
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::updateVTKButtonsView(ctkVTKChartView* ecgView,
-                                             vtkTableAlgorithm* signal)
-{
-  Q_Q(msvQVTKButtonsMainWindow);
-
-  vtkSmartPointer<vtkPlotLine> signalPlot;
-  if (signal)
-    {
-    signal->Update();
-    // Initialize signal view
-    signalPlot = vtkSmartPointer<vtkPlotLine>::New();
-    signalPlot->SetWidth(1.);
-    const double* color = colors[this->currentColor];
-    signalPlot->SetColor(color[0], color[1], color[2]);
-    this->currentColor = (this->currentColor + 1) % colorCount;
-
-    const int xCol = 0;
-    const int yCol = 1;
-    signalPlot->SetInput(signal->GetOutput(), xCol, yCol);
-    signalPlot->Update();
-    }
-
-  // Vertical bar for current time
-  vtkSmartPointer<vtkPlotLine> currentTimePlot = vtkSmartPointer<vtkPlotLine>::New();
-  currentTimePlot->SetInput(this->currentTimeLine, 0, 1);
-
-  ecgView->removeAllPlots();
-  // top right corner
-  ecgView->addPlot(currentTimePlot);
-  ecgView->chart()->SetPlotCorner(currentTimePlot, 2);
-
-  ecgView->chart()->SetAutoAxes(false);
-  ecgView->chart()->GetAxis(vtkAxis::BOTTOM)->SetTitle("Time (ms)");
-  ecgView->chart()->GetAxis(vtkAxis::LEFT)->SetTitle("Voltage (mV)");
-  ecgView->chart()->GetAxis(vtkAxis::TOP)->SetVisible(false);
-  ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetVisible(false);
-  ecgView->chart()->GetAxis(vtkAxis::TOP)->SetBehavior(vtkAxis::CUSTOM);
-  ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetBehavior(vtkAxis::CUSTOM);
-
-  if (signal)
-    {
-    this->addSignalPlot(ecgView, signalPlot);
-    }
-  q->onCurrentTimeChanged(this->timePlayerWidget->currentTime());
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::addSignalPlot(ctkVTKChartView* ecgView, vtkPlot* signalPlot)
-{
-  ecgView->addPlot(signalPlot);
-
-  ecgView->boundAxesToChartBounds();
-  ecgView->setAxesToChartBounds();
-  ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetMinimumLimit(0.);
-  ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetMaximumLimit(1.);
-  ecgView->chart()->GetAxis(vtkAxis::RIGHT)->SetRange(0., 1.);
-  ecgView->chart()->GetAxis(vtkAxis::TOP)->SetMinimumLimit(0.);
-  ecgView->chart()->GetAxis(vtkAxis::TOP)->SetMaximumLimit(2500.);
-  ecgView->chart()->GetAxis(vtkAxis::TOP)->SetRange(0., 2500.);
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::updateVTKButtonsItem(QListWidgetItem * ecgItem)
-{
-  if (!ecgItem)
-    {
-    return;
-    }
-  ctkVTKChartView* ecgView = qobject_cast<ctkVTKChartView*>(
-    this->ecgReviewListWidget->itemWidget(ecgItem));
-
-  // background color
-  QColor highlight = ecgView->palette().color(QPalette::Highlight);
-  QColor backgroundColor = QColor(Qt::white);
-  if (ecgItem->isSelected())
-    {
-    backgroundColor = highlight;
-    }
-  QColor backgroundColor2 = QColor(Qt::white);
-  if (ecgItem == this->ecgReviewListWidget->currentItem() ||
-      ecgItem->isSelected())
-    {
-    backgroundColor2 = highlight.lighter(); //orange: QColor(255, 124, 33);
-    }
-
-  vtkRendererCollection* renderers = ecgView->GetRenderWindow()->GetRenderers();
-  vtkRenderer* aren = 0;
-  for (renderers->InitTraversal() ; (aren = renderers->GetNextItem()) ; )
-    {
-    aren->SetBackground(backgroundColor.redF(),
-                        backgroundColor.greenF(),
-                        backgroundColor.blueF());
-    aren->SetBackground2(backgroundColor2.redF(),
-                         backgroundColor2.greenF(),
-                         backgroundColor2.blueF());
-    aren->SetGradientBackground(true);
-    }
-  ecgView->GetRenderWindow()->Render();
 }
 
 //------------------------------------------------------------------------------
@@ -559,14 +305,10 @@ void msvQVTKButtonsMainWindow::openData()
 {
   Q_D(msvQVTKButtonsMainWindow);
 
-  QString dir = QFileDialog::getExistingDirectory(
-    this, tr("Select root CartoData Folder"), QDir::homePath(),
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-  if (dir.isEmpty())
-    return;
-
+  QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Data"), QDir::homePath(), tr("VTK Files (*.vtk)"));
   d->clear();             // Clean Up data and scene
-  d->readCartoData(dir);  // Load data
+  d->importVTKData(fileName);  // Load data
   d->update();            // Update the Ui and the View
 }
 
@@ -598,62 +340,28 @@ void msvQVTKButtonsMainWindow::updateView()
 void msvQVTKButtonsMainWindow::setCurrentSignal(int pointId)
 {
   Q_D(msvQVTKButtonsMainWindow);
-
-  QListWidgetItem* ecgItem = d->ecgReviewListWidget->item(pointId);
-  d->ecgReviewListWidget->scrollToItem(ecgItem);
-  d->ecgReviewListWidget->setCurrentItem(ecgItem);
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onPointSelected()
 {
   Q_D(msvQVTKButtonsMainWindow);
-  int pointId = d->buttonsManager->GetIndexFromButtonId(
-    d->buttonsManager->GetLastSelectedButton());
-  this->setCurrentSignal(pointId);
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onCurrentTimeChanged(double time)
 {
-  Q_D(msvQVTKButtonsMainWindow);
-  // update signal chart
-  vtkDoubleArray* xCoords = vtkDoubleArray::SafeDownCast(
-    d->currentTimeLine->GetColumn(0));
-  xCoords->SetValue(0, time);
-  xCoords->SetValue(1, time);
-  d->currentTimeLine->Modified();
-  // update all VTKButtonss
-  foreach(QWidget* ecgView, this->findChildren<ctkVTKChartView*>())
-    {
-    ecgView->update();
-    }
-  // update 3D view
   this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onVTKButtonsSelectionChanged()
 {
-  Q_D(msvQVTKButtonsMainWindow);
-  d->updateVTKButtonsView(d->ecgView, 0);
-  for (int row = 0; row < d->ecgReviewListWidget->count(); ++row)
-    {
-    QListWidgetItem* ecgItem = d->ecgReviewListWidget->item(row);
-    ctkVTKChartView* ecgView = qobject_cast<ctkVTKChartView*>(
-      d->ecgReviewListWidget->itemWidget(ecgItem));
-    if (ecgItem->isSelected())
-      {
-      d->addSignalPlot(d->ecgView, ecgView->chart()->GetPlot(1));
-      }
-    d->updateVTKButtonsItem(ecgItem);
-    }
+
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onCurrentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)
 {
-  Q_D(msvQVTKButtonsMainWindow);
-  d->updateVTKButtonsItem(current);
-  d->updateVTKButtonsItem(previous);
+
 }

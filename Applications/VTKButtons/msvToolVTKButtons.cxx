@@ -24,12 +24,17 @@
 #include <vtkRenderer.h>
 
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkButtonWidget.h>
 #include <vtkTexturedButtonRepresentation.h>
 #include <vtkTexturedButtonRepresentation2D.h>
 #include <vtkBalloonRepresentation.h>
 #include <vtkCommand.h>
+
+
+#include <vtkEllipticalButtonSource.h>
+#include <vtkTexturedButtonRepresentation.h>
 
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
@@ -41,11 +46,9 @@ public:
     }
 
     virtual void Execute(vtkObject *caller, unsigned long, void*) {
-        QVTKWidget *widget = qobject_cast<QVTKWidget *>(this->graphicObject);
-        vtkRenderer *renderer = widget->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
         msvAnimateVTK *animateCamera = new msvAnimateVTK();
         if (flyTo) {
-            animateCamera->flyTo(widget, bounds, 200);
+            animateCamera->flyTo(renderer, bounds, 200);
         } else {
             renderer->ResetCamera(bounds);
         }
@@ -68,9 +71,9 @@ public:
         flyTo = fly;
     }
 
-    vtkButtonCallback():toolButton(NULL), graphicObject(0), flyTo(true) {}
+    vtkButtonCallback():toolButton(NULL), renderer(0), flyTo(true) {}
     msvToolVTKButtons *toolButton;
-    QObject *graphicObject;
+    vtkRenderer *renderer;
     double bounds[6];
     bool flyTo;
 };
@@ -106,6 +109,19 @@ msvToolVTKButtons::msvToolVTKButtons() : QObject(), m_ShowLabel(true), m_FlyTo(t
     bool loaded = false;
     VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
     rep->SetNumberOfStates(1);
+    
+    //Load image only the first time
+    
+    QImage image;
+    QString iconType = "/Users/dannox/Pictures/testIcon.png";
+    image.load(iconType);
+    VTK_CREATE(vtkQImageToImageSource, imageToVTK);
+    imageToVTK->SetQImage(&image);
+    imageToVTK->Update();
+    rep->SetButtonTexture(0, imageToVTK->GetOutput());
+    
+    int size[2]; size[0] = 16; size[1] = 16;
+    rep->GetBalloon()->SetImageSize(size);
 
     buttonCallback = vtkButtonCallback::New();
     buttonCallback->toolButton = this;
@@ -117,10 +133,51 @@ msvToolVTKButtons::msvToolVTKButtons() : QObject(), m_ShowLabel(true), m_FlyTo(t
     m_ButtonWidget->SetRepresentation(rep);
     m_ButtonWidget->AddObserver(vtkCommand::StateChangedEvent,buttonCallback);
     rep->AddObserver(vtkCommand::HighlightEvent,highlightCallback);
+
 }
 
 msvToolVTKButtons::~msvToolVTKButtons() {
     m_ButtonWidget->Delete();
+}
+
+void msvToolVTKButtons::setCurrentRenderer(vtkRenderer *renderer) {
+    if(renderer) {
+        m_ButtonWidget->SetInteractor(renderer->GetRenderWindow()->GetInteractor());
+        m_ButtonWidget->SetCurrentRenderer(renderer); //to check
+        buttonCallback->renderer = renderer;
+        m_ButtonWidget->EnabledOn();
+    } else {
+        m_ButtonWidget->SetInteractor(NULL);
+        m_ButtonWidget->SetCurrentRenderer(NULL); //to check
+        buttonCallback->renderer = NULL;
+        m_ButtonWidget->EnabledOff();
+    }
+}
+
+void msvToolVTKButtons::setBounds(double b[6]) {
+    buttonCallback->setBounds(b);
+    calculatePosition();
+}
+
+void msvToolVTKButtons::calculatePosition() {
+    //modify position of the vtkButton 
+    double bds[3];
+    if (m_OnCenter) {
+        bds[0] = (bounds[1] + bounds[0])*.5;
+        bds[1] = (bounds[3] + bounds[2])*.5;
+        bds[2] = (bounds[5] + bounds[4])*.5;
+    } else {
+        //on the corner of the bounding box of the VME.
+        bds[0] = bounds[0];
+        bds[1] = bounds[2]; 
+        bds[2] = bounds[4];
+    }
+    int size[2]; size[0] = 16; size[1] = 16;
+    vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(m_ButtonWidget->GetRepresentation());
+    
+    rep->PlaceWidget(bds, size);
+    rep->Modified();
+    m_ButtonWidget->SetRepresentation(rep);
 }
 
 void msvToolVTKButtons::resetTool() {

@@ -26,7 +26,7 @@
 #include "vtkSmartPointer.h"
 
 // VTKButtons includes
-#include "msvVTKButtonsExport.h"
+#include <msvVTKButtonsExport.h>
 
 class vtkPolyData;
 class vtkRenderer;

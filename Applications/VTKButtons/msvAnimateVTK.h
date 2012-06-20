@@ -15,7 +15,8 @@
 // Includes list
 
 #include "msvVTKButtonsExport.h"
-#include <QVTKWidget.h>
+#include <QObject.h>
+#include <vtkRenderer.h>
 
 
 /**
@@ -29,10 +30,10 @@ class MSV_VTKButtons_EXPORT msvAnimateVTK : public QObject
 
 public:
     /// Object constructor.
-    msvAnimateVTK(const QString code_location = "");
+    msvAnimateVTK();
 
     /// Animate the camera to zoom on the passed bounding box.
-    void flyTo(QVTKWidget *widget, double bounds[6], int numberOfSteps = 120);
+    void flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120);
 
 
     /// Object destructor.

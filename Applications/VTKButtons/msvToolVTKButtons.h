@@ -18,6 +18,7 @@
 class vtkButtonWidget;
 class vtkButtonCallback;
 class vtkButtonHighLightCallback;
+class vtkRenderer;
 
 /**
  Class name: msvToolVTKButtons
@@ -71,15 +72,20 @@ public:
     /// Hide tooltip
     void hideTooltip();
 
-    /// Select VME connected to button pressed
-    //void selectVME();
-
-
+    /// add vtk button to Renderer
+    void setCurrentRenderer(vtkRenderer *renderer);
+    
+    /// set buonds
+    void setBounds(double b[6]);
+    
 protected:
     /// Object destructor.
     /* virtual */ ~msvToolVTKButtons();
 
 private:
+    /// calculate Position (center or corner)
+    void calculatePosition();
+    
     vtkButtonWidget *m_ButtonWidget; ///< VTK button widget.
     vtkButtonCallback *buttonCallback; ///< Callback called by picking on vtkButton
     vtkButtonHighLightCallback *highlightCallback; ///< Callback called by hovering over the button.
@@ -89,6 +95,7 @@ private:
     bool m_ShowLabel; ///< Flag to show/hide label
     bool m_FlyTo; ///< Flag to activate FlyTo animation
     bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
+    double bounds[6];
 };
 
 /////////////////////////////////////////////////////////////

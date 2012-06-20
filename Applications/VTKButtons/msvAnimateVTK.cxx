@@ -18,14 +18,13 @@
 
 #include <vtkRendererCollection.h>
 
-msvAnimateVTK::msvAnimateVTK(const QString code_location) : QObject() {
+msvAnimateVTK::msvAnimateVTK() : QObject() {
     setObjectName("msvAnimateVTK");
 }
 
-void msvAnimateVTK::flyTo(QVTKWidget *widget, double bounds[6], int numberOfSteps) {
-    assert(widget);
+void msvAnimateVTK::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps) {
+    assert(renderer);
     //vtkRenderer *renderer = widget->renderer("tool");
-    vtkRenderer *renderer = widget->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
     double center[3]; 
     center[0] = (bounds[0] + bounds[1]) / 2;
     center[1] = (bounds[2] + bounds[3]) / 2;
@@ -113,13 +112,9 @@ void msvAnimateVTK::flyTo(QVTKWidget *widget, double bounds[6], int numberOfStep
         camera->SetPosition(fly[3],fly[4],fly[5]);
         camera->SetParallelScale(fly[6]);
 
-        if (widget->GetRenderWindow()) {
-            //widget->renderer()->ResetCameraClippingRange();
-            //widget->GetRenderWindow()->Render();
-            vtkRenderer *renderer = widget->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
-            renderer->ResetCameraClippingRange();
-            widget->GetRenderWindow()->Render();
-        }
+        renderer->ResetCameraClippingRange();
+        renderer->GetRenderWindow()->Render();
+        
     }
 }
 
