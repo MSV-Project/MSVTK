@@ -206,7 +206,17 @@ void msvToolVTKButtons::update() {
         rep->GetBalloon()->GetFrameProperty()->SetOpacity(0.65);
     } else {
         rep->GetBalloon()->SetBalloonText("");
-    }    
+    }
+    
+    if(m_ShowButton) {
+        m_ButtonWidget->EnabledOn();
+    } else {
+        m_ButtonWidget->EnabledOff();
+    }
+    
+    if(buttonCallback->renderer) {
+        buttonCallback->renderer->GetRenderWindow()->Render();
+    }
 }
 
 void msvToolVTKButtons::setToolTip(QString &text) {

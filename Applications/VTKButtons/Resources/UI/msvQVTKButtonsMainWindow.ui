@@ -36,7 +36,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -76,6 +76,16 @@
       <number>0</number>
      </property>
      <item>
+      <widget class="QCheckBox" name="checkBoxShowButtons">
+       <property name="text">
+        <string>Show Buttons</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QListWidget" name="ecgReviewListWidget">
        <property name="selectionMode">
         <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -101,7 +111,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="ctkVTKChartView" name="ecgView">
+      <widget class="ctkVTKChartView" name="ecgView" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>

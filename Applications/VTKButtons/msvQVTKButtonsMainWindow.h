@@ -49,6 +49,8 @@ public slots:
   void updateView();
   void setCurrentSignal(int pointId);
   void showTooltip(QString text);
+  
+  void on_checkBoxShowButtons_stateChanged(int state);
 
 protected slots:
   void onPointSelected();

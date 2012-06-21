@@ -24,6 +24,7 @@
 #include <QRegExp>
 #include <QString>
 #include <QToolTip>
+#include <QVector>
 
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
@@ -82,6 +83,7 @@ protected:
   void importVTKData(QString &filePath);
   void addVTKButton(QObject *parent);
   void setToolTip(msvToolVTKButtons *b);
+  void showButtons(bool value);
     
   // Scene Rendering
   vtkSmartPointer<vtkRenderer> threeDRenderer;
@@ -100,6 +102,8 @@ protected:
 
   unsigned int currentColor;
   const unsigned int colorCount;
+
+  QVector<msvToolVTKButtons *> buttons;
 public:
   msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsMainWindow& object);
   ~msvQVTKButtonsMainWindowPrivate();
@@ -320,6 +324,7 @@ void msvQVTKButtonsMainWindowPrivate::setToolTip(msvToolVTKButtons *b)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
     msvToolVTKButtons *toolButton = new msvToolVTKButtons();
+    buttons.append(toolButton);
     QString name("TestData");
     QString iconFileName("/Users/dannox/Pictures/testIcon.png");
     toolButton->setIconFileName(iconFileName);
@@ -330,6 +335,12 @@ void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
     toolButton->setCurrentRenderer(this->threeDRenderer);
 }
 
+void msvQVTKButtonsMainWindowPrivate::showButtons(bool value) {
+    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+        button->setShowButton(value);
+        button->update();
+    }
+}
 
 
 //------------------------------------------------------------------------------
@@ -416,6 +427,14 @@ void msvQVTKButtonsMainWindow::onCurrentItemChanged(QListWidgetItem * current, Q
 
 }
 
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindow::on_checkBoxShowButtons_stateChanged(int state) {
+    Q_D(msvQVTKButtonsMainWindow);
+    
+    d->showButtons(state);
+}
+
+//------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::showTooltip(QString text) {
     //show tooltip near the current mouse position
     QToolTip::showText(QCursor::pos(), text);
