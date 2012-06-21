@@ -48,6 +48,7 @@ public slots:
   void aboutApplication();
   void updateView();
   void setCurrentSignal(int pointId);
+  void showTooltip(QString text);
 
 protected slots:
   void onPointSelected();

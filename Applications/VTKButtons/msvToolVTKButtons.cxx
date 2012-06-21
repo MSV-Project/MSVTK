@@ -91,10 +91,10 @@ public:
        
         if ( highlightState == vtkButtonRepresentation::HighlightHovering && previousHighlightState == vtkButtonRepresentation::HighlightNormal ) {
             //show tooltip (not if previous state was selecting
-            toolButton->showTooltip();        
+            toolButton->setShowTooltip(true);        
         } else if ( highlightState == vtkButtonRepresentation::HighlightNormal) {
             //hide tooltip
-            toolButton->hideTooltip();
+            toolButton->setShowTooltip(false);
         } 
         previousHighlightState = highlightState;
     }
@@ -152,11 +152,14 @@ void msvToolVTKButtons::setIconFileName(QString &iconFileName) {
     
     int size[2]; size[0] = 16; size[1] = 16;
     rep->GetBalloon()->SetImageSize(size);
+    
+    update();
 }
 
 void msvToolVTKButtons::setBounds(double b[6]) {
     buttonCallback->setBounds(b);
     calculatePosition();
+    update();
 }
 
 void msvToolVTKButtons::calculatePosition() {
@@ -178,8 +181,6 @@ void msvToolVTKButtons::calculatePosition() {
     rep->PlaceWidget(bds, size);
     rep->Modified();
     m_ButtonWidget->SetRepresentation(rep);
-    
-    update();
 }
 
 void msvToolVTKButtons::resetTool() {
@@ -208,71 +209,6 @@ void msvToolVTKButtons::update() {
     }    
 }
 
-void msvToolVTKButtons::showTooltip() {
-    /*mafVME *vme = input();
-    if(vme == NULL) {
-        return;
-    }
-
-    QString matrixString = vme->dataSetCollection()->itemAtCurrentTime()->poseMatrixString();
-    QString text("<b>Data type</b>: ");
-    text.append(vme->dataSetCollection()->itemAtCurrentTime()->externalDataType());
-    text.append("<br>");
-
-     QStringList list = matrixString.split(" ");
-     int numElement = list.count();
-     int i = 0;
-
-     text.append("<b>Pose Matrix</b>:");
-     text.append("<table border=\"0.2\">");
-     for ( ; i < numElement; i++ ) {
-         text.append("<tr>");
-         text.append("<td>" + list[i] +"</td>");
-         i++;
-         text.append("<td>" + list[i] +"</td>");
-         i++;
-         text.append("<td>" + list[i] +"</td>");
-         i++;
-         text.append("<td>" + list[i] +"</td>");
-         text.append("</tr>");
-     }
-     text.append("</table>");
-
-    mafBounds *bounds = vme->dataSetCollection()->itemAtCurrentTime()->bounds();
-    text.append("<b>Bounds: (min - max)</b>:");
-    text.append("<table border=\"0.2\">");
-    text.append("<tr>");
-    text.append("<td>" + QString::number(bounds->xMin()) +"</td>");
-    text.append("<td>" + QString::number(bounds->xMax()) +"</td>");
-    text.append("</tr>");
-    text.append("<tr>");
-    text.append("<td>" + QString::number(bounds->yMin()) +"</td>");
-    text.append("<td>" + QString::number(bounds->yMax()) +"</td>");
-    text.append("</tr>");
-    text.append("<tr>");
-    text.append("<td>" + QString::number(bounds->zMin()) +"</td>");
-    text.append("<td>" + QString::number(bounds->zMax()) +"</td>");
-    text.append("</tr>");
-    text.append("</table>");
- 
-    mafEventBus::mafEventArgumentsList argList;
-    argList.append(mafEventArgument(QString , text));
-    mafEventBus::mafEventBusManager::instance()->notifyEvent("maf.local.gui.showTooltip", mafEventBus::mafEventTypeLocal, &argList);*/
+void msvToolVTKButtons::setToolTip(QString &text) {
+    m_Tooltip = text;
 }
-
-void msvToolVTKButtons::hideTooltip() {
-    //mafEventBus::mafEventArgumentsList argList;
-    //mafEventBus::mafEventBusManager::instance()->notifyEvent("maf.local.gui.hideTooltip", mafEventBus::mafEventTypeLocal, &argList);
-}
-
-/*void msvToolVTKButtons::selectVME() {
-    //select the VME associated to the button pressed
-    mafVME *vme = input();
-    if(vme == NULL) {
-        return;
-    }
-    mafCore::mafObjectBase *objBase = vme;
-    mafEventArgumentsList argList;
-    argList.append(mafEventArgument(mafCore::mafObjectBase*, objBase));
-    mafEventBusManager::instance()->notifyEvent("maf.local.resources.vme.select", mafEventTypeLocal, &argList);
-}*/

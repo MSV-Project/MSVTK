@@ -23,6 +23,7 @@
 #include <QFileDialog>
 #include <QRegExp>
 #include <QString>
+#include <QToolTip>
 
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
@@ -79,7 +80,8 @@ protected:
   msvQVTKButtonsMainWindow* const q_ptr;
 
   void importVTKData(QString &filePath);
-  void addVTKButton();
+  void addVTKButton(QObject *parent);
+  void setToolTip(msvToolVTKButtons *b);
     
   // Scene Rendering
   vtkSmartPointer<vtkRenderer> threeDRenderer;
@@ -95,9 +97,6 @@ protected:
 
   vtkSmartPointer<vtkPolyDataMapper>              surfaceMapper;
   vtkSmartPointer<vtkActor>                       surfaceActor;
-
-  // buttonsManager
-  vtkSmartPointer<msvVTKButtonsManager> buttonsManager;
 
   unsigned int currentColor;
   const unsigned int colorCount;
@@ -161,11 +160,6 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
   this->surfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
   this->surfaceActor->GetProperty()->BackfaceCullingOn();
   this->surfaceActor->SetMapper(this->surfaceMapper);
-
-  // Set the buttons manager
-  this->buttonsManager = vtkSmartPointer<msvVTKButtonsManager>::New();
-  this->buttonsManager->SetColors(colors, colorCount);
-  this->buttonsManager->SetRenderer(this->threeDRenderer);
 }
 
 //------------------------------------------------------------------------------
@@ -182,7 +176,6 @@ void msvQVTKButtonsMainWindowPrivate::clear()
   this->timePlayerWidget->play(false);            // stop the player widget
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
   this->timePlayerWidget->updateFromFilter();     // update the player widget
-  this->buttonsManager->Clear();                  // clean up the buttonsManager
 }
 
 //------------------------------------------------------------------------------
@@ -272,9 +265,6 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
         // render data into the scene
         this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
         this->threeDRenderer->AddActor(this->surfaceActor);
-    
-        addVTKButton();
-    
         this->threeDRenderer->ResetCamera();
     } else {
         qWarning() << "Current Data is not a polydata";
@@ -282,16 +272,65 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::addVTKButton() {
+void msvQVTKButtonsMainWindowPrivate::setToolTip(msvToolVTKButtons *b)
+{
+    double *bounds = polyDataReader->GetOutput()->GetBounds();
+    QString text("<b>Data type</b>: ");
+    text.append("vtkPolyData");
+    text.append("<br>");
+    
+    QString matrixString("1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"); //identity matrix
+    QStringList list = matrixString.split(" ");
+    int numElement = list.count();
+    int i = 0;
+    
+    text.append("<b>Pose Matrix</b>:");
+    text.append("<table border=\"0.2\">");
+    for ( ; i < numElement; i++ ) {
+        text.append("<tr>");
+        text.append("<td>" + list[i] +"</td>");
+        i++;
+        text.append("<td>" + list[i] +"</td>");
+        i++;
+        text.append("<td>" + list[i] +"</td>");
+        i++;
+        text.append("<td>" + list[i] +"</td>");
+        text.append("</tr>");
+    }
+    text.append("</table>");
+    text.append("<b>Bounds: (min - max)</b>:");
+    text.append("<table border=\"0.2\">");
+    text.append("<tr>");
+    text.append("<td>" + QString::number(bounds[0]) +"</td>");
+    text.append("<td>" + QString::number(bounds[1]) +"</td>");
+    text.append("</tr>");
+    text.append("<tr>");
+    text.append("<td>" + QString::number(bounds[2]) +"</td>");
+    text.append("<td>" + QString::number(bounds[3]) +"</td>");
+    text.append("</tr>");
+    text.append("<tr>");
+    text.append("<td>" + QString::number(bounds[4]) +"</td>");
+    text.append("<td>" + QString::number(bounds[5]) +"</td>");
+    text.append("</tr>");
+    text.append("</table>");
+
+    b->setToolTip(text);
+}
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
     msvToolVTKButtons *toolButton = new msvToolVTKButtons();
     QString name("TestData");
     QString iconFileName("/Users/dannox/Pictures/testIcon.png");
     toolButton->setIconFileName(iconFileName);
     toolButton->setLabel(name);
-
     toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
+    setToolTip(toolButton);
+    QObject::connect(toolButton, SIGNAL(showTooltip(QString)), parent, SLOT(showTooltip(QString)));
     toolButton->setCurrentRenderer(this->threeDRenderer);
 }
+
+
 
 //------------------------------------------------------------------------------
 // msvQVTKButtonsMainWindow methods
@@ -319,6 +358,7 @@ void msvQVTKButtonsMainWindow::openData()
                                                     tr("Open Data"), QDir::homePath(), tr("VTK Files (*.vtk)"));
   d->clear();             // Clean Up data and scene
   d->importVTKData(fileName);  // Load data
+  d->addVTKButton(this);
   d->update();            // Update the Ui and the View
 }
 
@@ -374,4 +414,9 @@ void msvQVTKButtonsMainWindow::onVTKButtonsSelectionChanged()
 void msvQVTKButtonsMainWindow::onCurrentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)
 {
 
+}
+
+void msvQVTKButtonsMainWindow::showTooltip(QString text) {
+    //show tooltip near the current mouse position
+    QToolTip::showText(QCursor::pos(), text);
 }
