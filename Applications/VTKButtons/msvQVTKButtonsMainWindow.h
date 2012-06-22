@@ -51,6 +51,7 @@ public slots:
   void showTooltip(QString text);
   
   void on_checkBoxShowButtons_stateChanged(int state);
+  void on_checkBoxShowLabels_stateChanged(int state);
 
 protected slots:
   void onPointSelected();

@@ -83,7 +83,9 @@ protected:
   void importVTKData(QString &filePath);
   void addVTKButton(QObject *parent);
   void setToolTip(msvToolVTKButtons *b);
+    
   void showButtons(bool value);
+  void showLabels(bool value);
     
   // Scene Rendering
   vtkSmartPointer<vtkRenderer> threeDRenderer;
@@ -342,6 +344,12 @@ void msvQVTKButtonsMainWindowPrivate::showButtons(bool value) {
     }
 }
 
+void msvQVTKButtonsMainWindowPrivate::showLabels(bool value) {
+    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+        button->setShowLabel(value);
+        button->update();
+    }
+}
 
 //------------------------------------------------------------------------------
 // msvQVTKButtonsMainWindow methods
@@ -432,6 +440,13 @@ void msvQVTKButtonsMainWindow::on_checkBoxShowButtons_stateChanged(int state) {
     Q_D(msvQVTKButtonsMainWindow);
     
     d->showButtons(state);
+}
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindow::on_checkBoxShowLabels_stateChanged(int state) {
+    Q_D(msvQVTKButtonsMainWindow);
+    
+    d->showLabels(state);
 }
 
 //------------------------------------------------------------------------------

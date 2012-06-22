@@ -105,7 +105,7 @@ public:
         
 };
 
-msvToolVTKButtons::msvToolVTKButtons() : QObject(), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false) {
+msvToolVTKButtons::msvToolVTKButtons() : QObject(), m_ShowButton(true), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false) {
     VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
     rep->SetNumberOfStates(1);
     
