@@ -52,6 +52,8 @@ public slots:
   
   void on_checkBoxShowButtons_stateChanged(int state);
   void on_checkBoxShowLabels_stateChanged(int state);
+  void on_checkBoxFlyTo_stateChanged(int state); 
+  void on_comboBoxPosition_currentIndexChanged(int index);
 
 protected slots:
   void onPointSelected();

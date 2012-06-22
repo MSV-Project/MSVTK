@@ -36,9 +36,6 @@ public:
      /// Object constructor.
     msvToolVTKButtons();
 
-    /// Allow to take the tool to the initial conditions.
-    /*virtual*/ void resetTool();
-
     /// Allow to show/hide button
     void setShowButton(bool show);
 
@@ -128,10 +125,6 @@ inline void msvToolVTKButtons::setShowLabel(bool show) {
 
 inline bool msvToolVTKButtons::showLabel() const {
     return m_ShowLabel;
-}
-
-inline void msvToolVTKButtons::setFlyTo(bool active) {
-    m_FlyTo = active;
 }
 
 inline bool msvToolVTKButtons::FlyTo() const {

@@ -86,6 +86,8 @@ protected:
     
   void showButtons(bool value);
   void showLabels(bool value);
+  void setFlyTo(bool value);
+  void setOnCenter(bool center);
     
   // Scene Rendering
   vtkSmartPointer<vtkRenderer> threeDRenderer;
@@ -351,6 +353,21 @@ void msvQVTKButtonsMainWindowPrivate::showLabels(bool value) {
     }
 }
 
+void msvQVTKButtonsMainWindowPrivate::setFlyTo(bool value) {
+    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+        button->setFlyTo(value);
+        button->update();
+    }
+}
+
+void msvQVTKButtonsMainWindowPrivate::setOnCenter(bool value) {
+    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+        button->setOnCenter(value);
+        button->update();
+    }
+}
+
+
 //------------------------------------------------------------------------------
 // msvQVTKButtonsMainWindow methods
 
@@ -447,6 +464,19 @@ void msvQVTKButtonsMainWindow::on_checkBoxShowLabels_stateChanged(int state) {
     Q_D(msvQVTKButtonsMainWindow);
     
     d->showLabels(state);
+}
+
+void msvQVTKButtonsMainWindow::on_checkBoxFlyTo_stateChanged(int state) {
+    Q_D(msvQVTKButtonsMainWindow);
+    
+    d->setFlyTo(state);
+}
+
+
+void msvQVTKButtonsMainWindow::on_comboBoxPosition_currentIndexChanged(int index) {
+    Q_D(msvQVTKButtonsMainWindow);
+    
+    d->setOnCenter(index == 1);
 }
 
 //------------------------------------------------------------------------------

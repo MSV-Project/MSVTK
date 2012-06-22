@@ -158,7 +158,11 @@ void msvToolVTKButtons::setIconFileName(QString &iconFileName) {
 
 void msvToolVTKButtons::setBounds(double b[6]) {
     buttonCallback->setBounds(b);
-    calculatePosition();
+    int i = 0;
+    for( ; i<6 ; i++ ) {
+        bounds[i] = b[i];    
+    }
+
     update();
 }
 
@@ -183,11 +187,8 @@ void msvToolVTKButtons::calculatePosition() {
     m_ButtonWidget->SetRepresentation(rep);
 }
 
-void msvToolVTKButtons::resetTool() {
-    //removeWidget(m_ButtonWidget);
-}
-
 void msvToolVTKButtons::update() {
+    calculatePosition();
     vtkTexturedButtonRepresentation2D *rep = reinterpret_cast<vtkTexturedButtonRepresentation2D*>(m_ButtonWidget->GetRepresentation());
 
     if (m_ShowLabel) {
@@ -214,9 +215,19 @@ void msvToolVTKButtons::update() {
         m_ButtonWidget->EnabledOff();
     }
     
-    if(buttonCallback->renderer) {
-        buttonCallback->renderer->GetRenderWindow()->Render();
+    if(buttonCallback) {
+        buttonCallback->flyTo = m_FlyTo;
+        
+        if(buttonCallback->renderer) {
+            buttonCallback->renderer->GetRenderWindow()->Render();
+        }
     }
+    
+}
+
+void msvToolVTKButtons::setFlyTo(bool active) {
+    m_FlyTo = active;
+    update();
 }
 
 void msvToolVTKButtons::setToolTip(QString &text) {

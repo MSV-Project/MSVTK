@@ -98,7 +98,7 @@
      <item>
       <widget class="QCheckBox" name="checkBoxFlyTo">
        <property name="text">
-        <string>CheckBox</string>
+        <string>FlyTo</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -115,7 +115,18 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBoxPosition"/>
+        <widget class="QComboBox" name="comboBoxPosition">
+         <item>
+          <property name="text">
+           <string>on corner</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>on center</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </item>
