@@ -46,6 +46,7 @@ public:
     }
 
     virtual void Execute(vtkObject *caller, unsigned long, void*) {
+        Q_UNUSED(caller);
         msvAnimateVTK *animateCamera = new msvAnimateVTK();
         if (flyTo) {
             animateCamera->flyTo(renderer, bounds, 200);
@@ -79,7 +80,7 @@ public:
 };
 
 // Callback respondign to vtkCommand::HighlightEvent
-class MSV_VTKButtons_EXPORT vtkButtonHighLightCallback : public vtkCommand {
+class MSV_QT_WIDGETS_EXPORT vtkButtonHighLightCallback : public vtkCommand {
 public:
     static vtkButtonHighLightCallback *New() { 
         return new vtkButtonHighLightCallback; 
@@ -105,7 +106,7 @@ public:
         
 };
 
-msvToolVTKButtons::msvToolVTKButtons() : QObject(), m_ShowButton(true), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false) {
+msvToolVTKButtons::msvToolVTKButtons(QObject *parent) : QObject(parent), m_ShowButton(true), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false) {
     VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
     rep->SetNumberOfStates(1);
     

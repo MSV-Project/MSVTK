@@ -53,10 +53,14 @@ endif()
 # --------------------------------------------------------------------------
 set(msvQtWidgets_SRCS
   msvQTimePlayerWidget.cxx
+  msvAnimateVTK.cxx
+  msvToolVTKButtons.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
   msvQTimePlayerWidget.h
+  msvAnimateVTK.h
+  msvToolVTKButtons.h
   )
 
 set(msv${KIT}_UI_SRCS

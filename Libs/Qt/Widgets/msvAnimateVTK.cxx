@@ -18,8 +18,7 @@
 
 #include <vtkRendererCollection.h>
 
-msvAnimateVTK::msvAnimateVTK() : QObject() {
-    setObjectName("msvAnimateVTK");
+msvAnimateVTK::msvAnimateVTK() {
 }
 
 void msvAnimateVTK::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps) {
@@ -91,7 +90,7 @@ void msvAnimateVTK::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfS
     fly1[6] = fly0[6];
 
     int numSteps = numberOfSteps;
-    int rate = 15;
+    //int rate = 15;
     double pi = vtkMath::Pi();
 
     //flyTo only if camera parameters has changed

@@ -29,7 +29,6 @@
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKButtonsManager.h"
 #include "msvVTKPolyDataFileSeriesReader.h"
 #include "ui_msvQVTKButtonsMainWindow.h"
 #include "msvQVTKButtonsAboutDialog.h"
@@ -55,23 +54,11 @@
 
 //new
 #include "msvToolVTKButtons.h"
-#include <vtkEllipticalButtonSource.h>
-#include <vtkTexturedButtonRepresentation.h>
 #include <vtkDataSetReader.h>
 #include <vtkButtonWidget.h>
 
 #define VTK_CREATE(type, name) \
 vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
-const unsigned int colorCount = 8;
-const double colors[colorCount][3] = { {0.925490196,  0.17254902, 0.2},
-                                       {0.070588235, 0.545098039, 0.290196078},
-                                       {0.086274509, 0.364705882, 0.654901961},
-                                       {0.952941176, 0.482352941, 0.176470588},
-                                       {0.396078431, 0.196078431, 0.560784314},
-                                       {0.631372549, 0.109803922, 0.176470588},
-                                       {0.698039216, 0.235294118, 0.576470588},
-                                       {0.003921568, 0.007843137, 0.007843137}};
 
 //------------------------------------------------------------------------------
 class msvQVTKButtonsMainWindowPrivate: public Ui_msvQVTKButtonsMainWindow
@@ -104,13 +91,10 @@ protected:
   vtkSmartPointer<vtkPolyDataMapper>              surfaceMapper;
   vtkSmartPointer<vtkActor>                       surfaceActor;
 
-  unsigned int currentColor;
-  const unsigned int colorCount;
-
   QVector<msvToolVTKButtons *> buttons;
 public:
   msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsMainWindow& object);
-  ~msvQVTKButtonsMainWindowPrivate();
+  virtual ~msvQVTKButtonsMainWindowPrivate();
 
   virtual void setup(QMainWindow*);
   virtual void setupUi(QMainWindow*);
@@ -129,8 +113,6 @@ public:
 //------------------------------------------------------------------------------
 msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsMainWindow& object)
   : q_ptr(&object)
-  , currentColor(0)
-  , colorCount(7)
 {
   // Renderer
   this->threeDRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -179,7 +161,7 @@ msvQVTKButtonsMainWindowPrivate::~msvQVTKButtonsMainWindowPrivate()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::clear()
 {
-  Q_Q(msvQVTKButtonsMainWindow);
+  //Q_Q(msvQVTKButtonsMainWindow);
 
   this->timePlayerWidget->play(false);            // stop the player widget
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
@@ -200,13 +182,13 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   this->Ui_msvQVTKButtonsMainWindow::setupUi(mainWindow);
 
-  this->ecgPanel->toggleViewAction()->setText("VTKButtons panel");
-  this->ecgPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
-  this->menuView->addAction(this->ecgPanel->toggleViewAction());
+  this->vtkButtonsPanel->toggleViewAction()->setText("VTKButtons panel");
+  this->vtkButtonsPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
+  this->menuView->addAction(this->vtkButtonsPanel->toggleViewAction());
 
-  this->ecgReviewPanel->toggleViewAction()->setText("VTKButtons review panel");
-  this->ecgReviewPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+2"));
-  this->menuView->addAction(this->ecgReviewPanel->toggleViewAction());
+  this->vtkButtonsReviewPanel->toggleViewAction()->setText("VTKButtons review panel");
+  this->vtkButtonsReviewPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+2"));
+  this->menuView->addAction(this->vtkButtonsReviewPanel->toggleViewAction());
 
   q->setStatusBar(0);
 
@@ -425,18 +407,20 @@ void msvQVTKButtonsMainWindow::updateView()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::setCurrentSignal(int pointId)
 {
-  Q_D(msvQVTKButtonsMainWindow);
+  Q_UNUSED(pointId)
+  //Q_D(msvQVTKButtonsMainWindow);
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onPointSelected()
 {
-  Q_D(msvQVTKButtonsMainWindow);
+  //Q_D(msvQVTKButtonsMainWindow);
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onCurrentTimeChanged(double time)
 {
+  Q_UNUSED(time)
   this->updateView();
 }
 
@@ -449,7 +433,8 @@ void msvQVTKButtonsMainWindow::onVTKButtonsSelectionChanged()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::onCurrentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)
 {
-
+  Q_UNUSED(current)
+  Q_UNUSED(previous);
 }
 
 //------------------------------------------------------------------------------
@@ -466,6 +451,7 @@ void msvQVTKButtonsMainWindow::on_checkBoxShowLabels_stateChanged(int state) {
     d->showLabels(state);
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::on_checkBoxFlyTo_stateChanged(int state) {
     Q_D(msvQVTKButtonsMainWindow);
     
@@ -473,6 +459,7 @@ void msvQVTKButtonsMainWindow::on_checkBoxFlyTo_stateChanged(int state) {
 }
 
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindow::on_comboBoxPosition_currentIndexChanged(int index) {
     Q_D(msvQVTKButtonsMainWindow);
     

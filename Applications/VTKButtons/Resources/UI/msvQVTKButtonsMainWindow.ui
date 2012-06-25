@@ -63,7 +63,7 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="ecgReviewPanel">
+  <widget class="QDockWidget" name="vtkButtonsReviewPanel">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
@@ -131,16 +131,22 @@
       </layout>
      </item>
      <item>
-      <widget class="QListWidget" name="ecgReviewListWidget">
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="ecgPanel">
+  <widget class="QDockWidget" name="vtkButtonsPanel">
    <property name="floating">
     <bool>false</bool>
    </property>

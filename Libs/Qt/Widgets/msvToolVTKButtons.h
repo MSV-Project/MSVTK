@@ -12,7 +12,7 @@
 #ifndef MSVTOOLVTKBUTTONS_H
 #define MSVTOOLVTKBUTTONS_H
 
-#include "msvVTKButtonsExport.h"
+#include "msvQtWidgetsExport.h"
 
 #include <QObject.h>
 class vtkButtonWidget;
@@ -24,9 +24,8 @@ class vtkRenderer;
  Class name: msvToolVTKButtons
  This is the tool representing a VTK buttons.
  */
-class MSV_VTKButtons_EXPORT msvToolVTKButtons : public QObject {
+class MSV_QT_WIDGETS_EXPORT msvToolVTKButtons : public QObject {
     Q_OBJECT
-    
     
 public Q_SLOTS:
     /// Allow to execute and update the pipeline when something change.
@@ -34,7 +33,7 @@ public Q_SLOTS:
 
 public:
      /// Object constructor.
-    msvToolVTKButtons();
+    msvToolVTKButtons(QObject *parent = 0);
 
     /// Allow to show/hide button
     void setShowButton(bool show);
@@ -77,6 +76,9 @@ public:
     
     /// set the show/hide signal
     void setShowTooltip(bool value);
+    
+    /// Object destructor.
+    virtual ~msvToolVTKButtons();
 
 signals:
     /// signal launched with shown tooltip
@@ -84,10 +86,6 @@ signals:
     
     /// signal launched with shown tooltip
     void hideTooltip();
-    
-protected:
-    /// Object destructor.
-    /* virtual */ ~msvToolVTKButtons();
 
 private:
     /// calculate Position (center or corner)
@@ -149,7 +147,6 @@ inline void msvToolVTKButtons::setShowTooltip(bool value) {
     } else {
         Q_EMIT hideTooltip();
     }
-    
 }
 
 #endif // MSVTOOLVTKBUTTONS_H

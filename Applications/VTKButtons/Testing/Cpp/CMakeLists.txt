@@ -2,7 +2,6 @@ set(KIT VTKButtons)
 set(KIT_TEST_SRCS
   vtkButtonsTest1.cxx
   msvQVTKButtonsMainWindowTest1.cxx
-  msvVTKButtonsManagerTest1.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
@@ -31,4 +30,3 @@ add_test(
 )
 
 SIMPLE_TEST( msvQVTKButtonsMainWindowTest1 )
-SIMPLE_TEST( msvVTKButtonsManagerTest1 )

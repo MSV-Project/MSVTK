@@ -7,17 +7,12 @@ project(msv${KIT})
 
 set(msv${KIT}_SRCS
   msvQVTKButtonsMainWindow.cxx
-  msvVTKButtonsManager.cxx
   msvQVTKButtonsAboutDialog.cxx
-  msvAnimateVTK.cxx
-  msvToolVTKButtons.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
   msvQVTKButtonsMainWindow.h
   msvQVTKButtonsAboutDialog.h
-  msvAnimateVTK.h
-  msvToolVTKButtons.h
   )
 
 set(msv${KIT}_UI_SRCS
