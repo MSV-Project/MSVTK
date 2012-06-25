@@ -1,5 +1,5 @@
 /*
- *  msvAnimateVTK.cpp
+ *  msvQVTKAnimate.cpp
  *  mafPluginVTK
  *
  *  Created by Roberto Mucci on 21/02/12.
@@ -9,7 +9,7 @@
  *
  */
 
-#include "msvAnimateVTK.h"
+#include "msvQVTKAnimate.h"
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -18,10 +18,10 @@
 
 #include <vtkRendererCollection.h>
 
-msvAnimateVTK::msvAnimateVTK() {
+msvQVTKAnimate::msvQVTKAnimate() {
 }
 
-void msvAnimateVTK::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps) {
+void msvQVTKAnimate::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps) {
     assert(renderer);
     //vtkRenderer *renderer = widget->renderer("tool");
     double center[3]; 
@@ -117,6 +117,6 @@ void msvAnimateVTK::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfS
     }
 }
 
-msvAnimateVTK::~msvAnimateVTK() {
+msvQVTKAnimate::~msvQVTKAnimate() {
 
 }

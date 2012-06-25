@@ -53,7 +53,7 @@
 #include "vtkTable.h"
 
 //new
-#include "msvToolVTKButtons.h"
+#include <msvQVTKButtons.h>
 #include <vtkDataSetReader.h>
 #include <vtkButtonWidget.h>
 
@@ -69,7 +69,7 @@ protected:
 
   void importVTKData(QString &filePath);
   void addVTKButton(QObject *parent);
-  void setToolTip(msvToolVTKButtons *b);
+  void setToolTip(msvQVTKButtons *b);
     
   void showButtons(bool value);
   void showLabels(bool value);
@@ -91,7 +91,7 @@ protected:
   vtkSmartPointer<vtkPolyDataMapper>              surfaceMapper;
   vtkSmartPointer<vtkActor>                       surfaceActor;
 
-  QVector<msvToolVTKButtons *> buttons;
+  QVector<msvQVTKButtons *> buttons;
 public:
   msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsMainWindow& object);
   virtual ~msvQVTKButtonsMainWindowPrivate();
@@ -262,7 +262,7 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::setToolTip(msvToolVTKButtons *b)
+void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
 {
     double *bounds = polyDataReader->GetOutput()->GetBounds();
     QString text("<b>Data type</b>: ");
@@ -309,7 +309,7 @@ void msvQVTKButtonsMainWindowPrivate::setToolTip(msvToolVTKButtons *b)
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
-    msvToolVTKButtons *toolButton = new msvToolVTKButtons();
+    msvQVTKButtons *toolButton = new msvQVTKButtons();
     buttons.append(toolButton);
     QString name("TestData");
     QString iconFileName("/Users/dannox/Pictures/testIcon.png");
@@ -322,28 +322,28 @@ void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
 }
 
 void msvQVTKButtonsMainWindowPrivate::showButtons(bool value) {
-    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+    Q_FOREACH(msvQVTKButtons *button, buttons) {
         button->setShowButton(value);
         button->update();
     }
 }
 
 void msvQVTKButtonsMainWindowPrivate::showLabels(bool value) {
-    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+    Q_FOREACH(msvQVTKButtons *button, buttons) {
         button->setShowLabel(value);
         button->update();
     }
 }
 
 void msvQVTKButtonsMainWindowPrivate::setFlyTo(bool value) {
-    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+    Q_FOREACH(msvQVTKButtons *button, buttons) {
         button->setFlyTo(value);
         button->update();
     }
 }
 
 void msvQVTKButtonsMainWindowPrivate::setOnCenter(bool value) {
-    Q_FOREACH(msvToolVTKButtons *button, buttons) {
+    Q_FOREACH(msvQVTKButtons *button, buttons) {
         button->setOnCenter(value);
         button->update();
     }

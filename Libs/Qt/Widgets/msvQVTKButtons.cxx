@@ -1,5 +1,5 @@
 /*
- *  msvToolVTKButtons.cpp
+ *  msvQVTKButtons.cpp
  *  VTKButtons
  *
  *  Created by Roberto Mucci on 13/01/12.
@@ -9,11 +9,11 @@
  *
  */
 
-#include "msvToolVTKButtons.h"
+#include "msvQVTKButtons.h"
 #include <QImage>
 #include <QDir>
 
-#include "msvAnimateVTK.h"
+#include "msvQVTKAnimate.h"
 
 #include <vtkSmartPointer.h>
 #include <vtkAlgorithmOutput.h>
@@ -47,7 +47,7 @@ public:
 
     virtual void Execute(vtkObject *caller, unsigned long, void*) {
         Q_UNUSED(caller);
-        msvAnimateVTK *animateCamera = new msvAnimateVTK();
+        msvQVTKAnimate *animateCamera = new msvQVTKAnimate();
         if (flyTo) {
             animateCamera->flyTo(renderer, bounds, 200);
         } else {
@@ -73,7 +73,7 @@ public:
     }
 
     vtkButtonCallback():toolButton(NULL), renderer(0), flyTo(true) {}
-    msvToolVTKButtons *toolButton;
+    msvQVTKButtons *toolButton;
     vtkRenderer *renderer;
     double bounds[6];
     bool flyTo;
@@ -101,12 +101,12 @@ public:
     }
 
     vtkButtonHighLightCallback():toolButton(NULL), previousHighlightState(0) {}
-    msvToolVTKButtons *toolButton;
+    msvQVTKButtons *toolButton;
     int previousHighlightState;
         
 };
 
-msvToolVTKButtons::msvToolVTKButtons(QObject *parent) : QObject(parent), m_ShowButton(true), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false) {
+msvQVTKButtons::msvQVTKButtons(QObject *parent) : QObject(parent), m_ShowButton(true), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false) {
     VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
     rep->SetNumberOfStates(1);
     
@@ -123,11 +123,11 @@ msvToolVTKButtons::msvToolVTKButtons(QObject *parent) : QObject(parent), m_ShowB
 
 }
 
-msvToolVTKButtons::~msvToolVTKButtons() {
+msvQVTKButtons::~msvQVTKButtons() {
     m_ButtonWidget->Delete();
 }
 
-void msvToolVTKButtons::setCurrentRenderer(vtkRenderer *renderer) {
+void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer) {
     if(renderer) {
         m_ButtonWidget->SetInteractor(renderer->GetRenderWindow()->GetInteractor());
         m_ButtonWidget->SetCurrentRenderer(renderer); //to check
@@ -141,7 +141,7 @@ void msvToolVTKButtons::setCurrentRenderer(vtkRenderer *renderer) {
     }
 }
 
-void msvToolVTKButtons::setIconFileName(QString &iconFileName) {
+void msvQVTKButtons::setIconFileName(QString &iconFileName) {
     m_IconFileName = iconFileName;
     QImage image;
     image.load(m_IconFileName);
@@ -157,7 +157,7 @@ void msvToolVTKButtons::setIconFileName(QString &iconFileName) {
     update();
 }
 
-void msvToolVTKButtons::setBounds(double b[6]) {
+void msvQVTKButtons::setBounds(double b[6]) {
     buttonCallback->setBounds(b);
     int i = 0;
     for( ; i<6 ; i++ ) {
@@ -167,7 +167,7 @@ void msvToolVTKButtons::setBounds(double b[6]) {
     update();
 }
 
-void msvToolVTKButtons::calculatePosition() {
+void msvQVTKButtons::calculatePosition() {
     //modify position of the vtkButton 
     double bds[3];
     if (m_OnCenter) {
@@ -188,7 +188,7 @@ void msvToolVTKButtons::calculatePosition() {
     m_ButtonWidget->SetRepresentation(rep);
 }
 
-void msvToolVTKButtons::update() {
+void msvQVTKButtons::update() {
     calculatePosition();
     vtkTexturedButtonRepresentation2D *rep = reinterpret_cast<vtkTexturedButtonRepresentation2D*>(m_ButtonWidget->GetRepresentation());
 
@@ -226,11 +226,11 @@ void msvToolVTKButtons::update() {
     
 }
 
-void msvToolVTKButtons::setFlyTo(bool active) {
+void msvQVTKButtons::setFlyTo(bool active) {
     m_FlyTo = active;
     update();
 }
 
-void msvToolVTKButtons::setToolTip(QString &text) {
+void msvQVTKButtons::setToolTip(QString &text) {
     m_Tooltip = text;
 }

@@ -1,5 +1,5 @@
 /*
- *  msvAnimateVTK.h
+ *  msvQVTKAnimate.h
  *  mafPluginVTK
  *
  *  Created by Roberto Mucci on 21/02/12.
@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef MSVANIMATEVTK_H
-#define MSVANIMATEVTK_H
+#ifndef msvQVTKAnimate_H
+#define msvQVTKAnimate_H
 
 // Includes list
 
@@ -20,23 +20,23 @@
 
 
 /**
-Class name: msvAnimateVTK
+Class name: msvQVTKAnimate
 This is an utility class to animate VTKCamera.
 */
 
-class MSV_QT_WIDGETS_EXPORT msvAnimateVTK 
+class MSV_QT_WIDGETS_EXPORT msvQVTKAnimate 
 {
 
 public:
     /// Object constructor.
-    msvAnimateVTK();
+    msvQVTKAnimate();
 
     /// Animate the camera to zoom on the passed bounding box.
     void flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120);
 
     /// Object destructor.
-    virtual ~msvAnimateVTK();
+    virtual ~msvQVTKAnimate();
 
 };
 
-#endif // MSVANIMATEVTK_H
+#endif // msvQVTKAnimate_H

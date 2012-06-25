@@ -1,5 +1,5 @@
 /*
- *  msvToolVTKButtons.h
+ *  msvQVTKButtons.h
  *  VTKButtons
  *
  *  Created by Roberto Mucci on 13/01/12.
@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef MSVTOOLVTKBUTTONS_H
-#define MSVTOOLVTKBUTTONS_H
+#ifndef msvQVTKButtons_H
+#define msvQVTKButtons_H
 
 #include "msvQtWidgetsExport.h"
 
@@ -21,10 +21,10 @@ class vtkButtonHighLightCallback;
 class vtkRenderer;
 
 /**
- Class name: msvToolVTKButtons
+ Class name: msvQVTKButtons
  This is the tool representing a VTK buttons.
  */
-class MSV_QT_WIDGETS_EXPORT msvToolVTKButtons : public QObject {
+class MSV_QT_WIDGETS_EXPORT msvQVTKButtons : public QObject {
     Q_OBJECT
     
 public Q_SLOTS:
@@ -33,7 +33,7 @@ public Q_SLOTS:
 
 public:
      /// Object constructor.
-    msvToolVTKButtons(QObject *parent = 0);
+    msvQVTKButtons(QObject *parent = 0);
 
     /// Allow to show/hide button
     void setShowButton(bool show);
@@ -78,7 +78,7 @@ public:
     void setShowTooltip(bool value);
     
     /// Object destructor.
-    virtual ~msvToolVTKButtons();
+    virtual ~msvQVTKButtons();
 
 signals:
     /// signal launched with shown tooltip
@@ -109,39 +109,39 @@ private:
 // Inline methods
 /////////////////////////////////////////////////////////////
 
-inline void msvToolVTKButtons::setShowButton(bool show) {
+inline void msvQVTKButtons::setShowButton(bool show) {
     m_ShowButton = show;
 }
 
-inline bool msvToolVTKButtons::showButton() const {
+inline bool msvQVTKButtons::showButton() const {
     return m_ShowButton;
 }
 
-inline void msvToolVTKButtons::setShowLabel(bool show) {
+inline void msvQVTKButtons::setShowLabel(bool show) {
     m_ShowLabel = show;
 }
 
-inline bool msvToolVTKButtons::showLabel() const {
+inline bool msvQVTKButtons::showLabel() const {
     return m_ShowLabel;
 }
 
-inline bool msvToolVTKButtons::FlyTo() const {
+inline bool msvQVTKButtons::FlyTo() const {
     return m_FlyTo;
 }
 
-inline void msvToolVTKButtons::setOnCenter(bool onCenter) {
+inline void msvQVTKButtons::setOnCenter(bool onCenter) {
     m_OnCenter = onCenter;
 }
 
-inline bool msvToolVTKButtons::OnCenter() const {
+inline bool msvQVTKButtons::OnCenter() const {
     return m_OnCenter;
 }
 
-inline void msvToolVTKButtons::setLabel(QString &text) {
+inline void msvQVTKButtons::setLabel(QString &text) {
     m_Label = text;
 }
 
-inline void msvToolVTKButtons::setShowTooltip(bool value) {
+inline void msvQVTKButtons::setShowTooltip(bool value) {
     if(value) {
         Q_EMIT showTooltip(m_Tooltip);
     } else {
@@ -149,4 +149,4 @@ inline void msvToolVTKButtons::setShowTooltip(bool value) {
     }
 }
 
-#endif // MSVTOOLVTKBUTTONS_H
+#endif // msvQVTKButtons_H
