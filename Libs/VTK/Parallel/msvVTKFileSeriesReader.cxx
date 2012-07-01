@@ -59,11 +59,11 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <algorithm>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 //=============================================================================
 vtkCxxSetObjectMacro(msvVTKFileSeriesReader,Reader,vtkAlgorithm);
@@ -84,15 +84,15 @@ public:
   int GetAggregateTimeInfo(vtkInformation *outInfo);
   int GetInputTimeInfo(int index, vtkInformation *outInfo);
   int GetIndexForTime(double time);
-  vtkstd::set<int> ChooseInputs(vtkInformation *outInfo);
-  vtkstd::vector<double> GetTimesForInput(int inputId, vtkInformation *outInfo);
+  std::set<int> ChooseInputs(vtkInformation *outInfo);
+  std::vector<double> GetTimesForInput(int inputId, vtkInformation *outInfo);
 
 private:
   static vtkInformationIntegerKey *INDEX();
-  typedef vtkstd::map<double, vtkSmartPointer<vtkInformation> > RangeMapType;
+  typedef std::map<double, vtkSmartPointer<vtkInformation> > RangeMapType;
   RangeMapType RangeMap;
   double outputTimeRange[2];
-  vtkstd::map<int, vtkSmartPointer<vtkInformation> > InputLookup;
+  std::map<int, vtkSmartPointer<vtkInformation> > InputLookup;
 };
 
 vtkInformationKeyMacro(msvVTKFileSeriesReaderTimeRanges, INDEX, Integer);
@@ -227,7 +227,7 @@ int msvVTKFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation *outIn
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
 
-  vtkstd::vector<double> timeSteps;
+  std::vector<double> timeSteps;
 
   RangeMapType::iterator itr = this->RangeMap.begin();
   while (itr != this->RangeMap.end())
@@ -315,10 +315,10 @@ int msvVTKFileSeriesReaderTimeRanges::GetIndexForTime(double time)
 }
 
 //-----------------------------------------------------------------------------
-vtkstd::set<int> msvVTKFileSeriesReaderTimeRanges::ChooseInputs(
-                                                        vtkInformation *outInfo)
+std::set<int> msvVTKFileSeriesReaderTimeRanges::
+ChooseInputs(vtkInformation *outInfo)
 {
-  vtkstd::set<int> indices;
+  std::set<int> indices;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
     {
     // get the update times
@@ -341,7 +341,7 @@ vtkstd::set<int> msvVTKFileSeriesReaderTimeRanges::ChooseInputs(
 }
 
 //-----------------------------------------------------------------------------
-vtkstd::vector<double> msvVTKFileSeriesReaderTimeRanges::GetTimesForInput(
+std::vector<double> msvVTKFileSeriesReaderTimeRanges::GetTimesForInput(
                                                         int inputId,
                                                         vtkInformation *outInfo)
 {
@@ -379,7 +379,7 @@ vtkstd::vector<double> msvVTKFileSeriesReaderTimeRanges::GetTimesForInput(
     }
 
   // Now we are finally ready to identify the times
-  vtkstd::vector<double> times;
+  std::vector<double> times;
 
   // Get the update times
   int numUpTimes =
@@ -393,8 +393,8 @@ vtkstd::vector<double> msvVTKFileSeriesReaderTimeRanges::GetTimesForInput(
       {
       // Add the time.  Clamp it to the input's supported time range in
       // case that input is clipping based on the time.
-      times.push_back(vtkstd::max(supportedTimeRange[0],
-                                  vtkstd::min(supportedTimeRange[1],
+      times.push_back(std::max(supportedTimeRange[0],
+                                  std::min(supportedTimeRange[1],
                                               upTimes[i])));
       }
     }
@@ -405,7 +405,7 @@ vtkstd::vector<double> msvVTKFileSeriesReaderTimeRanges::GetTimesForInput(
 //=============================================================================
 struct msvVTKFileSeriesReaderInternals
 {
-  vtkstd::vector<vtkstd::string> FileNames;
+  std::vector<std::string> FileNames;
   bool FileNameIsSet;
   msvVTKFileSeriesReaderTimeRanges *TimeRanges;
 };
@@ -627,7 +627,7 @@ int msvVTKFileSeriesReader::RequestUpdateExtent(
                                  vtkInformationVector* outputVector)
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkstd::set<int> inputs = this->Internal->TimeRanges->ChooseInputs(outInfo);
+  std::set<int> inputs = this->Internal->TimeRanges->ChooseInputs(outInfo);
   if (inputs.size() > 1)
     {
     vtkErrorMacro("vtkTemporalDataSet not fully supported.");
@@ -663,7 +663,7 @@ int msvVTKFileSeriesReader::RequestUpdateExtent(
   // here for completeness.
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
     {
-    vtkstd::vector<double> times
+    std::vector<double> times
       = this->Internal->TimeRanges->GetTimesForInput(index, outInfo);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
                  &times[0], times.size());
@@ -792,8 +792,8 @@ int msvVTKFileSeriesReader::ReadMetaDataFile(const char *metafilename,
     return 0;
     }
   // Get the path of the metafile for relative paths within.
-  vtkstd::string filePath = metafilename;
-  vtkstd::string::size_type pos = filePath.find_last_of("/\\");
+  std::string filePath = metafilename;
+  std::string::size_type pos = filePath.find_last_of("/\\");
   if(pos != filePath.npos)
     {
     filePath = filePath.substr(0, pos+1);

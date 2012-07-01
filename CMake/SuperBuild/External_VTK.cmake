@@ -50,7 +50,7 @@ if(NOT DEFINED VTK_DIR)
 
   #set(revision_tag "v5.8.0")
   #set(revision_tag fea2d622cf01dfd22f727330dbace97d4af892db)
-  set(revision_tag ad3fda67d01a3a58c715474ad81803ecb3d3ce1c)
+  set(revision_tag a5b75c93048adc617be8978ce1fe07cfe124d572)
   if(${proj}_REVISION_TAG)
     set(revision_tag ${${proj}_REVISION_TAG})
   endif()
@@ -70,7 +70,7 @@ if(NOT DEFINED VTK_DIR)
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
-    GIT_REPOSITORY ${git_protocol}://vtk.org/VTK.git
+    GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/VTK.git
     GIT_TAG ${revision_tag}
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""

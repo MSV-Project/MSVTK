@@ -385,12 +385,12 @@ endif()
 # VTK
 #-----------------------------------------------------------------------------
 find_package(VTK REQUIRED)
-if(NOT VTK_USE_QVTK)
-  message(FATAL_ERROR "error: VTK was not configured to use QT, you probably need "
-                      "to recompile it with VTK_USE_GUISUPPORT ON, VTK_USE_QVTK ON, "
-                      "DESIRED_QT_VERSION 4 and QT_QMAKE_EXECUTABLE set appropriatly. "
-                      "Note that Qt >= ${Slicer_REQUIRED_QT_VERSION} is *required*")
-endif()
+#if(NOT VTK_USE_QVTK)
+#  message(FATAL_ERROR "error: VTK was not configured to use QT, you probably need "
+#                      "to recompile it with VTK_USE_GUISUPPORT ON, VTK_USE_QVTK ON, "
+#                      "DESIRED_QT_VERSION 4 and QT_QMAKE_EXECUTABLE set appropriatly. "
+#                      "Note that Qt >= ${Slicer_REQUIRED_QT_VERSION} is *required*")
+#endif()
 include(${VTK_USE_FILE})
 
 #-----------------------------------------------------------------------------
