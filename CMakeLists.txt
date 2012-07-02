@@ -362,7 +362,7 @@ set(MSVTK_APPLICATIONS_SUBDIRS )
 
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkButtons" ON)
 option(MSVTK_APP_VTKBUTTONS "vtkButtons application to demonstrate vtkButtons" ON)
-list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG VTKBUTTONS)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG VTKButtons)
 
 #-----------------------------------------------------------------------------
 # Prerequisites
@@ -445,7 +445,7 @@ endforeach()
 # Add MSVTK application subdirectories
 #
 foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
-  IF (MSVTK_APP_${app})
+  if(MSVTK_APP_${app})
     add_subdirectory(Applications/${app})
   endif()
 endforeach()
