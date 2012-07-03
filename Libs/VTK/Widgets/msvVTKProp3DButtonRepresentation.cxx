@@ -46,7 +46,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
-#include <vtkstd/map>
+
+#include <map>
 
 // MSV includes
 #include "msvVTKProp3DButtonRepresentation.h"
@@ -61,8 +62,8 @@ struct vtkScaledProp
 };
 
 // Map of textures
-class vtkPropArray : public vtkstd::map<int,vtkScaledProp> {};
-typedef vtkstd::map<int,vtkScaledProp>::iterator vtkPropArrayIterator;
+class vtkPropArray : public std::map<int,vtkScaledProp> {};
+typedef std::map<int,vtkScaledProp>::iterator vtkPropArrayIterator;
 
 
 //----------------------------------------------------------------------
