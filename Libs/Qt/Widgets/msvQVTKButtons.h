@@ -1,8 +1,8 @@
 /*
  *  msvQVTKButtons.h
- *  VTKButtons
+ *  
  *
- *  Created by Roberto Mucci on 13/01/12.
+ *  Created by Daniele Giunchi on 13/01/12.
  *  Copyright 2011 B3C. All rights reserved.
  *
  *  See License at: http://tiny.cc/QXJ4D
@@ -14,7 +14,9 @@
 
 #include "msvQtWidgetsExport.h"
 
-#include <QObject.h>
+#include <QObject>
+
+//forward declarations
 class vtkButtonWidget;
 class vtkButtonCallback;
 class vtkButtonHighLightCallback;

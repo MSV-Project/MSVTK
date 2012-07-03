@@ -59,7 +59,6 @@ set(msvQtWidgets_SRCS
 
 set(msv${KIT}_MOC_SRCS
   msvQTimePlayerWidget.h
-  msvQVTKAnimate.h
   msvQVTKButtons.h
   )
 
