@@ -1,8 +1,8 @@
 /*
  *  msvQVTKAnimate.h
- *  mafPluginVTK
+ *  
  *
- *  Created by Roberto Mucci on 21/02/12.
+ *  Created by Daniele Giunchi on 21/02/12.
  *  Copyright 2009 B3C.s All rights reserved.
  *
  *  See License at: http://tiny.cc/QXJ4D
@@ -15,7 +15,6 @@
 // Includes list
 
 #include "msvQtWidgetsExport.h"
-#include <QObject.h>
 #include <vtkRenderer.h>
 
 
