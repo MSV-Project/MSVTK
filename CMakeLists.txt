@@ -290,7 +290,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   set(MSVTK_C_FLAGS "${cflags} ${MSVTK_C_FLAGS}")
-  set(MSVTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MSVTK_CXX_FLAGS}")
+#   set(MSVTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MSVTK_CXX_FLAGS}")
+  set(MSVTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wstrict-null-sentinel -Wsign-promo ${MSVTK_CXX_FLAGS}")
 endif()
 
 if(MSVC)
@@ -354,6 +355,7 @@ set(MSVTK_APPLICATIONS_SUBDIRS )
 
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkButtons" ON)
 option(MSVTK_APP_VTKButtons "vtkButtons application to demonstrate vtkButtons" ON)
+option(MSVTK_APP_MSI "CAF application to demonstrate the multiscale and simulation capabilities" ON)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
 

@@ -41,7 +41,8 @@ if(MINGW)
   list(APPEND additional_vtk_cmakevars -DCMAKE_USE_PTHREADS:BOOL=OFF)
 endif()
 
-set(IBAMR_DEPENDENCIES "PETSC;HYPRE;SAMRAI;HDF5;BLITZ;SILO")
+set(IBAMR_DEPENDENCIES "OPENMPI;SAMRAI;HDF5;SILO;BLITZ;PETSC;HYPRE")
+
 # Include dependent projects if any
 msvMacroCheckExternalProjectDependency(IBAMR)
 set(proj IBAMR)
@@ -63,14 +64,14 @@ if(NOT DEFINED IBAMR_DIR)
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
-    SVN_REPOSITORY http://ibamr.googlecode.com/svn/trunk
+#     SVN_REPOSITORY https://ibamr.googlecode.com/svn/branches/ibamr-dev
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
-    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/${proj}/configure
-      CFLAGS=-O3
-      CXXFLAGS=-O3 
-      FFLAGS=-O3
-      FCFLAGS=-O3
+    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/${proj}/configure 
+      "CFLAGS=${ep_common_c_flags}"
+      "CXXFLAGS=${ep_common_cxx_flags}"
+      "FCFLAGS=${CMAKE_F_FLAGS}"
+      "FFLAGS=${CMAKE_F_FLAGS}"
       CPPFLAGS=-DOMPI_SKIP_MPICXX
       CC=${ep_install_dir}/bin/mpicc
       CXX=${ep_install_dir}/bin/mpicxx
@@ -78,13 +79,18 @@ if(NOT DEFINED IBAMR_DIR)
       FC=${ep_install_dir}/bin/mpif90 
       MPICC=${ep_install_dir}/bin/mpicc 
       MPICXX=${ep_install_dir}/bin/mpicxx 
+      --with-samrai=${ep_install_dir}
+      --with-hdf5=${ep_install_dir}
       --with-petsc=${PETSC_DIR}
       --with-petsc-arch=${PETSC_ARCH}
       --with-hypre=${ep_install_dir}
-      --with-samrai=${ep_install_dir}
-      --with-hdf5=${ep_install_dir}
-      --with-blitz=${ep_install_dir}
+      --with-blitz=${BLITZ_DIR}
       --with-silo=${ep_install_dir}
+    TEST_BEFORE_INSTALL 1
+    LOG_CONFIGURE 1
+#     LOG_BUILD 1
+    LOG_INSTALL 1
+    TEST_COMMAND make check
     BUILD_COMMAND make lib
     DEPENDS
       ${IBAMR_DEPENDENCIES}

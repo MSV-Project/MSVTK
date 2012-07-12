@@ -45,7 +45,6 @@ set(VTK_DEPENDENCIES "")
 # Include dependent projects if any
 msvMacroCheckExternalProjectDependency(VTK)
 set(proj VTK)
-
 if(NOT DEFINED VTK_DIR)
 
   #set(revision_tag "v5.8.0")
@@ -73,7 +72,7 @@ if(NOT DEFINED VTK_DIR)
     GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/VTK.git
     GIT_TAG ${revision_tag}
     UPDATE_COMMAND ""
-    INSTALL_COMMAND ""
+    INSTALL_COMMAND make install
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -98,6 +97,7 @@ if(NOT DEFINED VTK_DIR)
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
       -DLIBRARY_OUTPUT_PATH:STRING=${MSVTK_BINARY_DIR}/MSVTK-build/bin
       -DEXECUTABLE_OUTPUT_PATH:STRING=${MSVTK_BINARY_DIR}/MSVTK-build/bin
+      
     DEPENDS
       ${VTK_DEPENDENCIES}
     )
