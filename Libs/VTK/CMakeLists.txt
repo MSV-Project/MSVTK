@@ -11,6 +11,7 @@ set(dirs
 
 list(APPEND dirs
   Parallel
+  Rendering
   Widgets
   )
 

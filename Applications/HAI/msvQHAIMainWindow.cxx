@@ -26,6 +26,8 @@
 #include "msvVTKXMLMultiblockLODReader.h"
 #include "ui_msvQHAIMainWindow.h"
 #include "msvQHAIAboutDialog.h"
+//#include "msvVTKCompositeActor.h"
+//#include "msvVTKCompositePainter.h"
 #include "msvVTKLODWidget.h"
 #include "msvVTKProp3DButtonRepresentation.h"
 
@@ -35,6 +37,7 @@
 #include "vtkCollection.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositePolyDataMapper2.h"
+#include "vtkDefaultPainter.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
@@ -106,7 +109,12 @@ msvQHAIMainWindowPrivate::msvQHAIMainWindowPrivate(msvQHAIMainWindow& object)
   this->lodMapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
   this->lodMapper->SetInputConnection(
     this->lodReader->GetOutputPort());
+  //vtkSmartPointer<msvVTKCompositePainter> compositePainter =
+  //  vtkSmartPointer<msvVTKCompositePainter>::New();
+  //vtkDefaultPainter::SafeDownCast(this->lodMapper->GetPainter())->SetCompositePainter(
+  //  compositePainter);
 
+  //this->lodActor = vtkSmartPointer<msvVTKCompositeActor>::New();
   this->lodActor = vtkSmartPointer<vtkActor>::New();
   this->lodActor->SetMapper(lodMapper.GetPointer());
   this->threeDRenderer->AddActor(lodActor);
