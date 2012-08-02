@@ -312,6 +312,7 @@ void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
     msvQVTKButtons *toolButton = new msvQVTKButtons();
     buttons.append(toolButton);
     QString name("TestData");
+    toolButton->setShowButton(true);
     QString iconFileName(":/Images/buttonIcon.png");
     toolButton->setIconFileName(iconFileName);
     toolButton->setLabel(name);

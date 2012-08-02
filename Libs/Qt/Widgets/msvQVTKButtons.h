@@ -15,6 +15,7 @@
 #include "msvQtWidgetsExport.h"
 
 #include <QObject>
+#include <QImage>
 
 //forward declarations
 class vtkButtonWidget;
@@ -47,13 +48,13 @@ public:
     void setShowLabel(bool show);
     
     /// set the icon path
-    void setIconFileName(QString &iconFileName);
+    void setIconFileName(QString iconFileName);
 
     /// Return showLabel flag
     bool showLabel() const;
     
     /// set the text label
-    void setLabel(QString &text);
+    void setLabel(QString text);
 
     /// Allow to activate FlyTo animation
     void setFlyTo(bool active);
@@ -68,7 +69,7 @@ public:
     bool OnCenter() const;
     
     /// set the tooltip string
-    void setToolTip(QString &text);
+    void setToolTip(QString text);
 
     /// add vtk button to Renderer
     void setCurrentRenderer(vtkRenderer *renderer);
@@ -81,6 +82,9 @@ public:
     
     /// Object destructor.
     virtual ~msvQVTKButtons();
+    
+    /// retrieve button pointer.
+    vtkButtonWidget *button();
 
 signals:
     /// signal launched with shown tooltip
@@ -97,6 +101,7 @@ private:
     vtkButtonCallback *buttonCallback; ///< Callback called by picking on vtkButton
     vtkButtonHighLightCallback *highlightCallback; ///< Callback called by hovering over the button.
     
+    QImage m_Image;
     QString m_Label; ///< label of the button
     QString m_Tooltip; ///< tooltip associated to the button
     QString m_IconFileName; ///< File name of the image to be applied to the button.
@@ -139,7 +144,7 @@ inline bool msvQVTKButtons::OnCenter() const {
     return m_OnCenter;
 }
 
-inline void msvQVTKButtons::setLabel(QString &text) {
+inline void msvQVTKButtons::setLabel(QString text) {
     m_Label = text;
 }
 
