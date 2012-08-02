@@ -1,0 +1,177 @@
+###########################################################################
+#
+#  Library:   MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+###########################################################################
+#
+#  Program:   Visualization Toolkit
+#  Module:    VTKConfig.cmake.in
+#
+#  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+#
+#  All rights reserved.
+#  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+#
+#     This software is distributed WITHOUT ANY WARRANTY; without even
+#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE.  See the above copyright notice for more information.
+#
+###########################################################################
+
+#
+# MSVTKConfig.cmake - MSVTK CMake configuration file for external projects.
+#
+# This file is configured by MSVTK and used by the UseMSVTK.cmake module
+# to load MSVTK's settings for an external project.
+
+
+# Import MSVTK targets
+IF(NOT MSVTK_EXPORTS_INCLUDED)
+  INCLUDE("@MSVTK_SUPERBUILD_BINARY_DIR@/MSVTKExports.cmake")
+  SET(MSVTK_EXPORTS_INCLUDED 1)
+ENDIF()
+
+# Include MSVTK macros
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionGetGccVersion.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroParseArguments.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroSetPaths.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroListFilter.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroBuildLibWrapper.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroBuildPlugin.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroTargetLibraries.cmake") # Import multiple macros
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionExtractOptionNameAndValue.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroValidateBuildOptions.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionGenerateDGraphInput.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionGeneratePluginManifest.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionGeneratePluginUseFile.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroGeneratePluginResourceFile.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionGetIncludeDirs.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionGetLibraryDirs.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKFunctionExtractPluginTargets.cmake")
+#INCLUDE("@MSVTK_CMAKE_DIR_CONFIG@/MSVTKMacroSetupExternalPlugins.cmake")
+
+SET(MSVTK_EXPORT_HEADER_TEMPLATE "@MSVTK_EXPORT_HEADER_TEMPLATE@")
+
+# Directory containing the MSVTKConfig.h file
+SET(MSVTK_CONFIG_H_INCLUDE_DIR @MSVTK_CONFIG_H_INCLUDE_DIR@)
+
+# The MSVTK DGraph executable used to compute target dependency graphs
+SET(MSVTK_DGRAPH_EXECUTABLE "@DGraph_EXECUTABLE@")
+
+# List all libraries
+SET(MSVTK_LIBRARIES @MSVTK_LIBRARIES@)
+
+# List all MSVTK libraries wrapped with PythonQt
+SET(MSVTK_WRAPPED_LIBRARIES_PYTHONQT @MSVTK_WRAPPED_LIBRARIES_PYTHONQT@)
+
+# Include MSVTK Plugin specific variables
+# INCLUDE("@MSVTK_PLUGIN_USE_FILE@")
+
+@MSVTK_CONFIG_INSTALL_ONLY@
+
+# Library specific include directories
+@MSVTK_LIBRARY_INCLUDE_DIRS_CONFIG@
+
+# Library specific library directories
+@MSVTK_LIBRARY_LIBRARY_DIRS_CONFIG@
+
+# The MSVTK include file directories.
+SET(MSVTK_INCLUDE_DIRS "@MSVTK_BUILD_DIR@;@MSVTK_INCLUDE_DIRS_CONFIG@")
+
+# The MSVTK library directories. Note that if
+# MSVTK_CONFIGURATION_TYPES is set (see below) then these directories
+# will be the parent directories under which there will be a directory
+# of runtime binaries for each configuration type.
+SET(MSVTK_LIBRARY_DIRS "@MSVTK_LIBRARY_DIRS_CONFIG@")
+
+# The MSVTK external project libraries.
+SET(MSVTK_EXTERNAL_LIBRARIES "@MSVTK_EXTERNAL_LIBRARIES_CONFIG@")
+
+# The MSVTK external project library directories. Note that if
+# MSVTK_CONFIGURATION_TYPES is set (see below) then these directories
+# will be the parent directories under which there will be a directory
+# of runtime binaries for each configuration type.
+SET(MSVTK_EXTERNAL_LIBRARY_DIRS "@MSVTK_EXTERNAL_LIBRARY_DIRS_CONFIG@")
+
+# The MSVTK binary executable directories. Note that if
+# MSVTK_CONFIGURATION_TYPES is set (see below) then these directories
+# will be the parent directories under which there will be a directory
+# of runtime binaries for each configuration type.
+SET(MSVTK_EXECUTABLE_DIRS "@MSVTK_EXECUTABLE_DIRS_CONFIG@")
+
+# The MSVTK runtime library directories. Note that if
+# MSVTK_CONFIGURATION_TYPES is set (see below) then these directories
+# will be the parent directories under which there will be a directory
+# of runtime libraries for each configuration type.
+SET(MSVTK_RUNTIME_LIBRARY_DIRS "@MSVTK_RUNTIME_LIBRARY_DIRS_CONFIG@")
+
+# The MSVTK Qt designer plugin directory. Note that if
+# MSVTK_CONFIGURATION_TYPES is set (see below) then these directories
+# will be the parent directories under which there will be a directory
+# of runtime libraries for each configuration type.
+SET(MSVTK_QTDESIGNERPLUGINS_DIR "@MSVTK_QTDESIGNERPLUGINS_DIR_CONFIG@")
+
+# MSVTK external projects variables
+@MSVTK_SUPERBUILD_EP_VARS_CONFIG@
+
+# Qt configuration
+SET(MSVTK_QT_RCC_EXECUTABLE "@QT_RCC_EXECUTABLE@")
+SET(MSVTK_QT_MOC_EXECUTABLE "@QT_MOC_EXECUTABLE@")
+SET(MSVTK_QT_UIC_EXECUTABLE "@QT_UIC_EXECUTABLE@")
+SET(MSVTK_QT_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
+
+# The MSVTK version number
+SET(MSVTK_MAJOR_VERSION "@MSVTK_MAJOR_VERSION@")
+SET(MSVTK_MINOR_VERSION "@MSVTK_MINOR_VERSION@")
+SET(MSVTK_BUILD_VERSION "@MSVTK_BUILD_VERSION@")
+
+# The location of the UseMSVTK.cmake file.
+SET(MSVTK_USE_FILE "@MSVTK_USE_FILE@")
+
+# CMake extension module directory
+SET(MSVTK_CMAKE_DIR "@MSVTK_CMAKE_DIR_CONFIG@")
+SET(MSVTK_CMAKE_UTILITIES_DIR "@MSVTK_CMAKE_UTILITIES_DIR_CONFIG@")
+
+# TODO The list of available libraries.
+
+# TODO The list of available plugins.
+
+# TODO The list of available applications.
+
+# TODO The Doxygen configuration.
+#SET(MSVTK_DOXYGEN_HOME "@MSVTK_DOXYGEN_HOME_CONFIG@")
+
+# TODO Relative install paths in the MSVTK install tree
+SET(MSVTK_INSTALL_BIN_DIR "@MSVTK_INSTALL_BIN_DIR@")
+SET(MSVTK_INSTALL_INCLUDE_DIR "@MSVTK_INSTALL_INCLUDE_DIR@")
+SET(MSVTK_INSTALL_LIB_DIR "@MSVTK_INSTALL_LIB_DIR@")
+#SET(MSVTK_INSTALL_PACKAGE_DIR "@MSVTK_INSTALL_PACKAGE_DIR@")
+
+# A MSVTK install tree always provides one build configuration. A MSVTK
+# build tree may provide either one or multiple build configurations
+# depending on the CMake generator used. Since MSVTK can be used either
+# from a build tree or an install tree it is useful for outside
+# projects to know the configurations available. If this
+# MSVTKConfig.cmake is in a MSVTK install tree MSVTK_CONFIGURATION_TYPES
+# will be empty and MSVTK_BUILD_TYPE will be set to the value of
+# CMAKE_BUILD_TYPE used to build MSVTK. If MSVTKConfig.cmake is in a MSVTK
+# build tree then MSVTK_CONFIGURATION_TYPES and MSVTK_BUILD_TYPE will have
+# values matching CMAKE_CONFIGURATION_TYPES and CMAKE_BUILD_TYPE for
+# that build tree (only one will ever be set).
+SET(MSVTK_CONFIGURATION_TYPES @MSVTK_CONFIGURATION_TYPES_CONFIG@)
+SET(MSVTK_BUILD_TYPE @MSVTK_BUILD_TYPE_CONFIG@)
