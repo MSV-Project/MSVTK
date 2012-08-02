@@ -362,7 +362,8 @@ set(MSVTK_APPLICATIONS_SUBDIRS )
 
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkButtons" ON)
 option(MSVTK_APP_VTKBUTTONS "vtkButtons application to demonstrate vtkButtons" ON)
-list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG VTKButtons)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKBUTTONS)
 
 #-----------------------------------------------------------------------------
 # Prerequisites
@@ -466,3 +467,10 @@ endif()
 # Documentation
 #
 add_subdirectory( Utilities/Documentation )
+
+
+#-----------------------------------------------------------------------------
+# The commands in this directory are intended to be executed as
+# the end of the whole configuration process, as a "last step".
+# This directory is typically the last SUBDIRS in the main CMakeLists.txt.
+add_subdirectory(Utilities/LastConfigureStep)
