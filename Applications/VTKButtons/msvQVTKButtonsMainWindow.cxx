@@ -25,6 +25,8 @@
 #include <QString>
 #include <QToolTip>
 #include <QVector>
+#include <QBuffer>
+
 
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
@@ -265,7 +267,21 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
 {
     double *bounds = polyDataReader->GetOutput()->GetBounds();
-    QString text("<b>Data type</b>: ");
+    
+    QString text("<table border=\"0\"");
+    text.append("<tr>");
+    text.append("<td>");
+    QImage preview = b->getPreview(180,180);
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    preview.save(&buffer, "PNG");
+
+    text.append(QString("<img src=\"data:image/png;base64,%1\">").arg(QString(buffer.data().toBase64())));
+    text.append("</td>");
+
+    text.append("<td>");
+    text.append("<b>Data type</b>: ");
     text.append("vtkPolyData");
     text.append("<br>");
     
@@ -303,6 +319,9 @@ void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
     text.append("<td>" + QString::number(bounds[5]) +"</td>");
     text.append("</tr>");
     text.append("</table>");
+    text.append("</td>");
+    text.append("</tr>");
+    text.append("</table>");
 
     b->setToolTip(text);
 }
@@ -317,6 +336,7 @@ void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
     toolButton->setIconFileName(iconFileName);
     toolButton->setLabel(name);
     toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
+    toolButton->setData(polyDataReader->GetOutput());
     setToolTip(toolButton);
     QObject::connect(toolButton, SIGNAL(showTooltip(QString)), parent, SLOT(showTooltip(QString)));
     toolButton->setCurrentRenderer(this->threeDRenderer);

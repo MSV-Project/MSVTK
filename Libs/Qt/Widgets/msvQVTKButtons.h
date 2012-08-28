@@ -22,6 +22,7 @@ class vtkButtonWidget;
 class vtkButtonCallback;
 class vtkButtonHighLightCallback;
 class vtkRenderer;
+class vtkDataSet;
 
 /**
  Class name: msvQVTKButtons
@@ -60,13 +61,13 @@ public:
     void setFlyTo(bool active);
 
     /// Return FlyTo flag
-    bool FlyTo() const;
+    bool flyTo() const;
 
     /// Allow to set button position on center or on corner
     void setOnCenter(bool onCenter);
 
     /// Return OnCenter flag
-    bool OnCenter() const;
+    bool onCenter() const;
     
     /// set the tooltip string
     void setToolTip(QString text);
@@ -85,6 +86,12 @@ public:
     
     /// retrieve button pointer.
     vtkButtonWidget *button();
+
+	/// get the button preview image
+    QImage getPreview(int width, int height);
+
+    /// set the data associated to the button
+    void setData(vtkDataSet *data);
 
 signals:
     /// signal launched with shown tooltip
@@ -109,7 +116,8 @@ private:
     bool m_ShowLabel; ///< Flag to show/hide label
     bool m_FlyTo; ///< Flag to activate FlyTo animation
     bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
-    double bounds[6]; ///< bounds of the data related to the button
+    double m_Bounds[6]; ///< bounds of the data related to the button
+    vtkDataSet* m_Data; ///< dataset associated with the button
 };
 
 /////////////////////////////////////////////////////////////
@@ -132,7 +140,7 @@ inline bool msvQVTKButtons::showLabel() const {
     return m_ShowLabel;
 }
 
-inline bool msvQVTKButtons::FlyTo() const {
+inline bool msvQVTKButtons::flyTo() const {
     return m_FlyTo;
 }
 
@@ -140,7 +148,7 @@ inline void msvQVTKButtons::setOnCenter(bool onCenter) {
     m_OnCenter = onCenter;
 }
 
-inline bool msvQVTKButtons::OnCenter() const {
+inline bool msvQVTKButtons::onCenter() const {
     return m_OnCenter;
 }
 
