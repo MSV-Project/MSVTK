@@ -13,24 +13,24 @@
 #define msvQVTKButtons_H
 
 #include "msvQtWidgetsExport.h"
+#include "msvQVTKButtonsInterface.h"
 
-#include <QObject>
 #include <QImage>
 
 //forward declarations
+class vtkRenderer;
 class vtkButtonWidget;
 class vtkButtonCallback;
 class vtkButtonHighLightCallback;
-class vtkRenderer;
 class vtkDataSet;
 
 /**
  Class name: msvQVTKButtons
  This is the tool representing a VTK buttons.
  */
-class MSV_QT_WIDGETS_EXPORT msvQVTKButtons : public QObject {
+class MSV_QT_WIDGETS_EXPORT msvQVTKButtons : public msvQVTKButtonsInterface {
     Q_OBJECT
-    
+
 public Q_SLOTS:
     /// Allow to execute and update the pipeline when something change.
     /*virtual*/ void update();
@@ -38,39 +38,12 @@ public Q_SLOTS:
 public:
      /// Object constructor.
     msvQVTKButtons(QObject *parent = 0);
-
-    /// Allow to show/hide button
-    void setShowButton(bool show);
-
-    /// Return showLabel flag
-    bool showButton() const;
-
-    /// Allow to show/hide label
-    void setShowLabel(bool show);
     
     /// set the icon path
     void setIconFileName(QString iconFileName);
 
-    /// Return showLabel flag
-    bool showLabel() const;
-    
-    /// set the text label
-    void setLabel(QString text);
-
-    /// Allow to activate FlyTo animation
+    // Allow to activate FlyTo animation
     void setFlyTo(bool active);
-
-    /// Return FlyTo flag
-    bool flyTo() const;
-
-    /// Allow to set button position on center or on corner
-    void setOnCenter(bool onCenter);
-
-    /// Return OnCenter flag
-    bool onCenter() const;
-    
-    /// set the tooltip string
-    void setToolTip(QString text);
 
     /// add vtk button to Renderer
     void setCurrentRenderer(vtkRenderer *renderer);
@@ -87,10 +60,9 @@ public:
     /// retrieve button pointer.
     vtkButtonWidget *button();
 
-	/// get the button preview image
     QImage getPreview(int width, int height);
 
-    /// set the data associated to the button
+    /// set the data for preview
     void setData(vtkDataSet *data);
 
 signals:
@@ -108,53 +80,14 @@ private:
     vtkButtonCallback *buttonCallback; ///< Callback called by picking on vtkButton
     vtkButtonHighLightCallback *highlightCallback; ///< Callback called by hovering over the button.
     
-    QImage m_Image;
-    QString m_Label; ///< label of the button
-    QString m_Tooltip; ///< tooltip associated to the button
-    QString m_IconFileName; ///< File name of the image to be applied to the button.
-    bool m_ShowButton; ///< Flag to show/hide button
-    bool m_ShowLabel; ///< Flag to show/hide label
-    bool m_FlyTo; ///< Flag to activate FlyTo animation
-    bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
+    QImage m_Image; ///< button image
     double m_Bounds[6]; ///< bounds of the data related to the button
-    vtkDataSet* m_Data; ///< dataset associated with the button
+    vtkDataSet* m_Data;
 };
 
 /////////////////////////////////////////////////////////////
 // Inline methods
 /////////////////////////////////////////////////////////////
-
-inline void msvQVTKButtons::setShowButton(bool show) {
-    m_ShowButton = show;
-}
-
-inline bool msvQVTKButtons::showButton() const {
-    return m_ShowButton;
-}
-
-inline void msvQVTKButtons::setShowLabel(bool show) {
-    m_ShowLabel = show;
-}
-
-inline bool msvQVTKButtons::showLabel() const {
-    return m_ShowLabel;
-}
-
-inline bool msvQVTKButtons::flyTo() const {
-    return m_FlyTo;
-}
-
-inline void msvQVTKButtons::setOnCenter(bool onCenter) {
-    m_OnCenter = onCenter;
-}
-
-inline bool msvQVTKButtons::onCenter() const {
-    return m_OnCenter;
-}
-
-inline void msvQVTKButtons::setLabel(QString text) {
-    m_Label = text;
-}
 
 inline void msvQVTKButtons::setShowTooltip(bool value) {
     if(value) {

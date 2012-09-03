@@ -21,7 +21,7 @@
 msvQVTKAnimate::msvQVTKAnimate() {
 }
 
-void msvQVTKAnimate::flyTo(vtkRenderer *renderer, double bounds[6], int numberOfSteps) {
+void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps) {
     assert(renderer);
     //vtkRenderer *renderer = widget->renderer("tool");
     double center[3]; 

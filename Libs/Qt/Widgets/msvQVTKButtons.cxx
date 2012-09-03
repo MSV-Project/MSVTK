@@ -38,6 +38,7 @@
 
 #include <vtkRenderWindow.h>
 #include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
 #include <vtkDataSetMapper.h>
 #include <vtkDataSet.h>
 #include <vtkCamera.h>
@@ -54,9 +55,9 @@ public:
 
     virtual void Execute(vtkObject *caller, unsigned long, void*) {
         Q_UNUSED(caller);
-        msvQVTKAnimate *animateCamera = new msvQVTKAnimate();
+        msvQVTKButtonsAction *animateCamera = new msvQVTKAnimate();
         if (flyTo) {
-            animateCamera->flyTo(renderer, bounds, 200);
+            animateCamera->execute(renderer, bounds, 200);
         } else {
             renderer->ResetCamera(bounds);
         }
@@ -113,7 +114,7 @@ public:
         
 };
 
-msvQVTKButtons::msvQVTKButtons(QObject *parent) : QObject(parent), m_ShowButton(false), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false), m_ButtonWidget(NULL) {
+msvQVTKButtons::msvQVTKButtons(QObject *parent) : msvQVTKButtonsInterface() {
     VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
     rep->SetNumberOfStates(1);
     
@@ -157,7 +158,7 @@ void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer) {
 }
 
 void msvQVTKButtons::setIconFileName(QString iconFileName) {
-    m_IconFileName = iconFileName;
+    msvQVTKButtonsInterface::setIconFileName(iconFileName);
     QImage image;
     image.load(m_IconFileName);
     VTK_CREATE(vtkQImageToImageSource, imageToVTK);
@@ -176,7 +177,7 @@ void msvQVTKButtons::setBounds(double b[6]) {
     buttonCallback->setBounds(b);
     int i = 0;
     for( ; i<6 ; i++ ) {
-        m_Bounds[i] = b[i];
+        m_Bounds[i] = b[i];    
     }
 
     update();
@@ -222,7 +223,7 @@ void msvQVTKButtons::update() {
         //This method allows to set the label's background opacity
         rep->GetBalloon()->GetFrameProperty()->SetOpacity(0.65);
     } else {
-      rep->GetBalloon()->SetBalloonText("");
+        rep->GetBalloon()->SetBalloonText("");
     }
     
     if(m_ShowButton) {
@@ -244,65 +245,78 @@ void msvQVTKButtons::update() {
 }
 
 void msvQVTKButtons::setFlyTo(bool active) {
-    m_FlyTo = active;
+    msvQVTKButtonsInterface::setFlyTo(active); 
     update();
 }
 
-void msvQVTKButtons::setToolTip(QString text) {
-    m_Tooltip = text;
-}
-
 QImage msvQVTKButtons::getPreview(int width, int height) {
-    if(m_Data) {
-        VTK_CREATE(vtkDataSetMapper, mapper);
-        VTK_CREATE(vtkActor, actor);
-        mapper->SetInput(m_Data);
-        mapper->Update();
-        actor->SetMapper(mapper);
+  if(m_Data) {
 
-        // offscreen rendering
-        VTK_CREATE(vtkRenderWindow, window);
-        VTK_CREATE(vtkRenderer, renderer);
-        window->OffScreenRenderingOn();
-        window->AddRenderer(renderer);
-        window->Start();
-        window->SetSize(width,height);
-        window->Render();
-        renderer->AddActor(actor);
-        renderer->Render();
-        renderer->ResetCamera(m_Bounds);
-        window->Render();
+    VTK_CREATE(vtkDataSetMapper, mapper);
+    VTK_CREATE(vtkActor, actor);
 
-        // Extract the image from the 'hidden' renderer
-        VTK_CREATE(vtkWindowToImageFilter, previewer);
-        previewer->SetInput(window);
-        previewer->Modified();
-        previewer->Update();
+    mapper->SetInput(m_Data);
+    mapper->Update();
 
-        // Convert image data to QImage and return
-        vtkImageData* vtkImage = previewer->GetOutput();
-        if(!vtkImage)
-            return QImage();
-        vtkUnsignedCharArray* scalars = vtkUnsignedCharArray::SafeDownCast(vtkImage->GetPointData()->GetScalars());
-        if(!width || !height || !scalars)
-            return QImage();
-        QImage qImage(width, height, QImage::Format_ARGB32);
-        vtkIdType tupleIndex=0;
-        int qImageBitIndex=0;
-        QRgb* qImageBits = (QRgb*)qImage.bits();
-        unsigned char* scalarTuples = scalars->GetPointer(0);
-        for(int j=0; j<height; j++) {
-            for(int i=0; i<width; i++) {
-                unsigned char* tuple = scalarTuples+(tupleIndex++*3);
-                QRgb color = qRgba(tuple[0], tuple[1], tuple[2], 255);
-                *(qImageBits+(qImageBitIndex++))=color;
-            }
-        }
-        return qImage;
-    } 
-    return QImage();
+    actor->SetMapper(mapper);
+
+    // offscreen rendering
+    VTK_CREATE(vtkRenderWindow, window);
+    VTK_CREATE(vtkRenderer, renderer);
+
+    window->OffScreenRenderingOn();
+    window->AddRenderer(renderer);
+    window->Start();
+    window->SetSize(width,height);
+    window->Render();
+
+    renderer->AddActor(actor);
+    renderer->Render();
+    renderer->ResetCamera(m_Bounds);
+
+    window->Render();
+
+    VTK_CREATE(vtkWindowToImageFilter, previewer);
+    VTK_CREATE(vtkPNGWriter, writer);
+
+    previewer->SetInput(window);
+    previewer->Modified();
+    previewer->Update();
+
+    // Convert to QImage and return
+    vtkImageData* vtkImage = previewer->GetOutput();
+
+    if(!vtkImage) 
+      return QImage(); 
+
+    vtkUnsignedCharArray* scalars = vtkUnsignedCharArray::SafeDownCast(vtkImage->GetPointData()->GetScalars()); 
+
+    if(!width || !height || !scalars) 
+      return QImage(); 
+    
+    QImage qImage(width, height, QImage::Format_ARGB32); 
+    vtkIdType tupleIndex=0; 
+    int qImageBitIndex=0; 
+
+    QRgb* qImageBits = (QRgb*)qImage.bits(); 
+    unsigned char* scalarTuples = scalars->GetPointer(0); 
+
+    for(int j=0; j<height; j++) 
+    { 
+      for(int i=0; i<width; i++) 
+      { 
+        unsigned char* tuple = scalarTuples+(tupleIndex++*3); 
+
+        QRgb color = qRgba(tuple[0], tuple[1], tuple[2], 255); 
+        *(qImageBits+(qImageBitIndex++))=color; 
+      } 
+    }
+    return qImage;
+   } 
+
+  return QImage();
 }
 
 void msvQVTKButtons::setData(vtkDataSet *data) {
-    m_Data = data;
+  m_Data = data;
 }
