@@ -282,7 +282,6 @@ QImage msvQVTKButtons::getPreview(int width, int height) {
     window->Render();
 
     VTK_CREATE(vtkWindowToImageFilter, previewer);
-    VTK_CREATE(vtkPNGWriter, writer);
 
     previewer->SetInput(window);
     previewer->Modified();
