@@ -88,11 +88,11 @@ endforeach()
 #-----------------------------------------------------------------------------
 # MSVTK version number.  An even minor number corresponds to releases.
 #
-set(MSVTK_MAJOR_VERSION 0)
-set(MSVTK_MINOR_VERSION 1)
-set(MSVTK_BUILD_VERSION 0)
+set(MSVTK_VERSION_MAJOR 0)
+set(MSVTK_VERSION_MINOR 1)
+set(MSVTK_VERSION_PATCH 0)
 set(MSVTK_VERSION
-    "${MSVTK_MAJOR_VERSION}.${MSVTK_MINOR_VERSION}.${MSVTK_BUILD_VERSION}")
+    "${MSVTK_VERSION_MAJOR}.${MSVTK_VERSION_MINOR}.${MSVTK_VERSION_PATCH}")
 
 # TODO Rename MSVTK_VERSION into MSVTK_VERSION_STR  -  MSVTK_VERSION should be hexadecimal one
 
@@ -365,6 +365,8 @@ option(MSVTK_APP_VTKBUTTONS "vtkButtons application to demonstrate vtkButtons" O
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
 
+set(MSVTK_MAIN_PROJECT_APPLICATION_NAME ECG)
+
 #-----------------------------------------------------------------------------
 # Prerequisites
 #-----------------------------------------------------------------------------
@@ -408,6 +410,12 @@ include(${CTK_USE_FILE})
 if(NOT DEFINED MSVTK_SUPERBUILD_BINARY_DIR)
   set(MSVTK_SUPERBUILD_BINARY_DIR ${MSVTK_BINARY_DIR})
 endif()
+
+#-----------------------------------------------------------------------------
+# Get operating system, architecture and bitness
+#-----------------------------------------------------------------------------
+include(CMake/msvMacroGetOperatingSystemArchitectureBitness.cmake)
+msvMacroGetOperatingSystemArchitectureBitness(VAR_PREFIX MSVTK)
 
 #-----------------------------------------------------------------------------
 # Configure files with settings
@@ -474,3 +482,8 @@ add_subdirectory( Utilities/Documentation )
 # the end of the whole configuration process, as a "last step".
 # This directory is typically the last SUBDIRS in the main CMakeLists.txt.
 add_subdirectory(Utilities/LastConfigureStep)
+
+#---------------------------------------------------------------------------
+# Packaging
+#
+include( CMake/msvCPack.cmake )
