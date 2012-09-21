@@ -1,5 +1,7 @@
-project(msvIBTK)
-set(KIT IBTK_SRC)
+
+
+project(msvIBAMR)
+set(KIT IBAMR_SRC)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.2)
@@ -28,8 +30,8 @@ endif()
 # Include dirs
 # --------------------------------------------------------------------------
 set(include_dirs
-  ${CMAKE_CURRENT_SOURCE_DIR}/utilities
-  ${CMAKE_CURRENT_BINARY_DIR}/utilities
+  ${CMAKE_CURRENT_SOURCE_DIR}/IB
+  ${CMAKE_CURRENT_BINARY_DIR}/IB
   )
 include_directories(${include_dirs})
 
@@ -49,22 +51,22 @@ endif()
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(msvIBTK_SRCS
-  utilities/msvAppInitializer.C
+set(msvIBAMR_SRCS
+  IB/msvIBInitializer.C
   )
 
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
-set(srcs ${msvIBTK_SRCS})
+set(srcs ${msvIBAMR_SRCS})
 
 add_library(${lib_name} ${srcs}
   )
 set_target_properties(${lib_name} PROPERTIES COMPILE_DEFINITIONS NDIM=3)
 
 target_link_libraries(${lib_name}
-  ${IBTK_LIBRARIES}
+  ${IBAMR_LIBRARIES}
   )
 
 # Apply user-defined properties to the library target.
@@ -121,5 +123,5 @@ endif()
 # --------------------------------------------------------------------------
 # Set INCLUDE_DIRS variable
 # --------------------------------------------------------------------------
-set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/utilities ${CMAKE_CURRENT_BINARY_DIR}/utilities
+set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/IB ${CMAKE_CURRENT_BINARY_DIR}/IB
   CACHE INTERNAL "${PROJECT_NAME} include dirs" FORCE)

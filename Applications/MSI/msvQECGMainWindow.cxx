@@ -27,7 +27,7 @@
 // MSV includes
 #include "msvQECGMainWindow.h"
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKECGButtonsManager.h"
+// #include "msvVTKECGButtonsManager.h"
 #include "msvVTKPolyDataFileSeriesReader.h"
 #include "msvVTKImageDataFileSeriesReader.h"
 #include "ui_msvQECGMainWindow.h"
@@ -82,6 +82,8 @@
 #include "vtkArrowSource.h"
 #include "vtkPointData.h"
 #include "vtkXMLHierarchicalBoxDataWriter.h"
+#include "vtkFeatureEdges.h"
+#include "vtkSelectPolyData.h"
 
 const double colors[][3] = { {0.925490196,  0.17254902, 0.2},
                                        {0.070588235, 0.545098039, 0.290196078},
@@ -133,10 +135,14 @@ protected:
   
   vtkSmartPointer<vtkXMLHierarchicalBoxDataWriter>      amrDataWriter;
   
-  vtkSmartPointer<vtkDelaunay3D>                  amrLagrangianDelaunayFilter;
   vtkSmartPointer<vtkDataSetSurfaceFilter>        amrLagrangianSurfaceFilter;
   vtkSmartPointer<vtkPolyDataMapper>              amrLagrangianSurfaceMapper;
   vtkSmartPointer<vtkActor>                       amrLagrangianSurfaceActor;
+  
+  vtkSmartPointer<vtkFeatureEdges>                amrFeatureEdgesFilter;
+  vtkSmartPointer<vtkSelectPolyData>              amrSelectBoundaryFilter;
+  vtkSmartPointer<vtkActor>                       amrSelectBoundaryActor;
+  vtkSmartPointer<vtkPolyDataMapper>              amrSelectBoundaryMapper;
   
   vtkSmartPointer<vtkGlyph3D>                     vectorFilter;
   vtkSmartPointer<vtkArrowSource>                 arrowSource;
@@ -144,12 +150,9 @@ protected:
   vtkSmartPointer<vtkActor>                       vectorActor;
 
   vtkSmartPointer<vtkAppendFilter>                mergedMapper;
-
-  // buttonsManager
-  vtkSmartPointer<msvVTKECGButtonsManager> buttonsManager;
-  
+ 
   // Fluid solver
-  SAMRAI::tbox::Pointer<msvFluidSimulator> fluidSimulator;
+  SAMRAI::tbox::Pointer<msvFluidSimulator>      fluidSimulator;
 
   unsigned int currentColor;
   const unsigned int colorCount;
@@ -162,15 +165,14 @@ public:
   virtual void setupView();
   virtual void update();
   virtual void updateUi();
-  virtual void updateView();  
+  virtual void updateView();
   
-  void renderScalarDataContour();
   void renderSurfaceVectorField();
 
   virtual void clear();
   
   static bool fileLessThan(const QString &, const QString &);
-    vtkSmartPointer< vtkPolyDataReader > New();
+  vtkSmartPointer< vtkPolyDataReader > New();
 };
 
 //------------------------------------------------------------------------------
@@ -197,7 +199,6 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   
   this->amrLagrangianSurfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   this->amrLagrangianSurfaceMapper->SetInputConnection(0,this->polyDataReader->GetOutputPort(0));
-  
   this->amrLagrangianSurfaceActor = vtkSmartPointer<vtkActor>::New();
   this->amrLagrangianSurfaceActor->SetMapper(this->amrLagrangianSurfaceMapper);
   
@@ -207,10 +208,14 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   this->threeDRenderer->SetBackground2(0.2, 0.4, 0.8);
   this->threeDRenderer->SetGradientBackground(true);
   
+  this->amrExtractLevel = vtkSmartPointer<vtkHierarchicalDataExtractLevel>::New();
+  this->amrExtractLevel->SetInput(fluidSimulator->getAMRDataSet());
+  this->amrExtractLevel->AddLevel(fluidSimulator->getAMRDataSet()->GetNumberOfLevels());
+
   // Add AMR Grid to pipeline
   this->amrGeometryFilter = vtkSmartPointer<vtkHierarchicalDataSetGeometryFilter>::New();
-  this->amrGeometryFilter->SetInput(fluidSimulator->getAMRDataSet());
-  
+  this->amrGeometryFilter->SetInputConnection(0,this->amrExtractLevel->GetOutputPort(0));
+
   this->amrShrinkFilter = vtkSmartPointer<vtkShrinkPolyData>::New();
   this->amrShrinkFilter->SetShrinkFactor(0.25);
   this->amrShrinkFilter->SetInputConnection(0, this->amrGeometryFilter->GetOutputPort(0));
@@ -220,53 +225,40 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   
   this->amrHierarchicalActor = vtkSmartPointer<vtkActor>::New();
   this->amrHierarchicalActor->SetMapper(this->amrHierarchicalMapper);
+  this->amrHierarchicalActor->GetProperty()->SetRepresentationToWireframe();
   
   // corner outline
-  this->amrOutlineCornerFilter = vtkSmartPointer<vtkOutlineCornerFilter>::New();
-  vtkCompositeDataPipeline* pipeline = vtkCompositeDataPipeline::New();
-  this->amrOutlineCornerFilter->SetExecutive(pipeline);
-  pipeline->Delete();
-  this->amrOutlineCornerFilter->SetInput(fluidSimulator->getAMRDataSet());
+  this->amrOutlineCornerFilter = vtkSmartPointer<vtkOutlineCornerFilter>::New();  
   this->amrOutlineCornerMapper = vtkSmartPointer<vtkHierarchicalPolyDataMapper>::New();
+  this->amrOutlineCornerFilter->SetInput(fluidSimulator->getAMRDataSet());
   this->amrOutlineCornerMapper->SetInputConnection(0,this->amrOutlineCornerFilter->GetOutputPort(0));
-  
   this->amrOutlineCornerActor = vtkSmartPointer<vtkActor>::New();
   this->amrOutlineCornerActor->SetMapper(this->amrOutlineCornerMapper);
+  
+  this->amrFeatureEdgesFilter = vtkSmartPointer<vtkFeatureEdges>::New();
+  this->amrFeatureEdgesFilter->SetInputConnection(0,this->polyDataReader->GetOutputPort(0));
+  this->amrFeatureEdgesFilter->FeatureEdgesOff();
+  this->amrFeatureEdgesFilter->NonManifoldEdgesOff();
+  this->amrFeatureEdgesFilter->ColoringOff();
+  
+  this->amrSelectBoundaryFilter = vtkSmartPointer<vtkSelectPolyData>::New();
+  this->amrSelectBoundaryFilter->SetInputConnection(0,this->amrFeatureEdgesFilter->GetOutputPort(0));
+  
+  this->amrSelectBoundaryMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  this->amrSelectBoundaryMapper->SetInputConnection(0,this->amrSelectBoundaryFilter->GetOutputPort(0));
+  
+  this->amrSelectBoundaryActor = vtkSmartPointer<vtkActor>::New();
+  this->amrSelectBoundaryActor->SetMapper(this->amrSelectBoundaryMapper);
   
   this->renderSurfaceVectorField();
   
   // AMR writer
-  this->amrDataWriter = vtkSmartPointer<vtkXMLHierarchicalBoxDataWriter>::New();
-  this->amrDataWriter->SetInput(this->fluidSimulator->getAMRDataSet());
-  this->amrDataWriter->SetDataModeToBinary();
-  std::string filename("amr_dataset.");
-  filename += this->amrDataWriter->GetDefaultFileExtension();
-  this->amrDataWriter->SetFileName(filename.c_str());
-}
-
-void msvQECGMainWindowPrivate::renderScalarDataContour()
-{
-  this->amrExtractLevel = vtkSmartPointer<vtkHierarchicalDataExtractLevel>::New();
-  this->amrExtractLevel->SetInput(fluidSimulator->getAMRDataSet());
-  this->amrExtractLevel->AddLevel(2);
-  
-  this->amrCellToPointFilter = vtkSmartPointer<vtkCellDataToPointData>::New();  
-  this->amrCellToPointFilter->SetInputConnection(0,this->amrExtractLevel->GetOutputPort(0));
-  
-  this->amrContour = vtkSmartPointer<vtkContourFilter>::New();
-  this->amrContour->SetInputConnection(0,this->amrCellToPointFilter->GetOutputPort(0));
-  this->amrContour->SetValue(.1,.5);
-  this->amrContour->SetInputArrayToProcess(
-    0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,"pressure");
-  
-  this->amrContourMapper = vtkSmartPointer<vtkHierarchicalPolyDataMapper>::New();
-  this->amrContourMapper->SetInputConnection(0, this->amrContour->GetOutputPort(0));
-  
-  this->amrContourActor = vtkSmartPointer<vtkActor>::New();
-  this->amrContourActor->SetMapper(this->amrContourMapper);
-  this->amrContourActor->GetProperty()->SetColor(1, 0, 0);
-  
-  this->threeDRenderer->AddActor(this->amrContourActor);  
+//   this->amrDataWriter = vtkSmartPointer<vtkXMLHierarchicalBoxDataWriter>::New();
+//   this->amrDataWriter->SetInput(this->fluidSimulator->getAMRDataSet());
+//   this->amrDataWriter->SetDataModeToBinary();
+//   std::string filename("amr_dataset.");
+//   filename += this->amrDataWriter->GetDefaultFileExtension();
+//   this->amrDataWriter->SetFileName(filename.c_str());
 }
 
 void msvQECGMainWindowPrivate::renderSurfaceVectorField()
@@ -276,17 +268,13 @@ void msvQECGMainWindowPrivate::renderSurfaceVectorField()
   
   this->vectorFilter = vtkSmartPointer<vtkGlyph3D>::New();
   this->vectorFilter->SetSourceConnection(0,this->arrowSource->GetOutputPort(0));
-  this->vectorFilter->SetInputConnection(fluidSimulator->getPolyDataSet()->GetProducerPort());
+  this->vectorFilter->SetInputConnection(0,this->polyDataReader->GetOutputPort(0));
   this->vectorFilter->SetVectorModeToUseVector();
   this->vectorFilter->SetScaleModeToScaleByVector();
   this->vectorFilter->ScalingOn();
   this->vectorFilter->OrientOn();
   
-  int n = fluidSimulator->getPolyDataSet()->GetPointData()->GetNumberOfArrays();
-  for (int i = 0; i < n; i++)
-    std::cout << "name of array[" << i << "]: " << fluidSimulator->getPolyDataSet()->GetPointData()->GetArrayName(i) << std::endl;
-  
-  this->vectorFilter->SetInputArrayToProcess(0,fluidSimulator->getPolyDataSet()->GetInformation());
+  this->vectorFilter->SetInputArrayToProcess(0,this->polyDataReader->GetInformation());
   this->vectorMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   this->vectorMapper->SetInputConnection(0, this->vectorFilter->GetOutputPort(0));
   this->vectorActor = vtkSmartPointer<vtkActor>::New();
@@ -300,21 +288,22 @@ void msvQECGMainWindowPrivate::readImmersedBoundary(QDir dir)
       dir.filePath("geometry.vtk").toLatin1().constData());    
     this->polyDataReader->Update();
   }
-  else { /* TODO: Do something. */return; }
+  else { /* TODO: Say Something/Do something. */return; }
   
-  this->fluidSimulator->msvInitializeAMR(
-    "/home/rortiz/projects/MSVTK/Applications/MSI/input3d",4,5,this->polyDataReader->GetOutput());
-  this->fluidSimulator->run();
-  this->fluidSimulator->setAMRData();
+//   this->fluidSimulator->msvInitializeAMR(
+//     "/home/rortiz/projects/MSVTK/Applications/MSI/Resources/simulator.config",4,5,this->polyDataReader->GetOutput());
+//   this->fluidSimulator->run();
+//   this->fluidSimulator->setAMRData(this->polyDataReader->GetOutput());
   
   // Render
   double extent[6];
   
   this->amrLagrangianSurfaceMapper->GetBounds(extent);
-  this->threeDRenderer->AddActor(this->amrLagrangianSurfaceActor);   
-  this->threeDRenderer->AddActor(this->amrHierarchicalActor); 
-  this->threeDRenderer->AddActor(this->amrOutlineCornerActor);
-  this->threeDRenderer->AddActor(this->vectorActor); 
+//   this->threeDRenderer->AddActor(this->amrLagrangianSurfaceActor);   
+//   this->threeDRenderer->AddActor(this->amrHierarchicalActor); 
+//   this->threeDRenderer->AddActor(this->amrOutlineCornerActor);
+//   this->threeDRenderer->AddActor(this->vectorActor); 
+  this->threeDRenderer->AddActor(this->amrSelectBoundaryActor); 
   this->threeDRenderer->ResetCamera(extent);
 }
 

@@ -397,6 +397,12 @@ find_package(CTK REQUIRED)
 include(${CTK_USE_FILE})
 
 #-----------------------------------------------------------------------------
+# IBAMR
+#-----------------------------------------------------------------------------
+find_package(IBAMR REQUIRED)
+include(${IBAMR_USE_FILE})
+
+#-----------------------------------------------------------------------------
 # MSVTK_SUPERBUILD_BINARY_DIR
 
 # If MSVTK_SUPERBUILD_BINARY_DIR isn't defined, it means MSVTK is *NOT* build using Superbuild.

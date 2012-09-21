@@ -72,7 +72,7 @@ if(NOT DEFINED VTK_DIR)
     GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/VTK.git
     GIT_TAG ${revision_tag}
     UPDATE_COMMAND ""
-    INSTALL_COMMAND make install
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}

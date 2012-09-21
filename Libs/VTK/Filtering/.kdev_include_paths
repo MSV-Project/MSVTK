@@ -1,0 +1,10 @@
+RESOLVE: SOURCE=/home/rortiz/projects/MSVTK/build_debug/VTK/Common BUILD=
+/home/rortiz/projects/MSVTK/build_debug/VTK/Common
+/home/rortiz/projects/MSVTK/build_debug/VTK/Filtering
+/home/rortiz/projects/MSVTK/build_debug/VTK/Graphics
+/home/rortiz/projects/MSVTK/build_debug/VTK/GenericFiltering
+/home/rortiz/projects/MSVTK/build_debug/VTK/Hybrid
+/home/rortiz/projects/MSVTK/build_debug/VTK/IO
+/home/rortiz/projects/MSVTK/build_debug/VTK/Parallel
+/home/rortiz/projects/MSVTK/build_debug/VTK/Rendering
+/home/rortiz/projects/MSVTK/build_debug/VTK/Widgets

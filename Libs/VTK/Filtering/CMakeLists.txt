@@ -1,5 +1,5 @@
-project(msvIBTK)
-set(KIT IBTK_SRC)
+project(msvVTKFiltering)
+set(KIT VTK_FILTERING)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.2)
@@ -15,10 +15,8 @@ if(POLICY CMP0017)
   cmake_policy(SET CMP0017 OLD)
 endif()
 
-set(IBAMR_DIR $ENV{HOME}/projects/IBAMR/build_debug)
-include(${IBAMR_DIR}/IBAMRConfig.cmake)
-
-include(${IBAMR_USE_FILE})
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
   option(BUILD_SHARED_LIBS "Build with shared libraries." ON)
@@ -28,8 +26,8 @@ endif()
 # Include dirs
 # --------------------------------------------------------------------------
 set(include_dirs
-  ${CMAKE_CURRENT_SOURCE_DIR}/utilities
-  ${CMAKE_CURRENT_BINARY_DIR}/utilities
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 include_directories(${include_dirs})
 
@@ -49,23 +47,31 @@ endif()
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(msvIBTK_SRCS
-  utilities/msvAppInitializer.C
+set(msvVTKFiltering_SRCS
+  msvVTKPolyDataBoundaryEdgeCaps.cxx
+  msvVTKEdgeLengthSubdivisionCriterion.cxx
   )
+
+# Abstract/pure virtual classes
+
+#set_source_files_properties(
+#  ABSTRACT
+#  )
+
+# Helper classes
 
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
-set(srcs ${msvIBTK_SRCS})
 
-add_library(${lib_name} ${srcs}
-  )
-set_target_properties(${lib_name} PROPERTIES COMPILE_DEFINITIONS NDIM=3)
+set(srcs ${msvVTKFiltering_SRCS})
+add_library(${lib_name} ${srcs})
 
-target_link_libraries(${lib_name}
-  ${IBTK_LIBRARIES}
+set(libs
+    ${VTK_LIBRARIES}
   )
+target_link_libraries(${lib_name} ${libs})
 
 # Apply user-defined properties to the library target.
 if(MSVTK_LIBRARY_PROPERTIES)
@@ -115,11 +121,11 @@ install(TARGETS ${lib_name}
 # Testing (requires some of the examples)
 # --------------------------------------------------------------------------
 if(BUILD_TESTING)
-#   add_subdirectory(Testing)
+  add_subdirectory(Testing)
 endif()
 
 # --------------------------------------------------------------------------
 # Set INCLUDE_DIRS variable
 # --------------------------------------------------------------------------
-set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/utilities ${CMAKE_CURRENT_BINARY_DIR}/utilities
+set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
   CACHE INTERNAL "${PROJECT_NAME} include dirs" FORCE)

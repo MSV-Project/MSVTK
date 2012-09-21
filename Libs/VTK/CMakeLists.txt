@@ -12,6 +12,7 @@ set(dirs
 list(APPEND dirs
   Parallel
   Widgets
+  Filtering
   )
 
 #-----------------------------------------------------------------------------

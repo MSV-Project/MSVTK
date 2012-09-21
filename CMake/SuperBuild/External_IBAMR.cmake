@@ -41,7 +41,7 @@ if(MINGW)
   list(APPEND additional_vtk_cmakevars -DCMAKE_USE_PTHREADS:BOOL=OFF)
 endif()
 
-set(IBAMR_DEPENDENCIES "OPENMPI;SAMRAI;HDF5;SILO;BLITZ;PETSC;HYPRE")
+set(IBAMR_DEPENDENCIES "")
 
 # Include dependent projects if any
 msvMacroCheckExternalProjectDependency(IBAMR)
@@ -64,34 +64,23 @@ if(NOT DEFINED IBAMR_DIR)
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
-#     SVN_REPOSITORY https://ibamr.googlecode.com/svn/branches/ibamr-dev
+    GIT_REPOSITORY ${git_protocol}@bitbucket.org:ricortiz/ibamr.git
+    GIT_TAG "master"
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
-    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/${proj}/configure 
-      "CFLAGS=${ep_common_c_flags}"
-      "CXXFLAGS=${ep_common_cxx_flags}"
-      "FCFLAGS=${CMAKE_F_FLAGS}"
-      "FFLAGS=${CMAKE_F_FLAGS}"
-      CPPFLAGS=-DOMPI_SKIP_MPICXX
-      CC=${ep_install_dir}/bin/mpicc
-      CXX=${ep_install_dir}/bin/mpicxx
-      F77=${ep_install_dir}/bin/mpif90 
-      FC=${ep_install_dir}/bin/mpif90 
-      MPICC=${ep_install_dir}/bin/mpicc 
-      MPICXX=${ep_install_dir}/bin/mpicxx 
-      --with-samrai=${ep_install_dir}
-      --with-hdf5=${ep_install_dir}
-      --with-petsc=${PETSC_DIR}
-      --with-petsc-arch=${PETSC_ARCH}
-      --with-hypre=${ep_install_dir}
-      --with-blitz=${BLITZ_DIR}
-      --with-silo=${ep_install_dir}
-    TEST_BEFORE_INSTALL 1
-    LOG_CONFIGURE 1
-#     LOG_BUILD 1
-    LOG_INSTALL 1
-    TEST_COMMAND make check
-    BUILD_COMMAND make lib
+    CMAKE_GENERATOR ${gen}
+    CMAKE_ARGS
+      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
+      -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+      -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+      ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      -DBUILD_TESTING:BOOL=OFF
+      ${additional_vtk_cmakevars}
+      -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+      -DLIBRARY_OUTPUT_PATH:STRING=${MSVTK_BINARY_DIR}/MSVTK-build/bin
+      -DEXECUTABLE_OUTPUT_PATH:STRING=${MSVTK_BINARY_DIR}/MSVTK-build/bin
+      -DBUILD_TESTING:BOO:=OFF
     DEPENDS
       ${IBAMR_DEPENDENCIES}
     )

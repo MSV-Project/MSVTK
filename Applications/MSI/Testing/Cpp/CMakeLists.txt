@@ -1,6 +1,8 @@
 set(KIT ECG)
 set(KIT_TEST_SRCS
-  msvSimulatorTest.cxx
+  msvMSISimulatorTest1.cxx
+  msvMSISimulatorTest2.cxx
+  msvMSISimulatorTest3.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
@@ -9,7 +11,7 @@ create_test_sourcelist(Tests ${KIT}CxxTests.cxx
 
 set(LIBRARY_NAME msv${KIT})
 
-add_executable(${KIT}CxxTests ${KIT_TEST_SRCS})
+add_executable(${KIT}CxxTests ${KIT}CxxTests.cxx ${KIT_TEST_SRCS})
 set_target_properties(${KIT}CxxTests PROPERTIES COMPILE_DEFINITIONS NDIM=3)
 target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
 
