@@ -71,9 +71,17 @@ endif()
 # MSVTK does require setting the windows path
 set(CPACK_NSIS_MODIFY_PATH OFF)
 
-set(APPLICATION_NAME "${MSVTK_MAIN_PROJECT_APPLICATION_NAME}")
-set(EXECUTABLE_NAME "${MSVTK_MAIN_PROJECT_APPLICATION_NAME}")
-set(CPACK_PACKAGE_EXECUTABLES "..\\\\${EXECUTABLE_NAME}" "${APPLICATION_NAME}")
+set(CPACK_PACKAGE_EXECUTABLES)
+
+if (MSVTK_APP_ECG)
+  get_target_property(ECG_EXECUTABLE_NAME ECG OUTPUT_NAME)
+  list(APPEND CPACK_PACKAGE_EXECUTABLES "${ECG_EXECUTABLE_NAME}" "ECG")
+endif()
+
+if (MSVTK_APP_VTKButtons)
+  get_target_property(VTKButtons_EXECUTABLE_NAME VTKButtons OUTPUT_NAME)
+  list(APPEND CPACK_PACKAGE_EXECUTABLES "${VTKButtons_EXECUTABLE_NAME}" "VTKButtons")
+endif()
 
 # -------------------------------------------------------------------------
 # File extensions

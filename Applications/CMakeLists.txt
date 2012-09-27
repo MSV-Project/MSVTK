@@ -1,4 +1,1 @@
-MESSAGE( STATUS "CREATE ECG")
-add_subdirectory(ECG)
-MESSAGE( STATUS "CREATE VTKBUTTONS")
-add_subdirectory(VTKButtons)
+MESSAGE( "NEVER CALLED, see toplevel CMakeLists")
