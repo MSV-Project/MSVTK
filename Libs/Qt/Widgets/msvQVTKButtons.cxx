@@ -114,7 +114,7 @@ public:
 };
 
 msvQVTKButtons::msvQVTKButtons(QObject *parent) : QObject(parent), m_ShowButton(false), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false), m_ButtonWidget(NULL), m_Window(NULL) {
-    VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
+    vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
     rep->SetNumberOfStates(1);
     
     buttonCallback = vtkButtonCallback::New();
