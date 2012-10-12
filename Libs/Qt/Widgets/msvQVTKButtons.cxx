@@ -114,7 +114,7 @@ public:
 };
 
 msvQVTKButtons::msvQVTKButtons(QObject *parent) : QObject(parent), m_ShowButton(false), m_ShowLabel(true), m_FlyTo(true), m_OnCenter(false), m_ButtonWidget(NULL), m_Window(NULL) {
-    VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
+    vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
     rep->SetNumberOfStates(1);
     
     buttonCallback = vtkButtonCallback::New();
@@ -267,7 +267,6 @@ QImage msvQVTKButtons::getPreview(int width, int height) {
     vtkRenderer *renderer = vtkRenderer::New();
     if(m_Window == NULL) {
         m_Window = vtkRenderWindow::New();
-        m_Window->SetSize(0,0);
         m_Window->SetDisplayId(NULL);
     }
 
@@ -278,13 +277,10 @@ QImage msvQVTKButtons::getPreview(int width, int height) {
     // offscreen rendering
     m_Window->OffScreenRenderingOn();
     m_Window->AddRenderer(renderer);
+    m_Window->Start();
     m_Window->SetSize(width,height);
     renderer->AddActor(actor);
     renderer->ResetCamera(bounds);
-
-    m_Window->Start();
-    m_Window->Render();
-
     // Extract the image from the 'hidden' renderer
     previewer->SetInput(m_Window);
     previewer->Modified();
@@ -321,7 +317,6 @@ QImage msvQVTKButtons::getPreview(int width, int height) {
 
     m_Window->RemoveRenderer(renderer);
     //destroy pipe
-    m_Window->SetSize(0,0);
     renderer->Delete();
 
     return qImage;
