@@ -23,6 +23,8 @@
 //forward declarations
 class vtkRenderer;
 class msvQVTKButtons;
+class vtkSliderWidget;
+class vtkSliderCallback;
 
 /**
 Class name: msvQVTKButtonsGroup
@@ -65,25 +67,50 @@ public:
     void setIconFileName(QString iconFileName);
 
     /// set the text label
-    void setLabel(QString text);
+    // void setLabel(QString text);
 
     /// Allow to activate FlyTo animation
-    void setFlyTo(bool active);
+    // void setFlyTo(bool active);
 
     /// Allow to set button position on center or on corner
-    void setOnCenter(bool onCenter);
+    // void setOnCenter(bool onCenter);
 
     /// set the tooltip string
-    void setToolTip(QString text);
+    // void setToolTip(QString text);
 
     /// add vtk button to Renderer
     void setCurrentRenderer(vtkRenderer *renderer);
+
+    /// Update graphic objects
+    void update();
+
+    /// Get the slider widget
+    vtkSliderWidget* slider();
+
+    /// Show/hide the slider widget
+    void showSlider(bool show);
+
+    /// Set the position on the path at the specified ratio
+    void setCameraPoistionOnPath(double ratio);
+
+public slots:
+
+    /// hide/show group
+    void show(bool val);
 
 private:
     /// Set the specified property
     void setElementProperty(QString name, QVariant value);
 
+    /// Calculate element position
+    void calculatePosition();
+
+    /// Update element bounds
+    void updateBounds();
+
     QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
+    vtkSliderWidget* m_Slider; //< Slider widget
+    vtkSliderCallback* m_SliderCallback; //< Slider callback function
 };
 
 /////////////////////////////////////////////////////////////
@@ -105,24 +132,24 @@ inline void msvQVTKButtonsGroup::setIconFileName(QString iconFileName) {
   setElementProperty("iconFileName",iconFileName);
 }
 
-inline void msvQVTKButtonsGroup::setLabel(QString text) {
-  msvQVTKButtonsInterface::setLabel(text);
-  setElementProperty("label",text);
-}
+// inline void msvQVTKButtonsGroup::setLabel(QString text) {
+//   msvQVTKButtonsInterface::setLabel(text);
+//   setElementProperty("label",text);
+// }
 
-inline void msvQVTKButtonsGroup::setFlyTo(bool active) {
-  msvQVTKButtonsInterface::setFlyTo(active);
-  setElementProperty("flyTo",active);
-}
+// inline void msvQVTKButtonsGroup::setFlyTo(bool active) {
+//   msvQVTKButtonsInterface::setFlyTo(active);
+//   setElementProperty("flyTo",active);
+// }
 
-inline void msvQVTKButtonsGroup::setOnCenter(bool onCenter) {
-  msvQVTKButtonsInterface::setOnCenter(onCenter);
-  setElementProperty("onCenter",onCenter);
-}
+// inline void msvQVTKButtonsGroup::setOnCenter(bool onCenter) {
+//   msvQVTKButtonsInterface::setOnCenter(onCenter);
+//   setElementProperty("onCenter",onCenter);
+// }
 
-inline void msvQVTKButtonsGroup::setToolTip(QString text) {
-  msvQVTKButtonsInterface::setToolTip(text);
-  setElementProperty("toolTip",text);
-}
+// inline void msvQVTKButtonsGroup::setToolTip(QString text) {
+//   msvQVTKButtonsInterface::setToolTip(text);
+//   setElementProperty("toolTip",text);
+// }
 
 #endif // msvQVTKButtonsGroup_H
