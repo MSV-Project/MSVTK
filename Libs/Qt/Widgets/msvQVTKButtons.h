@@ -68,8 +68,6 @@ public:
 
     void setCurrentRenderer(vtkRenderer *renderer);
 
-    void setShowButton(bool visible);
-
 private:
     /// calculate Position (center or corner)
     void calculatePosition();
@@ -77,7 +75,6 @@ private:
     QImage m_Image; ///< button image
     vtkDataSet* m_Data; ///< dataset associated with the button
     vtkRenderWindow *m_Window; ///< render window for offscreen rendering
-    vtkDataSet* m_Data; ///< Data associated to the button (used to create the preview)
     bool m_FlyTo; ///< Flag to activate FlyTo animation
     bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
 };
