@@ -55,11 +55,18 @@ set(msvQtWidgets_SRCS
   msvQTimePlayerWidget.cxx
   msvQVTKAnimate.cxx
   msvQVTKButtons.cxx
+  msvQVTKButtonsAction.cxx
+  msvQVTKButtonsGroup.cxx
+  msvQVTKButtonsInterface.cxx
+  msvQVTKButtonsManager.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
   msvQTimePlayerWidget.h
   msvQVTKButtons.h
+  msvQVTKButtonsGroup.h
+  msvQVTKButtonsInterface.h
+  msvQVTKButtonsManager.h
   )
 
 set(msv${KIT}_UI_SRCS
