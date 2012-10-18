@@ -1,0 +1,162 @@
+###########################################################################
+#
+#  Library: MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
+#
+# Make sure this CMake has BundleUtilities.cmake:
+#
+if(NOT EXISTS "${CMAKE_ROOT}/Modules/BundleUtilities.cmake")
+  message(FATAL_ERROR "error: BundleUtilities.cmake not found. Use CMake 2.8.3 or later.")
+endif()
+include(BundleUtilities)
+
+#
+# Avoid following symlinks encountered during FILE GLOB_RECURSE calls:
+#
+if(COMMAND CMAKE_POLICY)
+  cmake_policy(SET CMP0009 NEW)
+  if(POLICY CMP0011)
+    cmake_policy(SET CMP0011 NEW)
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
+# gp_log_message - Convenient function allowing to both display and log a message.
+# Log file: $ENV{DESTDIR}/../complete-bundles-log.txt
+#-----------------------------------------------------------------------------
+function(gp_log_message text)
+  message(${text})
+  file(APPEND "@MSVTK_BINARY_DIR@/complete-bundles-log.txt" "${text}
+")
+endfunction()
+
+#-----------------------------------------------------------------------------
+# gp_clear_log - Clear the log file
+#-----------------------------------------------------------------------------
+function(gp_clear_log)
+  file(WRITE "@MSVTK_BINARY_DIR@/complete-bundles-log.txt" "")
+  gp_log_message("Log file: @MSVTK_BINARY_DIR@/complete-bundles-log.txt")
+endfunction()
+
+#-----------------------------------------------------------------------------
+# gp_resolved_file_type_override resolved_file type_var
+#-----------------------------------------------------------------------------
+function(gp_resolved_file_type_override resolved_file type_var)
+  if(resolved_file MATCHES "^/usr/.*/lib")
+    set(${type_var} system PARENT_SCOPE)
+  endif()
+  #gp_log_message("resolving ${file} as ${${type_var}}")
+endfunction()
+
+#-----------------------------------------------------------------------------
+# gp_item_default_embedded_path_override item default_embedded_path_var
+#-----------------------------------------------------------------------------
+# Return the path that others should refer to the item by when the item
+# is embedded inside a bundle.
+#
+# This is a project-specific override of BundleUtilities.cmake's
+# gp_item_default_embedded_path
+#
+function(gp_item_default_embedded_path_override item default_embedded_path_var)
+
+  # By default, embed items as set by gp_item_default_embedded_path:
+  set(path "${${default_embedded_path_var}}")
+
+  if(item MATCHES "\\.dylib$")
+    set(path "@executable_path@/../@MSVTK_LIB_DIR@")
+  endif()
+
+  if(item MATCHES "@MSVTK_LIB_DIR@/[^/]+\\.dylib$")
+    set(path "@executable_path@/../@MSVTK_LIB_DIR@")
+  endif()
+
+  math(EXPR lib_current $ENV{FIXUP_LIB_CURRENT}+1)
+  set(ENV{FIXUP_LIB_CURRENT} ${lib_current})
+  gp_log_message("${lib_current}/$ENV{FIXUP_LIBS_COUNT} - fixing item ${item} with ${path}")
+
+  set(${default_embedded_path_var} "${path}" PARENT_SCOPE)
+endfunction()
+
+#-----------------------------------------------------------------------------
+# Fixup the .app bundles in the install tree:
+#-----------------------------------------------------------------------------
+function(fixup_bundle_with_plugins app)
+  set(app_dir "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${app}")
+  set(suffix "@CMAKE_SHARED_LIBRARY_SUFFIX@")
+
+  set(candiates_pattern
+    "${app_dir}/Contents/@MSVTK_LIB_DIR@/*${suffix}"
+    )
+
+  set(libs "")
+  file(GLOB_RECURSE candidates ${candiates_pattern})
+  foreach(lib ${candidates})
+    if(NOT lib MATCHES "(_debug|d[0-9])${suffix}$")
+      set(libs ${libs} "${lib}")
+    endif()
+  endforeach()
+
+  list(REMOVE_DUPLICATES libs)
+
+  # Additional libs may be found in:
+  set(libs_path "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@")
+  list(APPEND libs_path "@VTK_LIBRARY_DIRS@")
+  list(APPEND libs_path "@CTK_LIBRARY_DIRS@")
+
+  list(APPEND libs_path "@MSVTK_BINARY_DIR@/@MSVTK_LIB_DIR@")
+  list(REMOVE_DUPLICATES libs_path)
+
+  set(MSVTK_BUILD_DIR "@MSVTK_BINARY_DIR@")
+  set(MSVTK_SUPERBUILD_DIR "@MSVTK_SUPERBUILD_DIR@")
+
+  gp_clear_log()
+
+  gp_log_message("Calling fixup_bundle with")
+  gp_log_message("app=${app_dir}")
+  gp_log_message("<MSVTK_SUPERBUILD_DIR>=${MSVTK_SUPERBUILD_DIR}")
+  gp_log_message("libs=")
+  foreach(lib ${libs})
+    file(RELATIVE_PATH relative_lib ${MSVTK_SUPERBUILD_DIR} ${lib})
+    if(NOT "${relative_lib}" STREQUAL "${lib}")
+      set(lib "<MSVTK_SUPERBUILD_DIR>/${relative_lib}")
+    endif()
+    gp_log_message("  ${lib}")
+  endforeach()
+  gp_log_message("libs_path=")
+  foreach(path ${libs_path})
+    file(RELATIVE_PATH relative_path ${MSVTK_SUPERBUILD_DIR} ${path})
+    if(NOT "${relative_path}" STREQUAL "${path}")
+      set(path "<MSVTK_SUPERBUILD_DIR>/${relative_path}")
+    endif()
+    gp_log_message("  ${path}")
+  endforeach()
+
+  # Keep track of libs count and current lib being fixed
+  list(LENGTH libs libs_count)
+  set(ENV{FIXUP_LIBS_COUNT} ${libs_count})
+  set(ENV{FIXUP_LIB_CURRENT} 0)
+
+  fixup_bundle(
+    "${app_dir}"
+    "${libs}"
+    "${libs_path}"
+    )
+endfunction()
+
+fixup_bundle_with_plugins("@MSVTK_MAIN_PROJECT_APPLICATION_NAME@.app")

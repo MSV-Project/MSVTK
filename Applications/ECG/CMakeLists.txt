@@ -65,6 +65,11 @@ target_link_libraries(msv${KIT}
   msvQtWidgets
   )
 
+install(TARGETS msv${KIT}
+  RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
+  LIBRARY DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
+  ARCHIVE DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT Development
+  )
 
 # --------------------------------------------------------------------------
 # Build the executable
@@ -100,3 +105,16 @@ set(dynamicHeaders
 if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif()
+
+# --------------------------------------------------------------------------
+# Install
+# --------------------------------------------------------------------------
+if(NOT APPLE)
+  set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR})
+else()
+  set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ".")
+endif()
+
+install(TARGETS ${KIT}
+  ${${KIT}_INSTALL_DESTINATION_ARGS}
+  COMPONENT Runtime)

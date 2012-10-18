@@ -22,6 +22,7 @@ class vtkRenderer;
 class vtkButtonWidget;
 class vtkButtonCallback;
 class vtkButtonHighLightCallback;
+class vtkRenderWindow;
 class vtkDataSet;
 
 /**
@@ -82,7 +83,8 @@ private:
     
     QImage m_Image; ///< button image
     double m_Bounds[6]; ///< bounds of the data related to the button
-    vtkDataSet* m_Data;
+    vtkDataSet* m_Data; ///< dataset associated with the button
+    vtkRenderWindow *m_Window; ///< render window for offscreen rendering
 };
 
 /////////////////////////////////////////////////////////////
