@@ -354,8 +354,10 @@ set(MSVTK_APPLICATIONS_SUBDIRS )
 
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkButtons" ON)
 option(MSVTK_APP_VTKButtons "vtkButtons application to demonstrate vtkButtons" ON)
+option(MSVTK_APP_ButtonClusters "vtkButtons application to demonstrate vtkButtons clustering" ON)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS ButtonClusters)
 
 set(MSVTK_MAIN_PROJECT_APPLICATION_NAME ECG)
 

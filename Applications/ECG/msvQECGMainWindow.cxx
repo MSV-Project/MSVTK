@@ -377,13 +377,14 @@ void msvQECGMainWindowPrivate::readCartoSignals(QDir dir)
   dir.setNameFilters(signalFileFilters);
   QStringList signalFiles = dir.entryList(QDir::Files,QDir::Name);
 
-  if (signalFiles.size() == 0){
+  if (signalFiles.size() == 0)
+    {
     qWarning() << "No carto signals in" << dir;
-  }
+    }
 
   // Resort files using their index number
   qSort(signalFiles.begin(), signalFiles.end(),
-        msvQECGMainWindowPrivate::fileLessThan);
+      msvQECGMainWindowPrivate::fileLessThan);
 
   // Fill the FileSerieReader
   foreach(const QString& signalFile, signalFiles)
