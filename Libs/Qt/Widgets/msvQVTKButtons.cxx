@@ -114,7 +114,7 @@ public:
         
 };
 
-msvQVTKButtons::msvQVTKButtons(QObject *parent) : msvQVTKButtonsInterface(), m_FlyTo(true), m_OnCenter(false) {
+msvQVTKButtons::msvQVTKButtons(QObject *parent) : msvQVTKButtonsInterface(), m_FlyTo(true), m_OnCenter(false), m_Window(NULL) {
   m_ButtonCallback = vtkButtonCallback::New();
   reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->toolButton = this;
   m_HighlightCallback = vtkButtonHighLightCallback::New();
