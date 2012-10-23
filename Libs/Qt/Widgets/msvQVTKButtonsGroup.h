@@ -16,7 +16,7 @@
 
 #include "msvQtWidgetsExport.h"
 #include "msvQVTKButtonsInterface.h"
-#include <Qstring>
+#include <QString>
 #include <QVariant>
 #include <QVector>
 

@@ -1,7 +1,7 @@
 # -------------------------------------------------------------------------
 # Find and install Qt
 # -------------------------------------------------------------------------
-set(QT_INSTALL_LIB_DIR ${Slicer_INSTALL_LIB_DIR})
+set(QT_INSTALL_LIB_DIR ${MSVTK_INSTALL_LIB_DIR})
 
 set(QTLIBLIST QTCORE QTGUI QTNETWORK QTXML QTTEST QTSCRIPT QTSQL QTSVG QTOPENGL QTWEBKIT PHONON QTXMLPATTERNS)
 if(UNIX OR APPLE)
