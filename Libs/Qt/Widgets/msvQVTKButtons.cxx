@@ -125,7 +125,6 @@ msvQVTKButtons::msvQVTKButtons(QObject *parent) : msvQVTKButtonsInterface(), m_F
 }
 
 msvQVTKButtons::~msvQVTKButtons() {
-    button()->Delete();
     if(m_Window) {
         m_Window->Delete();
     }

@@ -27,7 +27,7 @@
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(parent), m_ShowButton(false), m_ShowLabel(true), m_ButtonWidget(NULL), m_ButtonCallback(NULL), m_HighlightCallback(NULL) {
-    VTK_CREATE(vtkTexturedButtonRepresentation2D, rep);
+    vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
     rep->SetNumberOfStates(1);
     button()->SetRepresentation(rep);
     if(m_ButtonCallback)
@@ -51,12 +51,12 @@ void msvQVTKButtonsInterface::setIconFileName(QString iconFileName) {
   m_IconFileName = iconFileName;
   QImage image;
   image.load(m_IconFileName);
-  VTK_CREATE(vtkQImageToImageSource, imageToVTK);
+  vtkQImageToImageSource *imageToVTK = vtkQImageToImageSource::New();
   imageToVTK->SetQImage(&image);
   imageToVTK->Update();
   vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(button()->GetRepresentation());
   rep->SetButtonTexture(0, imageToVTK->GetOutput());
-
+  imageToVTK->Delete();
   int size[2]; size[0] = 16; size[1] = 16;
   rep->GetBalloon()->SetImageSize(size);
 

@@ -231,20 +231,27 @@ vtkSliderWidget* msvQVTKButtonsGroup::slider() {
     sliderRep->SetLabelFormat("%0.f");
     sliderRep->SetValue(0.0);
     sliderRep->SetTitleText("");
-    sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToNormalizedViewport();
-    sliderRep->GetPoint1Coordinate()->SetValue(.1,.1);
-    sliderRep->GetPoint2Coordinate()->SetCoordinateSystemToNormalizedViewport();
-    sliderRep->GetPoint2Coordinate()->SetValue(.1,.4);
-    sliderRep->SetSliderLength(0.02);
-    sliderRep->SetSliderWidth(0.02);
-    sliderRep->SetEndCapLength(0.04);
-    sliderRep->GetSliderProperty()->SetColor(.5,.5,.5);
+    sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToDisplay();
+    sliderRep->GetPoint1Coordinate()->SetValue(24,24);
+    sliderRep->GetPoint2Coordinate()->SetCoordinateSystemToDisplay();
+    sliderRep->GetPoint2Coordinate()->SetValue(24,96);
+    sliderRep->SetSliderLength(0.015);
+    sliderRep->SetSliderWidth(0.04);
+    sliderRep->SetEndCapLength(0.015);
+    sliderRep->SetEndCapWidth(0.04);
+    sliderRep->SetTubeWidth(0.005);
+    sliderRep->GetSliderProperty()->SetColor(.7,.7,.7);
+    sliderRep->GetSliderProperty()->SetOpacity(.8);
+    sliderRep->GetCapProperty()->SetOpacity(.8);
+    sliderRep->GetSelectedProperty()->SetColor(.9,.9,.9);
+    sliderRep->GetSelectedProperty()->SetOpacity(.8);
+    sliderRep->GetTubeProperty()->SetOpacity(.8);
     sliderRep->SetVisibility(false);
-
     m_Slider = vtkSliderWidget::New();
     m_Slider->SetRepresentation(sliderRep);
     m_Slider->SetAnimationModeToAnimate();
     m_Slider->AddObserver(vtkCommand::InteractionEvent,m_SliderCallback);
+    
   }
   return m_Slider;
 }
