@@ -209,7 +209,7 @@ msvQVTKButtonsInterface* msvQVTKButtonsGroup::getElement(int index)
   return m_Elements.at(index);
 }
 
-msvQVTKButtonsGroup* msvQVTKButtonsGroup::createGroup(
+msvQVTKButtonsGroup* msvQVTKButtonsGroup::createGroup()
 {
   msvQVTKButtonsGroup* element = new msvQVTKButtonsGroup();
   addElement(element);

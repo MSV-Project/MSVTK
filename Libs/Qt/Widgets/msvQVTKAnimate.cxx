@@ -17,13 +17,13 @@
   limitations under the License.
 
 ==============================================================================*/
+
 #include "msvQVTKAnimate.h"
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkCamera.h>
 #include <vtkMath.h>
-
 #include <vtkRendererCollection.h>
 
 msvQVTKAnimate::msvQVTKAnimate()

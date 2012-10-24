@@ -22,8 +22,6 @@
 #define msvQVTKButtonsInterface_H
 
 #include "msvQtWidgetsExport.h"
-
-#include <QObject>
 #include <QImage>
 
 //forward declarations

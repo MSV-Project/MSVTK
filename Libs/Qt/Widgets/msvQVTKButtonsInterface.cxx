@@ -19,7 +19,6 @@
 ==============================================================================*/
 
 #include "msvQVTKButtonsInterface.h"
-
 #include <vtkTexturedButtonRepresentation.h>
 #include <vtkTexturedButtonRepresentation2D.h>
 #include <vtkButtonWidget.h>
@@ -132,7 +131,7 @@ void msvQVTKButtonsInterface::setCurrentRenderer(vtkRenderer *renderer)
 
 void msvQVTKButtonsInterface::getBounds(double b[6])
 {
-  for(int i = 0; i < 6; i++) 
+  for(int i = 0; i < 6; i++)
   {
     b[i] = m_Bounds[i];
   }

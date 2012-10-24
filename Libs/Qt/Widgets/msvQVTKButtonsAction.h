@@ -22,17 +22,17 @@
 #define msvQVTKButtonsAction_H
 
 // Includes list
-
 #include "msvQtWidgetsExport.h"
-#include <vtkRenderer.h>
 
+// Forward references
+class vtkRenderer;
 
 /**
 Class name: msvQVTKButtonsAction
 Interface abstract class for buttons actions
 */
 
-class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsAction 
+class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsAction
 {
 
 public:

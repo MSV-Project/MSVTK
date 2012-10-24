@@ -22,10 +22,11 @@
 #define msvQVTKAnimate_H
 
 // Includes list
-
 #include "msvQtWidgetsExport.h"
 #include "msvQVTKButtonsAction.h"
-#include <vtkRenderer.h>
+
+// forward references
+class vtkRenderer;
 
 /**
 Class name: msvQVTKAnimate

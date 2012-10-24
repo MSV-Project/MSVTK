@@ -69,20 +69,24 @@ private:
 // Inline methods
 /////////////////////////////////////////////////////////////
 
-inline msvQVTKButtonsGroup *msvQVTKButtonsManager::createGroup() {
+inline msvQVTKButtonsGroup *msvQVTKButtonsManager::createGroup()
+{
   m_Elements.push_back(new msvQVTKButtonsGroup());
   return static_cast<msvQVTKButtonsGroup*>(m_Elements.at(m_Elements.size()-1));
 }
-inline msvQVTKButtons *msvQVTKButtonsManager::createButtons() {
+inline msvQVTKButtons *msvQVTKButtonsManager::createButtons()
+{
   m_Elements.push_back(new msvQVTKButtons());
   return static_cast<msvQVTKButtons*>(m_Elements.at(m_Elements.size()-1));
 }
 
-inline void msvQVTKButtonsManager::setShowButton(bool show) {
+inline void msvQVTKButtonsManager::setShowButton(bool show)
+{
   setElementProperty("showButton",show);
 }
 
-inline void msvQVTKButtonsManager::setShowLabel(bool show) {
+inline void msvQVTKButtonsManager::setShowLabel(bool show)
+{
   setElementProperty("showLabel",show);
 }
 

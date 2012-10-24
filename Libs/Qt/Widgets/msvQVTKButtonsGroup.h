@@ -25,9 +25,7 @@
 
 #include "msvQtWidgetsExport.h"
 #include "msvQVTKButtonsInterface.h"
-#include <QString>
 #include <QVariant>
-#include <QVector>
 
 //forward declarations
 class vtkRenderer;
