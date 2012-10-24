@@ -31,7 +31,7 @@ int vtkButtonsTest1(int argc, char * argv[])
 {
   QCoreApplication app(argc, argv);
   QString path = (argc > 2) ? ("\"" + QString(argv[2]) + "/") : "";
-  QString command = QString(path + "ecg\"");
+  QString command = QString(path + "vtkbuttons\"");
   QProcess process;
   process.start(command);
   bool res = process.waitForStarted();
