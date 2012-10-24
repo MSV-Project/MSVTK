@@ -27,7 +27,6 @@
 #include "msvQVTKButtonsAction.h"
 #include <vtkRenderer.h>
 
-
 /**
 Class name: msvQVTKAnimate
 This is an utility class to animate VTKCamera.
@@ -37,14 +36,14 @@ class MSV_QT_WIDGETS_EXPORT msvQVTKAnimate : public msvQVTKButtonsAction
 {
 
 public:
-    /// Object constructor.
-    msvQVTKAnimate();
+  /// Object constructor.
+  msvQVTKAnimate();
 
-    /// Animate the camera to zoom on the passed bounding box.
-    void execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120);
+  /// Animate the camera to zoom on the passed bounding box.
+  void execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120);
 
-    /// Object destructor.
-    virtual ~msvQVTKAnimate();
+  /// Object destructor.
+  virtual ~msvQVTKAnimate();
 
 };
 

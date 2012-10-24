@@ -20,20 +20,24 @@
 
 #include "msvQVTKButtonsManager.h"
 
-msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent) {
+msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent)
+{
 
 }
 
-msvQVTKButtonsManager* msvQVTKButtonsManager::instance() {
+msvQVTKButtonsManager* msvQVTKButtonsManager::instance()
+{
   static msvQVTKButtonsManager manager;
   return &manager;
 }
 
-msvQVTKButtonsManager::~msvQVTKButtonsManager() {
+msvQVTKButtonsManager::~msvQVTKButtonsManager()
+{
 
 }
 
-void msvQVTKButtonsManager::setElementProperty(QString name, QVariant value) {
+void msvQVTKButtonsManager::setElementProperty(QString name, QVariant value)
+{
   for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
   {
     (*buttonsIt)->setProperty(name.toStdString().c_str(),value);

@@ -42,121 +42,128 @@ Manager class to manage groups of msvQVTKButtons
 
 class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface 
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    /// Object constructor.
-    msvQVTKButtonsGroup(QObject *parent = 0);
+  /// Object constructor.
+  msvQVTKButtonsGroup(QObject *parent = 0);
 
-    /// Object destructor.
-    virtual ~msvQVTKButtonsGroup();
+  /// Object destructor.
+  virtual ~msvQVTKButtonsGroup();
 
-    /// Add a buttons to the buttons' vector
-    void addElement(msvQVTKButtonsInterface* buttons);
+  /// Add a buttons to the buttons' vector
+  void addElement(msvQVTKButtonsInterface* buttons);
 
-    /// Remove a buttons to the buttons' vector
-    void removeElement(msvQVTKButtonsInterface* buttons);
+  /// Remove a buttons to the buttons' vector
+  void removeElement(msvQVTKButtonsInterface* buttons);
     
-    /// Get the specified element
-    msvQVTKButtonsInterface* getElement(int index);
+  /// Get the specified element
+  msvQVTKButtonsInterface* getElement(int index);
 
-    /// create a new element
-    msvQVTKButtonsGroup* createGroup();
+  /// create a new element
+  msvQVTKButtonsGroup* createGroup();
 
-    /// create a new element
-    msvQVTKButtons* createButtons();
+  /// create a new element
+  msvQVTKButtons* createButtons();
 
-    /// Allow to show/hide button
-    void setShowButton(bool show);
+  /// Allow to show/hide button
+  void setShowButton(bool show);
 
-    /// Allow to show/hide label
-    void setShowLabel(bool show);
+  /// Allow to show/hide label
+  void setShowLabel(bool show);
 
-    /// set the icon path
-    void setIconFileName(QString iconFileName);
+  /// set the icon path
+  void setIconFileName(QString iconFileName);
 
-    /// set the text label
-    // void setLabel(QString text);
+  /// set the text label
+  // void setLabel(QString text);
 
-    /// Allow to activate FlyTo animation
-    // void setFlyTo(bool active);
+  /// Allow to activate FlyTo animation
+  // void setFlyTo(bool active);
 
-    /// Allow to set button position on center or on corner
-    // void setOnCenter(bool onCenter);
+  /// Allow to set button position on center or on corner
+  // void setOnCenter(bool onCenter);
 
-    /// set the tooltip string
-    // void setToolTip(QString text);
+  /// set the tooltip string
+  // void setToolTip(QString text);
 
-    /// add vtk button to Renderer
-    void setCurrentRenderer(vtkRenderer *renderer);
+  /// add vtk button to Renderer
+  void setCurrentRenderer(vtkRenderer *renderer);
 
-    /// Update graphic objects
-    void update();
+  /// Update graphic objects
+  void update();
 
-    /// Get the slider widget
-    vtkSliderWidget* slider();
+  /// Get the slider widget
+  vtkSliderWidget* slider();
 
-    /// Show/hide the slider widget
-    void showSlider(bool show);
+  /// Show/hide the slider widget
+  void showSlider(bool show);
 
-    /// Set the position on the path at the specified ratio
-    void setCameraPoistionOnPath(double ratio);
+  /// Set the position on the path at the specified ratio
+  void setCameraPoistionOnPath(double ratio);
 
 public slots:
 
-    /// hide/show group
-    void show(bool val);
+  /// hide/show group
+  void show(bool val);
 
 private:
-    /// Set the specified property
-    void setElementProperty(QString name, QVariant value);
+  /// Set the specified property
+  void setElementProperty(QString name, QVariant value);
 
-    /// Calculate element position
-    void calculatePosition();
+  /// Calculate element position
+  void calculatePosition();
 
-    /// Update element bounds
-    void updateBounds();
+  /// Update element bounds
+  void updateBounds();
 
-    QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
-    vtkSliderWidget* m_Slider; //< Slider widget
-    vtkSliderCallback* m_SliderCallback; //< Slider callback function
+  QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
+  vtkSliderWidget* m_Slider; //< Slider widget
+  vtkSliderCallback* m_SliderCallback; //< Slider callback function
 };
 
 /////////////////////////////////////////////////////////////
 // Inline methods
 /////////////////////////////////////////////////////////////
 
-inline void msvQVTKButtonsGroup::setShowButton(bool show) {
+inline void msvQVTKButtonsGroup::setShowButton(bool show)
+{
   msvQVTKButtonsInterface::setShowButton(show);
   setElementProperty("showButton",show);
 }
 
-inline void msvQVTKButtonsGroup::setShowLabel(bool show) {
+inline void msvQVTKButtonsGroup::setShowLabel(bool show)
+{
   msvQVTKButtonsInterface::setShowLabel(show);
   setElementProperty("showLabel",show);
 }
 
-inline void msvQVTKButtonsGroup::setIconFileName(QString iconFileName) {
+inline void msvQVTKButtonsGroup::setIconFileName(QString iconFileName)
+{
   msvQVTKButtonsInterface::setIconFileName(iconFileName);
   setElementProperty("iconFileName",iconFileName);
 }
 
-// inline void msvQVTKButtonsGroup::setLabel(QString text) {
+// inline void msvQVTKButtonsGroup::setLabel(QString text)
+// {
 //   msvQVTKButtonsInterface::setLabel(text);
 //   setElementProperty("label",text);
 // }
 
-// inline void msvQVTKButtonsGroup::setFlyTo(bool active) {
+// inline void msvQVTKButtonsGroup::setFlyTo(bool active)
+// {
 //   msvQVTKButtonsInterface::setFlyTo(active);
 //   setElementProperty("flyTo",active);
 // }
 
-// inline void msvQVTKButtonsGroup::setOnCenter(bool onCenter) {
+// inline void msvQVTKButtonsGroup::setOnCenter(bool onCenter)
+// {
 //   msvQVTKButtonsInterface::setOnCenter(onCenter);
 //   setElementProperty("onCenter",onCenter);
 // }
 
-// inline void msvQVTKButtonsGroup::setToolTip(QString text) {
+// inline void msvQVTKButtonsGroup::setToolTip(QString text)
+// {
 //   msvQVTKButtonsInterface::setToolTip(text);
 //   setElementProperty("toolTip",text);
 // }

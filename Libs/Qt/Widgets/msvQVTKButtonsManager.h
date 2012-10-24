@@ -26,6 +26,7 @@
 #include "msvQtWidgetsExport.h"
 #include "msvQVTKButtons.h"
 #include "msvQVTKButtonsGroup.h"
+
 /**
 Class name: msvQVTKButtonsManager
 Manager class to manage groups of msvQVTKButtons and msvVTKButtonsGroup
@@ -33,35 +34,35 @@ Manager class to manage groups of msvQVTKButtons and msvVTKButtonsGroup
 
 class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsManager : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    /// Object destructor.
-    virtual ~msvQVTKButtonsManager();
+  /// Object destructor.
+  virtual ~msvQVTKButtonsManager();
 
-    /// Get the singleton instance of the manager
-    static msvQVTKButtonsManager* instance();
+  /// Get the singleton instance of the manager
+  static msvQVTKButtonsManager* instance();
 
-    /// Create a group 
-    inline msvQVTKButtonsGroup *createGroup();
+  /// Create a group 
+  inline msvQVTKButtonsGroup *createGroup();
 
-    /// Create a button
-    inline msvQVTKButtons *createButtons();
+  /// Create a button
+  inline msvQVTKButtons *createButtons();
 
-    /// Set show button property for children elements
-    inline void setShowButton(bool show);
+  /// Set show button property for children elements
+  inline void setShowButton(bool show);
 
-    /// Set show label property for children elements
-    inline void setShowLabel(bool show);
+  /// Set show label property for children elements
+  inline void setShowLabel(bool show);
 
 private:
-    /// Object constructor.
-    msvQVTKButtonsManager(QObject *parent = 0);
+  /// Object constructor.
+  msvQVTKButtonsManager(QObject *parent = 0);
 
-    /// Set the specified property for children elements
-    void setElementProperty(QString name, QVariant value);
+  /// Set the specified property for children elements
+  void setElementProperty(QString name, QVariant value);
 
-    QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
+  QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
 };
 
 /////////////////////////////////////////////////////////////

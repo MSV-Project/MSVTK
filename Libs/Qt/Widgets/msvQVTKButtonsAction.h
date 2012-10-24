@@ -36,14 +36,14 @@ class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsAction
 {
 
 public:
-    /// Object constructor.
-    msvQVTKButtonsAction();
+  /// Object constructor.
+  msvQVTKButtonsAction();
 
-    /// Animate the camera to zoom on the passed bounding box.
-    virtual void execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120)=0;
+  /// Animate the camera to zoom on the passed bounding box.
+  virtual void execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120)=0;
 
-    /// Object destructor.
-    virtual ~msvQVTKButtonsAction();
+  /// Object destructor.
+  virtual ~msvQVTKButtonsAction();
 
 };
 

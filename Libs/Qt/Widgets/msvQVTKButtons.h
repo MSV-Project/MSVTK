@@ -36,79 +36,88 @@ class vtkDataSet;
  Class name: msvQVTKButtons
  This is the tool representing a VTK buttons.
  */
-class MSV_QT_WIDGETS_EXPORT msvQVTKButtons : public msvQVTKButtonsInterface {
-    Q_OBJECT
-    Q_PROPERTY(bool flyTo READ flyTo WRITE setFlyTo);
-    Q_PROPERTY(bool onCenter READ onCenter WRITE setOnCenter);
+class MSV_QT_WIDGETS_EXPORT msvQVTKButtons : public msvQVTKButtonsInterface
+{
+  Q_OBJECT
+  Q_PROPERTY(bool flyTo READ flyTo WRITE setFlyTo);
+  Q_PROPERTY(bool onCenter READ onCenter WRITE setOnCenter);
 
 public Q_SLOTS:
-    /// Allow to execute and update the pipeline when something change.
-    /*virtual*/ void update();
+  /// Allow to execute and update the pipeline when something change.
+  /*virtual*/ void update();
 
 public:
-     /// Object constructor.
-    msvQVTKButtons(QObject *parent = 0);
+  /// Object constructor.
+  msvQVTKButtons(QObject *parent = 0);
     
-    /// set the icon path
-    //void setIconFileName(QString iconFileName);
+  /// set the icon path
+  //void setIconFileName(QString iconFileName);
 
-    // Allow to activate FlyTo animation
-    void setFlyTo(bool active);
+  // Allow to activate FlyTo animation
+  void setFlyTo(bool active);
     
-    /// set bounds
-    void setBounds(double b[6]);
+  /// set bounds
+  void setBounds(double b[6]);
     
-    /// Object destructor.
-    virtual ~msvQVTKButtons();
+  /// Object destructor.
+  virtual ~msvQVTKButtons();
 
-    QImage getPreview(int width, int height);
+  QImage getPreview(int width, int height);
 
-    /// set the data for preview
-    void setData(vtkDataSet *data);
+  /// set the data for preview
+  void setData(vtkDataSet *data);
 
-    /// Return FlyTo flag
-    bool flyTo() const;
+  /// Return FlyTo flag
+  bool flyTo() const;
 
-    /// Allow to set button position on center or on corner
-    void setOnCenter(bool onCenter);
+  /// Allow to set button position on center or on corner
+  void setOnCenter(bool onCenter);
 
-    /// Return OnCenter flag
-    bool onCenter() const;
+  /// Return OnCenter flag
+  bool onCenter() const;
 
-    void setCurrentRenderer(vtkRenderer *renderer);
+  // Set the current renderer
+  void setCurrentRenderer(vtkRenderer *renderer);
 
 private:
-    /// calculate Position (center or corner)
-    void calculatePosition();
+  /// Calculate position (center or corner)
+  void calculatePosition();
 
-    QImage m_Image; ///< button image
-    vtkDataSet* m_Data; ///< dataset associated with the button
-    vtkRenderWindow *m_Window; ///< render window for offscreen rendering
-    bool m_FlyTo; ///< Flag to activate FlyTo animation
-    bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
+  QImage m_Image; ///< button image
+  vtkDataSet* m_Data; ///< dataset associated with the button
+  vtkRenderWindow *m_Window; ///< render window for offscreen rendering
+  bool m_FlyTo; ///< Flag to activate FlyTo animation
+  bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
 };
 
 /////////////////////////////////////////////////////////////
 // Inline methods
 /////////////////////////////////////////////////////////////
 
-// inline void msvQVTKButtons::setShowTooltip(bool value) {
-//     if(value) {
-//         Q_EMIT showTooltip(m_Tooltip);
-//     } else {
-//         Q_EMIT hideTooltip();
-//     }
+// inline void msvQVTKButtons::setShowTooltip(bool value)
+// {
+//   if(value)
+//   {
+//     Q_EMIT showTooltip(m_Tooltip);
+//   }
+//   else 
+//   {
+//     Q_EMIT hideTooltip();
+//   }
 // }
 
-inline bool msvQVTKButtons::flyTo() const {
+inline bool msvQVTKButtons::flyTo() const
+{
   return m_FlyTo;
 }
 
-inline void msvQVTKButtons::setOnCenter(bool onCenter) {
+inline void msvQVTKButtons::setOnCenter(bool onCenter)
+{
   m_OnCenter = onCenter;
 }
 
-inline bool msvQVTKButtons::onCenter() const {
+inline bool msvQVTKButtons::onCenter() const
+{
   return m_OnCenter;
 }
 
