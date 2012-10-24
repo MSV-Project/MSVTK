@@ -174,14 +174,6 @@ set(MSVTK_CMAKE_UTILITIES_DIR ${MSVTK_SOURCE_DIR}/Utilities/CMake)
 #include(CMake/MSVTKFunctionGetGccVersion.cmake)
 
 #-----------------------------------------------------------------------------
-# Qt Designer Plugins
-
-option(BUILD_QTDESIGNER_PLUGINS "Build Qt Designer plugins" OFF)
-if(BUILD_QTDESIGNER_PLUGINS)
-  include(CMake/MSVTKMacroBuildQtDesignerPlugin.cmake)
-endif()
-
-#-----------------------------------------------------------------------------
 # Testing
 #
 option(BUILD_TESTING "Test the project" ON)
@@ -435,6 +427,12 @@ set(CMAKE_C_FLAGS ${MSVTK_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 # for shared libraries
 #
 set(MSVTK_EXPORT_HEADER_TEMPLATE "${MSVTK_SOURCE_DIR}/Libs/msvExport.h.in")
+
+#-----------------------------------------------------------------------------
+# Add utility cmake macro to create tests, it sets the environment path before
+# executing the tests
+#
+include(CMake/msvMacroSimpleTest.cmake)
 
 #-----------------------------------------------------------------------------
 # Add MSVTK library subdirectories
