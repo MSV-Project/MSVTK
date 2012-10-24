@@ -57,7 +57,7 @@ public:
 
   /// Allow to show/hide label
   void setShowLabel(bool show);
-    
+
   /// set the icon path
   void setIconFileName(QString iconFileName);
 
@@ -66,13 +66,13 @@ public:
 
   /// Return showLabel flag
   bool showLabel() const;
-    
+
   /// set the text label
   void setLabel(QString text);
 
   /// Get The string
   QString label();
-    
+
   /// set the tooltip string
   void setToolTip(QString text);
 

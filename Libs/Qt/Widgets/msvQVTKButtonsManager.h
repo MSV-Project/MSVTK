@@ -43,7 +43,7 @@ public:
   /// Get the singleton instance of the manager
   static msvQVTKButtonsManager* instance();
 
-  /// Create a group 
+  /// Create a group
   inline msvQVTKButtonsGroup *createGroup();
 
   /// Create a button

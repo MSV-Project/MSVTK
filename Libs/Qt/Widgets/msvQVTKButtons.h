@@ -49,19 +49,20 @@ public Q_SLOTS:
 public:
   /// Object constructor.
   msvQVTKButtons(QObject *parent = 0);
-    
+
   /// set the icon path
   //void setIconFileName(QString iconFileName);
 
   // Allow to activate FlyTo animation
   void setFlyTo(bool active);
-    
+
   /// set bounds
   void setBounds(double b[6]);
-    
+
   /// Object destructor.
   virtual ~msvQVTKButtons();
 
+  /// Get the button preview image
   QImage getPreview(int width, int height);
 
   /// set the data for preview
@@ -100,7 +101,7 @@ private:
 //   {
 //     Q_EMIT showTooltip(m_Tooltip);
 //   }
-//   else 
+//   else
 //   {
 //     Q_EMIT hideTooltip();
 //   }

@@ -40,7 +40,7 @@ Class name: msvQVTKButtonsGroup
 Manager class to manage groups of msvQVTKButtons
 */
 
-class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface 
+class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface
 {
   Q_OBJECT
 
@@ -56,7 +56,7 @@ public:
 
   /// Remove a buttons to the buttons' vector
   void removeElement(msvQVTKButtonsInterface* buttons);
-    
+
   /// Get the specified element
   msvQVTKButtonsInterface* getElement(int index);
 

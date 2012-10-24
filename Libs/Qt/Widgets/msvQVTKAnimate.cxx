@@ -35,7 +35,7 @@ void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int number
 {
   assert(renderer);
   //vtkRenderer *renderer = widget->renderer("tool");
-  double center[3]; 
+  double center[3];
   center[0] = (bounds[0] + bounds[1]) / 2;
   center[1] = (bounds[2] + bounds[3]) / 2;
   center[2] = (bounds[4] + bounds[5]) / 2;
@@ -77,16 +77,16 @@ void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int number
   renderer->GetAspect(aspect);
 
   if(aspect[0]>=1.0)
-  { 
+  {
     // horizontal window, deal with vertical angle|scale
     if(camera->GetUseHorizontalViewAngle())
     {
       angle=2.0*atan(tan(angle*0.5)/aspect[0]);
     }
   } else
-  { 
+  {
     // vertical window, deal with horizontal angle|scale
-    if(!camera->GetUseHorizontalViewAngle()) 
+    if(!camera->GetUseHorizontalViewAngle())
     {
       angle=2.0*atan(tan(angle*0.5)*aspect[0]);
     }
@@ -108,8 +108,8 @@ void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int number
   double pi = vtkMath::Pi();
 
   //flyTo only if camera parameters has changed
-  if (fabs(fly0[0]-fly1[0]) < 0.0000001 && fabs(fly0[1]-fly1[1]) < 0.0000001 && fabs(fly0[2]-fly1[2]) < 0.0000001 
-    && fabs(fly0[3]-fly1[3]) < 0.0000001 && fabs(fly0[4]-fly1[4]) < 0.0000001 && fabs(fly0[5]-fly1[5]) < 0.0000001 
+  if (fabs(fly0[0]-fly1[0]) < 0.0000001 && fabs(fly0[1]-fly1[1]) < 0.0000001 && fabs(fly0[2]-fly1[2]) < 0.0000001
+    && fabs(fly0[3]-fly1[3]) < 0.0000001 && fabs(fly0[4]-fly1[4]) < 0.0000001 && fabs(fly0[5]-fly1[5]) < 0.0000001
     && fabs(fly0[6]-fly1[6]) < 0.0000001)
   {
           return;
@@ -130,7 +130,6 @@ void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int number
 
     renderer->ResetCameraClippingRange();
     renderer->GetRenderWindow()->Render();
-        
   }
 }
 

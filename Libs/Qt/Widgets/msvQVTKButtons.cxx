@@ -60,8 +60,8 @@ class vtkButtonCallback : public vtkCommand
 {
 public:
   static vtkButtonCallback *New()
-  { 
-    return new vtkButtonCallback; 
+  {
+    return new vtkButtonCallback;
   }
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
@@ -85,7 +85,7 @@ public:
 
   void setBounds(double b[6])
   {
-    bounds[0] = b[0]; 
+    bounds[0] = b[0];
     bounds[1] = b[1];
     bounds[2] = b[2];
     bounds[3] = b[3];
@@ -110,25 +110,24 @@ class MSV_QT_WIDGETS_EXPORT vtkButtonHighLightCallback : public vtkCommand
 {
 public:
   static vtkButtonHighLightCallback *New()
-  { 
-    return new vtkButtonHighLightCallback; 
+  {
+    return new vtkButtonHighLightCallback;
   }
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
     vtkTexturedButtonRepresentation2D *rep = reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
     int highlightState = rep->GetHighlightState();
-       
     if ( highlightState == vtkButtonRepresentation::HighlightHovering && previousHighlightState == vtkButtonRepresentation::HighlightNormal )
     {
       //show tooltip (not if previous state was selecting
-      toolButton->setShowTooltip(true);        
-    } 
+      toolButton->setShowTooltip(true);
+    }
     else if ( highlightState == vtkButtonRepresentation::HighlightNormal)
     {
       //hide tooltip
       toolButton->setShowTooltip(false);
-    } 
+    }
     previousHighlightState = highlightState;
   }
 
@@ -162,7 +161,7 @@ void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer)
   if(renderer)
   {
     reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->renderer = renderer;
-  } 
+  }
   else
   {
     reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->renderer = NULL;
@@ -175,7 +174,7 @@ void msvQVTKButtons::setBounds(double b[6])
   int i = 0;
   for( ; i<6 ; i++ )
   {
-    m_Bounds[i] = b[i];    
+    m_Bounds[i] = b[i];
   }
 
   update();
@@ -183,7 +182,7 @@ void msvQVTKButtons::setBounds(double b[6])
 
 void msvQVTKButtons::calculatePosition()
 {
-  //modify position of the vtkButton 
+  //modify position of the vtkButton
   double bds[3];
   if (m_OnCenter)
   {
@@ -195,7 +194,7 @@ void msvQVTKButtons::calculatePosition()
   {
     //on the corner of the bounding box of the VME.
     bds[0] = m_Bounds[0];
-    bds[1] = m_Bounds[2]; 
+    bds[1] = m_Bounds[2];
     bds[2] = m_Bounds[4];
   }
   int size[2]; size[0] = 16; size[1] = 16;
@@ -255,7 +254,7 @@ QImage msvQVTKButtons::getPreview(int width, int height)
     m_Window->SetSize(width,height);
     renderer->AddActor(actor);
     renderer->ResetCamera(bounds);
-    
+
     // Extract the image from the 'hidden' renderer
     previewer->SetInput(m_Window);
     previewer->Modified();
