@@ -38,8 +38,8 @@ class vtkButtonCallback2 : public vtkCommand
 {
 public:
   static vtkButtonCallback2 *New()
-  { 
-    return new vtkButtonCallback2; 
+  {
+    return new vtkButtonCallback2;
   }
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
@@ -61,8 +61,8 @@ class MSV_QT_WIDGETS_EXPORT vtkButtonHighLightCallback2 : public vtkCommand
 {
 public:
   static vtkButtonHighLightCallback2 *New()
-  { 
-    return new vtkButtonHighLightCallback2; 
+  {
+    return new vtkButtonHighLightCallback2;
   }
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
@@ -73,13 +73,13 @@ public:
     if ( highlightState == vtkButtonRepresentation::HighlightHovering && previousHighlightState == vtkButtonRepresentation::HighlightNormal )
     {
       //show tooltip (not if previous state was selecting
-      toolButton->setShowTooltip(true);        
-    } 
+      toolButton->setShowTooltip(true);
+    }
     else if ( highlightState == vtkButtonRepresentation::HighlightNormal)
     {
       //hide tooltip
       toolButton->setShowTooltip(false);
-    } 
+    }
     previousHighlightState = highlightState;
   }
 
@@ -92,7 +92,7 @@ public:
 class vtkSliderCallback : public vtkCommand
 {
 public:
-  static vtkSliderCallback *New() 
+  static vtkSliderCallback *New()
   {
     return new vtkSliderCallback;
   }
@@ -233,7 +233,7 @@ void msvQVTKButtonsGroup::calculatePosition()
 {
   updateBounds();
 
-  //modify position of the vtkButton 
+  //modify position of the vtkButton
   double bds[6];
 
   bds[0] = 0;
@@ -285,7 +285,6 @@ vtkSliderWidget* msvQVTKButtonsGroup::slider()
     m_Slider->SetRepresentation(sliderRep);
     m_Slider->SetAnimationModeToAnimate();
     m_Slider->AddObserver(vtkCommand::InteractionEvent,m_SliderCallback);
-    
   }
   return m_Slider;
 }
@@ -336,7 +335,6 @@ void msvQVTKButtonsGroup::setCameraPoistionOnPath(double ratio) {
   }
   else
   {
-    
     m_Elements.at(targetButton+1)->getBounds(b2);
     resetBounds[0] = b1[0] * (1 - subPathRatio) + b2[0] * subPathRatio;
     resetBounds[1] = b1[1] * (1 - subPathRatio) + b2[1] * subPathRatio;
