@@ -27,11 +27,14 @@
 #include "msvQVTKButtonsInterface.h"
 #include <QVariant>
 
-//forward declarations
+// forward declarations
 class vtkRenderer;
 class msvQVTKButtons;
 class vtkSliderWidget;
 class vtkSliderCallback;
+
+// Pimpl
+class msvQVTKButtonsGroupPrivate;
 
 /**
 Class name: msvQVTKButtonsGroup
@@ -73,18 +76,6 @@ public:
   /// set the icon path
   void setIconFileName(QString iconFileName);
 
-  /// set the text label
-  // void setLabel(QString text);
-
-  /// Allow to activate FlyTo animation
-  // void setFlyTo(bool active);
-
-  /// Allow to set button position on center or on corner
-  // void setOnCenter(bool onCenter);
-
-  /// set the tooltip string
-  // void setToolTip(QString text);
-
   /// add vtk button to Renderer
   void setCurrentRenderer(vtkRenderer *renderer);
 
@@ -105,19 +96,22 @@ public slots:
   /// hide/show group
   void show(bool val);
 
-private:
+protected:
+  QScopedPointer<msvQVTKButtonsGroupPrivate> d_ptr;
+
   /// Set the specified property
   void setElementProperty(QString name, QVariant value);
 
   /// Calculate element position
   void calculatePosition();
 
-  /// Update element bounds
-  void updateBounds();
-
-  QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
-  vtkSliderWidget* m_Slider; //< Slider widget
+//   QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
+//   vtkSliderWidget* m_Slider; //< Slider widget
   vtkSliderCallback* m_SliderCallback; //< Slider callback function
+
+private:
+  Q_DECLARE_PRIVATE(msvQVTKButtonsGroup);
+  Q_DISABLE_COPY(msvQVTKButtonsGroup);
 };
 
 /////////////////////////////////////////////////////////////
@@ -141,29 +135,5 @@ inline void msvQVTKButtonsGroup::setIconFileName(QString iconFileName)
   msvQVTKButtonsInterface::setIconFileName(iconFileName);
   setElementProperty("iconFileName",iconFileName);
 }
-
-// inline void msvQVTKButtonsGroup::setLabel(QString text)
-// {
-//   msvQVTKButtonsInterface::setLabel(text);
-//   setElementProperty("label",text);
-// }
-
-// inline void msvQVTKButtonsGroup::setFlyTo(bool active)
-// {
-//   msvQVTKButtonsInterface::setFlyTo(active);
-//   setElementProperty("flyTo",active);
-// }
-
-// inline void msvQVTKButtonsGroup::setOnCenter(bool onCenter)
-// {
-//   msvQVTKButtonsInterface::setOnCenter(onCenter);
-//   setElementProperty("onCenter",onCenter);
-// }
-
-// inline void msvQVTKButtonsGroup::setToolTip(QString text)
-// {
-//   msvQVTKButtonsInterface::setToolTip(text);
-//   setElementProperty("toolTip",text);
-// }
 
 #endif // msvQVTKButtonsGroup_H
