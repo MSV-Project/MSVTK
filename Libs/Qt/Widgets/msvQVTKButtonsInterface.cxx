@@ -123,7 +123,7 @@ void msvQVTKButtonsInterfacePrivate::bounds(double bds[6])
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(parent)
+msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(parent), m_ButtonCallback(NULL), m_HighlightCallback(NULL)
 {
 
 }
