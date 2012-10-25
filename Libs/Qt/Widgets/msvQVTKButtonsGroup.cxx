@@ -143,7 +143,7 @@ msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& obje
 
 }
 
-msvQVTKButtonsGroupPrivate::~msvQVTKButtonsGroupPrivate()
+msvQVTKButtonsGroupPrivate::~msvQVTKButtonsGroupPrivate() : q_ptr(&object)
 {
 
 }
@@ -247,7 +247,7 @@ void msvQVTKButtonsGroupPrivate::setCurrentRenderer(vtkRenderer* renderer)
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent) : msvQVTKButtonsInterface()
+msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent) : msvQVTKButtonsInterface(), m_SliderCallback(NULL)
 {
   m_ButtonCallback = vtkButtonCallback::New();
   reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->toolButton = this;
