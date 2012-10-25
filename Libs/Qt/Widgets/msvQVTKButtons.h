@@ -32,6 +32,9 @@ class vtkButtonHighLightCallback;
 class vtkRenderWindow;
 class vtkDataSet;
 
+// Pimpl
+class msvQVTKButtonsPrivate;
+
 /**
  Class name: msvQVTKButtons
  This is the tool representing a VTK buttons.
@@ -50,6 +53,9 @@ public:
   /// Object constructor.
   msvQVTKButtons(QObject *parent = 0);
 
+  /// Object destructor.
+  virtual ~msvQVTKButtons();
+
   /// set the icon path
   //void setIconFileName(QString iconFileName);
 
@@ -59,9 +65,6 @@ public:
   /// set bounds
   void setBounds(double b[6]);
 
-  /// Object destructor.
-  virtual ~msvQVTKButtons();
-
   /// Get the button preview image
   QImage getPreview(int width, int height);
 
@@ -69,57 +72,26 @@ public:
   void setData(vtkDataSet *data);
 
   /// Return FlyTo flag
-  bool flyTo() const;
+  bool flyTo();
 
   /// Allow to set button position on center or on corner
   void setOnCenter(bool onCenter);
 
   /// Return OnCenter flag
-  bool onCenter() const;
+  bool onCenter();
 
   // Set the current renderer
   void setCurrentRenderer(vtkRenderer *renderer);
 
-private:
+protected:
+  QScopedPointer<msvQVTKButtonsPrivate> d_ptr;
+
   /// Calculate position (center or corner)
   void calculatePosition();
 
-  QImage m_Image; ///< button image
-  vtkDataSet* m_Data; ///< dataset associated with the button
-  vtkRenderWindow *m_Window; ///< render window for offscreen rendering
-  bool m_FlyTo; ///< Flag to activate FlyTo animation
-  bool m_OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
+private:
+  Q_DECLARE_PRIVATE(msvQVTKButtons);
+  Q_DISABLE_COPY(msvQVTKButtons);
 };
-
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-// inline void msvQVTKButtons::setShowTooltip(bool value)
-// {
-//   if(value)
-//   {
-//     Q_EMIT showTooltip(m_Tooltip);
-//   }
-//   else
-//   {
-//     Q_EMIT hideTooltip();
-//   }
-// }
-
-inline bool msvQVTKButtons::flyTo() const
-{
-  return m_FlyTo;
-}
-
-inline void msvQVTKButtons::setOnCenter(bool onCenter)
-{
-  m_OnCenter = onCenter;
-}
-
-inline bool msvQVTKButtons::onCenter() const
-{
-  return m_OnCenter;
-}
 
 #endif // msvQVTKButtons_H

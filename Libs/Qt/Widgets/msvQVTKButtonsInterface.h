@@ -30,6 +30,9 @@ class vtkButtonWidget;
 class vtkCommand;
 class msvQVTKButtonsAction;
 
+// Pimpl
+class msvQVTKButtonsInterfacePrivate;
+
 /**
  Class name: msvQVTKButtonsInterface
  Interface class for buttons generalization
@@ -51,7 +54,7 @@ public:
   void setShowButton(bool visible);
 
   /// Return showLabel flag
-  bool showButton() const;
+  bool showButton();
 
   /// Allow to show/hide label
   void setShowLabel(bool show);
@@ -63,7 +66,7 @@ public:
   QString iconFileName();
 
   /// Return showLabel flag
-  bool showLabel() const;
+  bool showLabel();
 
   /// set the text label
   void setLabel(QString text);
@@ -93,7 +96,10 @@ public:
   void update();
 
   /// get element bounds
-  void getBounds(double b[6]);
+  void bounds(double b[6]);
+
+  /// set the element bounds
+  void setBounds(double b[6]);
 
 signals:
 
@@ -108,75 +114,17 @@ signals:
 
 protected:
 
-  QString m_Label; ///< label of the button
-  QString m_Tooltip; ///< tooltip associated to the button
-  QString m_IconFileName; ///< File name of the image to be applied to the button.
-  bool m_ShowButton;///< Flag to show/hide button
-  bool m_ShowLabel; ///< Flag to show/hide label
-  msvQVTKButtonsAction* m_Action; ///< Action performed when the vtk button is pressed (e.g. fly to)
-  vtkButtonWidget *m_ButtonWidget; ///< VTK button widget.
+  QScopedPointer<msvQVTKButtonsInterfacePrivate> d_ptr;
   vtkCommand *m_ButtonCallback; ///< Callback called by picking on vtkButton
   vtkCommand *m_HighlightCallback; ///< Callback called by hovering over the button.
-  QImage m_Image; ///< Button image
-  double m_Bounds[6]; ///< Bounds of the data related to the button
+
+  //virtual void calculatePosition() = 0;
+
+private:
+
+  Q_DECLARE_PRIVATE(msvQVTKButtonsInterface);
+  Q_DISABLE_COPY(msvQVTKButtonsInterface);
 };
 
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-inline void msvQVTKButtonsInterface::setShowTooltip(bool value)
-{
-  if(value) {
-    Q_EMIT showTooltip(m_Tooltip);
-  } else {
-    Q_EMIT hideTooltip();
-  }
-}
-
-inline bool msvQVTKButtonsInterface::showButton() const
-{
-  return m_ShowButton;
-}
-
-inline void msvQVTKButtonsInterface::setShowLabel(bool show)
-{
-  m_ShowLabel = show;
-}
-
-inline bool msvQVTKButtonsInterface::showLabel() const
-{
-  return m_ShowLabel;
-}
-
-inline void msvQVTKButtonsInterface::setLabel(QString text)
-{
-  m_Label = text;
-}
-
-inline QString msvQVTKButtonsInterface::label()
-{
-  return m_Label;
-}
-
-inline QString msvQVTKButtonsInterface::toolTip()
-{
-  return m_Tooltip;
-}
-
-inline QString msvQVTKButtonsInterface::iconFileName()
-{
-  return m_IconFileName;
-}
-
-inline void msvQVTKButtonsInterface::setToolTip(QString text)
-{
-  m_Tooltip = text;
-}
-
-// inline void msvQVTKButtonsInterface::setIconFileName(QString iconFileName)
-// {
-//   m_IconFileName = iconFileName;
-// }
 
 #endif // msvQVTKButtonsInterface_H
