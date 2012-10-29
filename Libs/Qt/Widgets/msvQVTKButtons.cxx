@@ -227,6 +227,7 @@ void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer)
 
 void msvQVTKButtons::setBounds(double b[6])
 {
+  msvQVTKButtonsInterface::setBounds(b);
   reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->setBounds(b);
   update();
 }
@@ -344,6 +345,7 @@ void msvQVTKButtons::setOnCenter(bool onCenter)
 {
   Q_D(msvQVTKButtons);
   d->setOnCenter(onCenter);
+  update();
 }
 
 bool msvQVTKButtons::onCenter()
@@ -376,7 +378,7 @@ void msvQVTKButtons::calculatePosition()
   int size[2]; size[0] = 16; size[1] = 16;
   vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(button()->GetRepresentation());
 
-  rep->PlaceWidget(bds, size);
+  rep->PlaceWidget(coord, size);
   rep->Modified();
   button()->SetRepresentation(rep);
 }

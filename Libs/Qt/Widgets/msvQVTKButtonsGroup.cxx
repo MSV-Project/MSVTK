@@ -35,12 +35,12 @@
 
 //------------------------------------------------------------------------------
 // Callback respondign to vtkCommand::StateChangedEvent
-class vtkButtonCallback : public vtkCommand
+class vtkButtonCallbackGroup : public vtkCommand
 {
 public:
-  static vtkButtonCallback *New()
+  static vtkButtonCallbackGroup *New()
   {
-    return new vtkButtonCallback;
+    return new vtkButtonCallbackGroup;
   }
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
@@ -52,19 +52,19 @@ public:
     toolButton->setCameraPoistionOnPath(0);
   }
 
-  vtkButtonCallback() : toolButton(NULL) , state (false) {}
+  vtkButtonCallbackGroup() : toolButton(NULL) , state (false) {}
   msvQVTKButtonsGroup *toolButton;
   bool state;
 };
 
 //------------------------------------------------------------------------------
 // Callback respondign to vtkCommand::HighlightEvent
-class MSV_QT_WIDGETS_EXPORT vtkButtonHighLightCallback : public vtkCommand
+class MSV_QT_WIDGETS_EXPORT vtkButtonHighLightCallbackGroup : public vtkCommand
 {
 public:
-  static vtkButtonHighLightCallback *New()
+  static vtkButtonHighLightCallbackGroup *New()
   {
-    return new vtkButtonHighLightCallback;
+    return new vtkButtonHighLightCallbackGroup;
   }
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
@@ -85,7 +85,7 @@ public:
     previousHighlightState = highlightState;
   }
 
-  vtkButtonHighLightCallback():toolButton(NULL), previousHighlightState(0) {}
+  vtkButtonHighLightCallbackGroup():toolButton(NULL), previousHighlightState(0) {}
   msvQVTKButtonsGroup *toolButton;
   int previousHighlightState;
 
@@ -143,7 +143,7 @@ msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& obje
 
 }
 
-msvQVTKButtonsGroupPrivate::~msvQVTKButtonsGroupPrivate() : q_ptr(&object)
+msvQVTKButtonsGroupPrivate::~msvQVTKButtonsGroupPrivate()
 {
 
 }
@@ -155,6 +155,7 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
   double b[6];
   buttons->bounds(b);
   double dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
+  q->connect(buttons, SIGNAL(show(bool)), q, SLOT(show(bool)));
   for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
   {
     if(*buttonsIt == buttons)
@@ -170,7 +171,6 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
     }
     i++;
   }
-  q->connect(buttons, SIGNAL(show(bool)), q, SLOT(show(bool)));
   m_Elements.push_back(buttons);
 }
 
@@ -199,6 +199,7 @@ msvQVTKButtonsInterface* msvQVTKButtonsGroupPrivate::getElement(int index)
 
 vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
 {
+  Q_Q(msvQVTKButtonsGroup);
   if(!m_Slider)
   {
     vtkSliderRepresentation2D* sliderRep = vtkSliderRepresentation2D::New();
@@ -227,11 +228,13 @@ vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
     m_Slider->SetRepresentation(sliderRep);
     m_Slider->SetAnimationModeToAnimate();
     sliderRep->Delete();
+    m_Slider->AddObserver(vtkCommand::InteractionEvent,q->getSliderCallback());
   }
   return m_Slider;
 }
 
-void msvQVTKButtonsGroupPrivate::setElementProperty(QString name, QVariant value) {
+void msvQVTKButtonsGroupPrivate::setElementProperty(QString name, QVariant value)
+{
   for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
   {
     (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
@@ -247,12 +250,13 @@ void msvQVTKButtonsGroupPrivate::setCurrentRenderer(vtkRenderer* renderer)
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent) : msvQVTKButtonsInterface(), m_SliderCallback(NULL)
+msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent) : msvQVTKButtonsInterface(), m_SliderCallback(NULL), d_ptr(new msvQVTKButtonsGroupPrivate(*this))
 {
-  m_ButtonCallback = vtkButtonCallback::New();
-  reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->toolButton = this;
-  m_HighlightCallback = vtkButtonHighLightCallback::New();
-  reinterpret_cast<vtkButtonHighLightCallback*>(m_HighlightCallback)->toolButton = this;
+  Q_D(msvQVTKButtonsGroup);
+  m_ButtonCallback = vtkButtonCallbackGroup::New();
+  reinterpret_cast<vtkButtonCallbackGroup*>(m_ButtonCallback)->toolButton = this;
+  m_HighlightCallback = vtkButtonHighLightCallbackGroup::New();
+  reinterpret_cast<vtkButtonHighLightCallbackGroup*>(m_HighlightCallback)->toolButton = this;
 
   m_SliderCallback = vtkSliderCallback::New();
   reinterpret_cast<vtkSliderCallback*>(m_SliderCallback)->toolButton = this;
@@ -286,7 +290,7 @@ void msvQVTKButtonsGroup::setCurrentRenderer(vtkRenderer *renderer) {
     slider()->SetInteractor(NULL);
     slider()->SetCurrentRenderer(NULL);
     slider()->GetRepresentation()->SetRenderer(NULL);
-    reinterpret_cast<vtkSliderCallback*>(m_ButtonCallback)->renderer = NULL;
+    reinterpret_cast<vtkSliderCallback*>(m_SliderCallback)->renderer = NULL;
     slider()->EnabledOff();
   }
   Q_D(msvQVTKButtonsGroup);
@@ -354,7 +358,6 @@ void msvQVTKButtonsGroup::calculatePosition()
 vtkSliderWidget* msvQVTKButtonsGroup::slider()
 {
   Q_D(msvQVTKButtonsGroup);
-  d->slider()->AddObserver(vtkCommand::InteractionEvent,m_SliderCallback);
   return d->slider();
 }
 
@@ -415,4 +418,9 @@ void msvQVTKButtonsGroup::setCameraPoistionOnPath(double ratio) {
   }
 
   slider()->GetCurrentRenderer()->ResetCamera(resetBounds);
+}
+
+vtkCommand* msvQVTKButtonsGroup::getSliderCallback()
+{
+  return m_SliderCallback;
 }
