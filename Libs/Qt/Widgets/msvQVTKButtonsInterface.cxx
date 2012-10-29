@@ -94,7 +94,7 @@ msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInt
 
 msvQVTKButtonsInterfacePrivate::~msvQVTKButtonsInterfacePrivate()
 {
-  button()->Delete();
+  //button()->Delete();
 }
 
 vtkButtonWidget* msvQVTKButtonsInterfacePrivate::button()
@@ -123,7 +123,7 @@ void msvQVTKButtonsInterfacePrivate::bounds(double bds[6])
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(parent), m_ButtonCallback(NULL), m_HighlightCallback(NULL)
+msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(parent), m_ButtonCallback(NULL), m_HighlightCallback(NULL), d_ptr(new msvQVTKButtonsInterfacePrivate(*this))
 {
 
 }
@@ -229,7 +229,7 @@ void msvQVTKButtonsInterface::setShowButton(bool visible)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setShowButton(visible);
-  Q_EMIT(show(visible));
+  //Q_EMIT(show(visible));
 }
 
 inline void msvQVTKButtonsInterface::setShowTooltip(bool value)
@@ -293,5 +293,5 @@ inline void msvQVTKButtonsInterface::setToolTip(QString text)
 void msvQVTKButtonsInterface::setBounds(double b[6])
 {
   Q_D(msvQVTKButtonsInterface);
-  setBounds(b);
+  d->setBounds(b);
 }

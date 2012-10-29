@@ -32,6 +32,7 @@ class vtkRenderer;
 class msvQVTKButtons;
 class vtkSliderWidget;
 class vtkSliderCallback;
+class vtkCommand;
 
 // Pimpl
 class msvQVTKButtonsGroupPrivate;
@@ -90,6 +91,8 @@ public:
 
   /// Set the position on the path at the specified ratio
   void setCameraPoistionOnPath(double ratio);
+
+  vtkCommand *getSliderCallback();
 
 public slots:
 
