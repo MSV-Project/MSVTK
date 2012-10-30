@@ -4,6 +4,8 @@
 # For more information, see:
 #   http://public.kitware.com/Wiki/Git/Hooks
 
+current_directory=`pwd`
+
 die() {
   echo 'Failure during hook setup.' 1>&2
   echo '--------------------------' 1>&2
@@ -27,12 +29,18 @@ fi
 # Grab the hooks.
 # Use the local hooks if possible (no local hooks yet, use the ones of VTK).
 echo "Pulling the hooks..."
+
+
 #if GIT_DIR=.. git for-each-ref refs/remotes/origin/hooks 2>/dev/null | \
 #  grep -q '\<refs/remotes/origin/hooks$'; then
 #  git pull .. remotes/origin/hooks
 #else
-  git pull http://${projectUrl}/${project}.git hooks || die "Downloading the hooks failed."
+#   git pull http://${projectUrl}/${project}.git hooks || die "Downloading the hooks failed."
 #fi
+
+cp $current_directory/commit-msg.py ./commit-msg
+chmod +x commit-msg
+
 cd ../..
 
 echo "Done."
