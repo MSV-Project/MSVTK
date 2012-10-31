@@ -35,10 +35,10 @@ echo "Pulling the hooks..."
 #  grep -q '\<refs/remotes/origin/hooks$'; then
 #  git pull .. remotes/origin/hooks
 #else
-#   git pull http://${projectUrl}/${project}.git hooks || die "Downloading the hooks failed."
+  git pull http://${projectUrl}/${project}.git hooks || die "Downloading the hooks failed."
 #fi
 
-cp $current_directory/commit-msg.py ./commit-msg
+cp $current_directory/commit-msg.sh ./commit-msg
 chmod +x commit-msg
 
 cd ../..
