@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 #=============================================================================
-# Copyright 2010-2012 Kitware, Inc.
+#
+# Library: MSVTK
+# 
+# Copyright (c) Kitware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,145 +18,35 @@
 # limitations under the License.
 #=============================================================================
 
-. "${BASH_SOURCE%/*}/hooks-config.bash"
 
-# Prepare a copy of the message:
-#  - strip comment lines
-#  - stop at "diff --git" (git commit -v)
-commit_msg="$GIT_DIR/COMMIT_MSG"
-sed -n -e '/^#/d' -e '/^diff --git/q' -e 'p;d' "$1" > "$commit_msg"
+MSG="$1"
 
 die_advice='
+Valid issue tokens are (in regex): 
+    1. [Ff]ix(ed|es)?\s#[0-9]+
+    2. [Cc]lose(d|s)?\s#[0-9]+
+    3. [Ii]ssue(d|s)?\s#[0-9]+
+Look at: 
+  https://github.com/blog/831-issues-2-0-the-next-generation 
+for more info.
+
 To continue editing, run the command
-  git commit -e -F '"$commit_msg"'
+  git commit -e -F '"$MSG"'
 (assuming your working directory is at the top).'
 
 die() {
-	echo 'commit-msg hook failure' 1>&2
-	echo '-----------------------' 1>&2
-	echo '' 1>&2
-	echo "$@" 1>&2
-	test -n "$die_advice" && echo "$die_advice" 1>&2
-	exit 1
-}
-
-#-----------------------------------------------------------------------------
-# Check the commit message layout with a simple state machine.
-
-msg_is_merge() {
-	test -f "$GIT_DIR/MERGE_HEAD" &&
-	echo "$line" | grep "^Merge " >/dev/null 2>&1
-}
-
-msg_is_revert() {
-	echo "$line" | grep "^Revert " >/dev/null 2>&1
-}
-
-msg_first() {
-	len=$(echo -n "$line" | wc -c)
-	if test $len -eq 0; then
-		# not yet first line
-		return
-	elif test $len -lt 8; then
-		die 'The first line must be at least 8 characters:
---------
-'"$line"'
---------'
-	elif test $len -gt 78 && ! msg_is_merge && ! msg_is_revert; then
-		die 'The first line may be at most 78 characters:
-------------------------------------------------------------------------------
-'"$line"'
-------------------------------------------------------------------------------'
-	elif echo "$line" | grep "^[	 ]\|[	 ]$" >/dev/null 2>&1; then
-		die 'The first line may not have leading or trailing space:
-['"$line"']'
-	else
-		# first line okay
-		state=second
-	fi
-}
-
-msg_second() {
-	if test "x$line" != "x"; then
-		die 'The second line must be empty:
-'"$line"
-	else
-		state=rest
-	fi
-}
-
-msg_rest() {
-	if echo "$line" | grep -q "^Change-Id:"; then
-		state=gerrit
-	fi
-}
-
-msg_gerrit() {
-	test "x$line" = "x" && return
-	echo "$line" | grep -q '^[A-Za-z0-9-][A-Za-z0-9-]*:' && return
-	die 'The Change-Id line must appear in a footer at the bottom.'
+        echo 'github/commit-msg hook failure' 1>&2
+        echo '-----------------------' 1>&2
+        echo '' 1>&2
+        echo "$@" 1>&2
+        test -n "$die_advice" && echo "$die_advice" 1>&2
+        exit 1
 }
 
 msg_github() {
-	if cat "$commit_msg" | grep -q -E '([Ff]ix(ed|es)?\s#[0-9]+)|([Cc]lose(d|s)?\s#[0-9]+)|([Ii]ssue(d|s)?\s#[0-9]+)'; then
-	  state=first
-	else
-	  die 'Github issue reference not found.'
-	fi
+        cat "$MSG" | grep -q -E '([Ff]ix(ed|es)?\s#[0-9]+)|([Cc]lose(d|s)?\s#[0-9]+)|([Ii]ssue(d|s)?\s#[0-9]+)' && return
+        die 'Github issue reference not found.'
 }
 
-# First, check for github issue reference
-msg_github
+msg_github 
 
-# Pipe commit message into the state machine.
-cat "$commit_msg" |
-while IFS='' read line; do
-	msg_$state || break
-done &&
-rm -f "$commit_msg" || exit 1
-die_advice='' # No more temporary message file.
-
-#-----------------------------------------------------------------------------
-# Optionally run Gerrit's commit-msg hook to add a Change-Id line.
-
-gerrit_advice() {
-	gerrits=$(git config -l |grep '^remote\.[^=]\+url=.*review.*$')
-	test "x$gerrits" != "x" || return 0
-
-	echo 'Some config values look like Gerrit Code Review URLs:'
-	echo ''
-	echo "$gerrits" | sed 's/^/  /'
-	echo '
-This hook can automatically add a "Change-Id" footer to commit messages
-to make interaction with Gerrit easier.  To enable this feature, run
-
-  git config hooks.GerritId true
-
-Then run "git commit --amend" to fix this commit.  Otherwise, run
-
-  git config hooks.GerritId false
-
-to disable the feature and this message.'
-}
-
-gerrit_error() {
-	die 'non-bool config value hooks.GerritId = '"$hooks_GerritId"
-}
-
-gerrit_hook() {
-	"$GIT_DIR/hooks/gerrit/commit-msg" "$@" ||
-	die 'gerrit/commit-msg failed'
-}
-
-hooks_GerritId=$(git config --get hooks.GerritId)
-case "$hooks_GerritId" in
-	'true')  gerrit_hook "$@" ;;
-	'false') ;;
-	'')      gerrit_advice ;;
-	*)       gerrit_error ;;
-esac
-
-#-----------------------------------------------------------------------------
-# Chain to project-specific hook.
-. "$GIT_DIR/hooks/hooks-chain.bash"
-hooks_chain commit-msg "$@"

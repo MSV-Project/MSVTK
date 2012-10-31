@@ -38,9 +38,20 @@ echo "Pulling the hooks..."
   git pull http://${projectUrl}/${project}.git hooks || die "Downloading the hooks failed."
 #fi
 
-cp $current_directory/commit-msg.sh ./commit-msg
-chmod +x commit-msg
+echo "Setting github hooks..."
+
+if ! test -d ./github; then
+  mkdir ./github
+fi
+
+# Install github issue hook
+cp $current_directory/commit-msg.sh ./github/commit-msg
+chmod +x ./github/commit-msg
 
 cd ../..
+
+# hooks-config.bash looks in source directory for this file
+cp $current_directory/hooks-config.sh .hooks-config.bash
+chmod +x .hooks-config.bash
 
 echo "Done."
