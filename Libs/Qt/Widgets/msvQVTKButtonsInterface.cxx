@@ -232,7 +232,7 @@ void msvQVTKButtonsInterface::setShowButton(bool visible)
   //Q_EMIT(show(visible));
 }
 
-inline void msvQVTKButtonsInterface::setShowTooltip(bool value)
+void msvQVTKButtonsInterface::setShowTooltip(bool value)
 {
   Q_D(msvQVTKButtonsInterface);
   if(value) {
@@ -242,49 +242,49 @@ inline void msvQVTKButtonsInterface::setShowTooltip(bool value)
   }
 }
 
-inline bool msvQVTKButtonsInterface::showButton()
+bool msvQVTKButtonsInterface::showButton()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->showButton();
 }
 
-inline void msvQVTKButtonsInterface::setShowLabel(bool show)
+void msvQVTKButtonsInterface::setShowLabel(bool show)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setShowLabel(show);
 }
 
-inline bool msvQVTKButtonsInterface::showLabel()
+bool msvQVTKButtonsInterface::showLabel()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->showLabel();
 }
 
-inline void msvQVTKButtonsInterface::setLabel(QString text)
+void msvQVTKButtonsInterface::setLabel(QString text)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setLabel(text);
 }
 
-inline QString msvQVTKButtonsInterface::label()
+QString msvQVTKButtonsInterface::label()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->label();
 }
 
-inline QString msvQVTKButtonsInterface::toolTip()
+QString msvQVTKButtonsInterface::toolTip()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->tooltip();
 }
 
-inline QString msvQVTKButtonsInterface::iconFileName()
+QString msvQVTKButtonsInterface::iconFileName()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->iconFileName();
 }
 
-inline void msvQVTKButtonsInterface::setToolTip(QString text)
+void msvQVTKButtonsInterface::setToolTip(QString text)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setTooltip(text);
