@@ -20,6 +20,46 @@
 
 #include "msvQVTKButtonsManager.h"
 
+//------------------------------------------------------------------------------
+class msvQVTKButtonsManagerPrivate
+{
+  Q_DECLARE_PUBLIC(msvQVTKButtonsManager);
+
+protected:
+
+  msvQVTKButtonsManager* const q_ptr;
+  QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
+
+public:
+
+  msvQVTKButtonsManagerPrivate(msvQVTKButtonsManager& object);
+  virtual ~msvQVTKButtonsManagerPrivate();
+  void setElementProperty(QString name, QVariant value);
+  msvQVTKButtonsGroup *createGroup();
+  msvQVTKButtons *createButtons();
+};
+
+void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant value)
+{
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
+  {
+    (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
+  }
+}
+
+msvQVTKButtonsGroup *msvQVTKButtonsManagerPrivate::createGroup()
+{
+  m_Elements.push_back(new msvQVTKButtonsGroup());
+  return static_cast<msvQVTKButtonsGroup*>(m_Elements.at(m_Elements.size()-1));
+}
+
+msvQVTKButtons *msvQVTKButtonsManagerPrivate::createButtons()
+{
+  m_Elements.push_back(new msvQVTKButtons());
+  return static_cast<msvQVTKButtons*>(m_Elements.at(m_Elements.size()-1));
+}
+
+//------------------------------------------------------------------------------
 msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent)
 {
 
@@ -36,10 +76,25 @@ msvQVTKButtonsManager::~msvQVTKButtonsManager()
 
 }
 
-void msvQVTKButtonsManager::setElementProperty(QString name, QVariant value)
+msvQVTKButtonsGroup *msvQVTKButtonsManager::createGroup()
 {
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
-  {
-    (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
-  }
+  Q_D(msvQVTKButtonsManager);
+  return d->createGroup();
+}
+msvQVTKButtons *msvQVTKButtonsManager::createButtons()
+{
+  Q_D(msvQVTKButtonsManager);
+  return d->createButtons();
+}
+
+void msvQVTKButtonsManager::setShowButton(bool show)
+{
+  Q_D(msvQVTKButtonsManager);
+  d->setElementProperty("showButton",show);
+}
+
+void msvQVTKButtonsManager::setShowLabel(bool show)
+{
+  Q_D(msvQVTKButtonsManager);
+  d->setElementProperty("showLabel",show);
 }
