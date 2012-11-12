@@ -23,12 +23,12 @@ MSG="$1"
 
 die_advice='
 Valid issue tokens are (in regex): 
-    1. [Ff]ix(ed|es)?\s#[0-9]+
-    2. [Cc]lose(d|s)?\s#[0-9]+
-    3. [Ii]ssue(d|s)?\s#[0-9]+
+    1. [Ff]ix(es)? #[0-9]+
+    2. [Cc]lose(s)? #[0-9]+
+    3. [Ii]ssue #[0-9]+
 Look at: 
   https://github.com/blog/831-issues-2-0-the-next-generation 
-for more info.
+for more information.
 
 To continue editing, run the command
   git commit -e -F '"$MSG"'
@@ -44,7 +44,7 @@ die() {
 }
 
 msg_github() {
-        cat "$MSG" | grep -q -E '([Ff]ix(ed|es)?\s#[0-9]+)|([Cc]lose(d|s)?\s#[0-9]+)|([Ii]ssue(d|s)?\s#[0-9]+)' && return
+        cat "$MSG" | grep -q -E '([Ff]ix(es)? #[0-9]+)|([Cc]lose(s)? #[0-9]+)|([Ii]ssue #[0-9]+)' && return
         die 'Github issue reference not found.'
 }
 
