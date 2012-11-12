@@ -25,7 +25,7 @@
 #include <vtkObject.h>
 #include <vtkCommand.h>
 #include <vtkButtonWidget.h>
-#include <vtkSliderRepresentation2D.h>
+#include <msvVTKSliderFixedRepresentation2D.h>
 #include <vtkSliderWidget.h>
 #include <vtkProperty2D.h>
 #include <vtkRenderer.h>
@@ -202,27 +202,29 @@ vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
   Q_Q(msvQVTKButtonsGroup);
   if(!m_Slider)
   {
-    vtkSliderRepresentation2D* sliderRep = vtkSliderRepresentation2D::New();
+    msvVTKSliderFixedRepresentation2D* sliderRep = msvVTKSliderFixedRepresentation2D::New();
     sliderRep->SetMinimumValue(0.0);
     sliderRep->SetMaximumValue(100.0);
-    sliderRep->SetLabelFormat("%0.f");
+    sliderRep->SetLabelFormat("%0.f%%");
     sliderRep->SetValue(0.0);
     sliderRep->SetTitleText("");
     sliderRep->GetPoint1Coordinate()->SetCoordinateSystemToDisplay();
-    sliderRep->GetPoint1Coordinate()->SetValue(24,24);
+    sliderRep->GetPoint1Coordinate()->SetValue(24,48);
     sliderRep->GetPoint2Coordinate()->SetCoordinateSystemToDisplay();
     sliderRep->GetPoint2Coordinate()->SetValue(24,96);
-    sliderRep->SetSliderLength(0.015);
+    sliderRep->SetSliderLength(0.07);
     sliderRep->SetSliderWidth(0.04);
-    sliderRep->SetEndCapLength(0.015);
+    sliderRep->SetEndCapLength(0.07);
     sliderRep->SetEndCapWidth(0.04);
     sliderRep->SetTubeWidth(0.005);
-    sliderRep->GetSliderProperty()->SetColor(.7,.7,.7);
-    sliderRep->GetSliderProperty()->SetOpacity(.8);
-    sliderRep->GetCapProperty()->SetOpacity(.8);
-    sliderRep->GetSelectedProperty()->SetColor(.9,.9,.9);
-    sliderRep->GetSelectedProperty()->SetOpacity(.8);
-    sliderRep->GetTubeProperty()->SetOpacity(.8);
+    sliderRep->GetSliderProperty()->SetColor(.35,.45,.6);
+    sliderRep->GetSliderProperty()->SetOpacity(.9);
+    sliderRep->GetCapProperty()->SetOpacity(.9);
+    sliderRep->GetCapProperty()->SetColor(.3,.4,.5);
+    sliderRep->GetSelectedProperty()->SetOpacity(.9);
+    sliderRep->GetSelectedProperty()->SetColor(.4,.5,.7);
+    sliderRep->GetTubeProperty()->SetOpacity(.9);
+    sliderRep->GetTubeProperty()->SetColor(.3,.4,.5);
     sliderRep->SetVisibility(false);
     m_Slider = vtkSliderWidget::New();
     m_Slider->SetRepresentation(sliderRep);
