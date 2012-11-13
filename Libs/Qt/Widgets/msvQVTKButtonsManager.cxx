@@ -19,6 +19,7 @@
 ==============================================================================*/
 
 #include "msvQVTKButtonsManager.h"
+#include "msvQVTKButtonsInterface.h"
 
 //------------------------------------------------------------------------------
 class msvQVTKButtonsManagerPrivate
@@ -33,11 +34,21 @@ protected:
 public:
 
   msvQVTKButtonsManagerPrivate(msvQVTKButtonsManager& object);
-  virtual ~msvQVTKButtonsManagerPrivate();
+  ~msvQVTKButtonsManagerPrivate();
   void setElementProperty(QString name, QVariant value);
   msvQVTKButtonsGroup *createGroup();
   msvQVTKButtons *createButtons();
 };
+
+msvQVTKButtonsManagerPrivate::msvQVTKButtonsManagerPrivate(msvQVTKButtonsManager& object) : q_ptr(&object)
+{
+
+}
+
+msvQVTKButtonsManagerPrivate::~msvQVTKButtonsManagerPrivate()
+{
+
+}
 
 void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant value)
 {
@@ -60,7 +71,7 @@ msvQVTKButtons *msvQVTKButtonsManagerPrivate::createButtons()
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent)
+msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent) : d_ptr(new msvQVTKButtonsManagerPrivate(*this))
 {
 
 }
