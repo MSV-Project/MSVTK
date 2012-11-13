@@ -46,16 +46,16 @@ public:
   static msvQVTKButtonsManager* instance();
 
   /// Create a group
-  inline msvQVTKButtonsGroup *createGroup();
+  msvQVTKButtonsGroup *createGroup();
 
   /// Create a button
-  inline msvQVTKButtons *createButtons();
+  msvQVTKButtons *createButtons();
 
   /// Set show button property for children elements
-  inline void setShowButton(bool show);
+  void setShowButton(bool show);
 
   /// Set show label property for children elements
-  inline void setShowLabel(bool show);
+  void setShowLabel(bool show);
 
 protected:
   QScopedPointer<msvQVTKButtonsManagerPrivate> d_ptr;
