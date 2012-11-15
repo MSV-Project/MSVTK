@@ -62,9 +62,15 @@ public:
   //
   void BuildRepresentation();
 
+  vtkSetVectorMacro(Scale,double,2);
+  vtkSetVectorMacro(Translate,double,2);
+
 protected:
   msvVTKSliderFixedRepresentation2D();
   ~msvVTKSliderFixedRepresentation2D();
+
+  double Scale[2];
+  double Translate[2];
 
 private:
   msvVTKSliderFixedRepresentation2D(const msvVTKSliderFixedRepresentation2D&);  //Not implemented

@@ -58,7 +58,8 @@ vtkStandardNewMacro(msvVTKSliderFixedRepresentation2D);
 //----------------------------------------------------------------------
 msvVTKSliderFixedRepresentation2D::msvVTKSliderFixedRepresentation2D()
 {
-
+  Scale[0] = Scale[1] = 100;
+  Translate[0] = Translate[1] = 0;
 }
 
 //----------------------------------------------------------------------
@@ -171,9 +172,10 @@ void msvVTKSliderFixedRepresentation2D::BuildRepresentation()
     double ty = static_cast<double>((p1[1]+p2[1])/2.0);
 
     // fixed transform
+    // @ToDo Expose API to translate and scale
     this->XForm->Identity();
-    this->XForm->Translate(24,90,0.0);
-    this->XForm->Scale(400,100,1.0);
+    this->XForm->Translate(Translate[0],Translate[1],0.0);
+    this->XForm->Scale(Scale[0],Scale[1],1.0);
     this->XForm->RotateZ( vtkMath::DegreesFromRadians( theta ) );
 
     // The transform has done the work of finding the center point for the text.
