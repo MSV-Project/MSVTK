@@ -18,8 +18,9 @@
 
 ==============================================================================*/
 
-#include "msvQVTKButtonsManager.h"
+// MSVTK includes
 #include "msvQVTKButtonsInterface.h"
+#include "msvQVTKButtonsManager.h"
 
 //------------------------------------------------------------------------------
 class msvQVTKButtonsManagerPrivate

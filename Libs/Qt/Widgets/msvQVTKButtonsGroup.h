@@ -21,11 +21,12 @@
 #ifndef msvQVTKButtonsGroup_H
 #define msvQVTKButtonsGroup_H
 
-// Includes list
-
-#include "msvQtWidgetsExport.h"
-#include "msvQVTKButtonsInterface.h"
+// Qt includes
 #include <QVariant>
+
+// MSVTK Includes
+#include "msvQVTKButtonsInterface.h"
+#include "msvQtWidgetsExport.h"
 
 // forward declarations
 class vtkRenderer;

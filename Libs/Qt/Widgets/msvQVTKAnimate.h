@@ -21,7 +21,7 @@
 #ifndef msvQVTKAnimate_H
 #define msvQVTKAnimate_H
 
-// Includes list
+// MSVTK includes
 #include "msvQtWidgetsExport.h"
 #include "msvQVTKButtonsAction.h"
 

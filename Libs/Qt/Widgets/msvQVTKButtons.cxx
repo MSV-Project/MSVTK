@@ -18,40 +18,37 @@
 
 ==============================================================================*/
 
-#include "msvQVTKButtons.h"
+// Qt includes
 #include <QImage>
 #include <QDir>
 
-#include "msvQVTKAnimate.h"
-
+// VTK Includes
 #include <vtkSmartPointer.h>
+
 #include <vtkAlgorithmOutput.h>
-#include <vtkQImageToImageSource.h>
-
-#include <vtkTextProperty.h>
+#include <vtkBalloonRepresentation.h>
+#include <vtkButtonWidget.h>
+#include <vtkCamera.h>
+#include <vtkCommand.h>
+#include <vtkDataSet.h>
+#include <vtkDataSetMapper.h>
+#include <vtkEllipticalButtonSource.h>
+#include <vtkPointData.h>
 #include <vtkProperty2D.h>
+#include <vtkQImageToImageSource.h>
 #include <vtkRenderer.h>
-
+#include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkRendererCollection.h>
-#include <vtkButtonWidget.h>
+#include <vtkTextProperty.h>
 #include <vtkTexturedButtonRepresentation.h>
 #include <vtkTexturedButtonRepresentation2D.h>
-#include <vtkBalloonRepresentation.h>
-#include <vtkCommand.h>
-
-
-#include <vtkEllipticalButtonSource.h>
-#include <vtkTexturedButtonRepresentation.h>
-
-#include <vtkRenderWindow.h>
 #include <vtkWindowToImageFilter.h>
 
-#include <vtkDataSetMapper.h>
-#include <vtkDataSet.h>
-#include <vtkCamera.h>
-#include <vtkPointData.h>
+// MSVTK includes
+#include "msvQVTKAnimate.h"
+#include "msvQVTKButtons.h"
+
 
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
