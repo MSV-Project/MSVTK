@@ -21,7 +21,7 @@
 #ifndef msvQVTKButtonsAction_H
 #define msvQVTKButtonsAction_H
 
-// Includes list
+// MSVTK includes
 #include "msvQtWidgetsExport.h"
 
 // Forward references

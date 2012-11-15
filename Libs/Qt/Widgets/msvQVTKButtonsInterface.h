@@ -21,8 +21,11 @@
 #ifndef msvQVTKButtonsInterface_H
 #define msvQVTKButtonsInterface_H
 
-#include "msvQtWidgetsExport.h"
+// Qt includes
 #include <QImage>
+
+// MSVTK includes
+#include "msvQtWidgetsExport.h"
 
 //forward declarations
 class vtkRenderer;

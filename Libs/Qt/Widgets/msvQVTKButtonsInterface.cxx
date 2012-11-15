@@ -18,19 +18,22 @@
 
 ==============================================================================*/
 
-#include "msvQVTKButtonsInterface.h"
-#include <vtkTexturedButtonRepresentation.h>
-#include <vtkTexturedButtonRepresentation2D.h>
-#include <vtkButtonWidget.h>
-#include <vtkSmartPointer.h>
+// VTK includes
 #include <vtkBalloonRepresentation.h>
+#include <vtkButtonWidget.h>
 #include <vtkCommand.h>
-#include <vtkQImageToImageSource.h>
-#include <vtkTextProperty.h>
 #include <vtkProperty2D.h>
+#include <vtkQImageToImageSource.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
+#include <vtkTextProperty.h>
+#include <vtkTexturedButtonRepresentation.h>
+#include <vtkTexturedButtonRepresentation2D.h>
+
+// MSVTK includes
+#include "msvQVTKButtonsInterface.h"
 
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 

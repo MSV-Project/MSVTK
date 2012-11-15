@@ -21,11 +21,10 @@
 #ifndef msvQVTKButtonsManager_H
 #define msvQVTKButtonsManager_H
 
-// Includes list
-
-#include "msvQtWidgetsExport.h"
+// MSVTK includes
 #include "msvQVTKButtons.h"
 #include "msvQVTKButtonsGroup.h"
+#include "msvQtWidgetsExport.h"
 
 class msvQVTKButtonsManagerPrivate;
 

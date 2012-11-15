@@ -18,13 +18,15 @@
 
 ==============================================================================*/
 
-#include "msvQVTKAnimate.h"
-
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
+// VTK includes
 #include <vtkCamera.h>
 #include <vtkMath.h>
+#include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
+
+// MSVTK includes
+#include "msvQVTKAnimate.h"
 
 msvQVTKAnimate::msvQVTKAnimate()
 {
