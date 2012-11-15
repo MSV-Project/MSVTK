@@ -165,11 +165,13 @@ public:
 
 };
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object) : m_FlyTo(true), m_OnCenter(false), m_Window(NULL), q_ptr(&object)
 {
 
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsPrivate::~msvQVTKButtonsPrivate()
 {
   if(m_Window)
@@ -178,6 +180,7 @@ msvQVTKButtonsPrivate::~msvQVTKButtonsPrivate()
   }
 }
 
+//------------------------------------------------------------------------------
 vtkRenderWindow* msvQVTKButtonsPrivate::window()
 {
   if(m_Window == NULL)
@@ -200,6 +203,7 @@ msvQVTKButtons::msvQVTKButtons(QObject *parent) : msvQVTKButtonsInterface(), d_p
   button()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,m_HighlightCallback);
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtons::~msvQVTKButtons()
 {
 //   if(m_Window)
@@ -208,6 +212,7 @@ msvQVTKButtons::~msvQVTKButtons()
 //   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer)
 {
   Q_D(msvQVTKButtons);
@@ -222,6 +227,7 @@ void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer)
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::setBounds(double b[6])
 {
   msvQVTKButtonsInterface::setBounds(b);
@@ -229,6 +235,7 @@ void msvQVTKButtons::setBounds(double b[6])
   update();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::update()
 {
   Q_D(msvQVTKButtons);
@@ -244,6 +251,7 @@ void msvQVTKButtons::update()
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::setFlyTo(bool active)
 {
   Q_D(msvQVTKButtons);
@@ -251,6 +259,7 @@ void msvQVTKButtons::setFlyTo(bool active)
   update();
 }
 
+//------------------------------------------------------------------------------
 QImage msvQVTKButtons::getPreview(int width, int height)
 {
   Q_D(msvQVTKButtons);
@@ -326,18 +335,21 @@ QImage msvQVTKButtons::getPreview(int width, int height)
   return QImage();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::setData(vtkDataSet *data)
 {
   Q_D(msvQVTKButtons);
   d->setData(data);
 }
 
+//------------------------------------------------------------------------------
 bool msvQVTKButtons::flyTo()
 {
   Q_D(msvQVTKButtons);
   return d->flyTo();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::setOnCenter(bool onCenter)
 {
   Q_D(msvQVTKButtons);
@@ -345,12 +357,14 @@ void msvQVTKButtons::setOnCenter(bool onCenter)
   update();
 }
 
+//------------------------------------------------------------------------------
 bool msvQVTKButtons::onCenter()
 {
   Q_D(msvQVTKButtons);
   return d->onCenter();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtons::calculatePosition()
 {
   Q_D(msvQVTKButtons);

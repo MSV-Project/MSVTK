@@ -87,6 +87,7 @@ public:
   virtual ~msvQVTKButtonsInterfacePrivate();
 };
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object) : m_ShowButton(false), m_ShowLabel(true), m_ButtonWidget(NULL), q_ptr(&object)
 {
   vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
@@ -95,11 +96,13 @@ msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInt
   rep->Delete();
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsInterfacePrivate::~msvQVTKButtonsInterfacePrivate()
 {
   //button()->Delete();
 }
 
+//------------------------------------------------------------------------------
 vtkButtonWidget* msvQVTKButtonsInterfacePrivate::button()
 {
   if(m_ButtonWidget == NULL)
@@ -109,6 +112,7 @@ vtkButtonWidget* msvQVTKButtonsInterfacePrivate::button()
   return m_ButtonWidget;
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterfacePrivate::setBounds(double bds[6])
 {
   for(int i = 0; i < 6; i++)
@@ -117,6 +121,7 @@ void msvQVTKButtonsInterfacePrivate::setBounds(double bds[6])
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterfacePrivate::bounds(double bds[6])
 {
   for(int i = 0; i < 6; i++)
@@ -131,6 +136,7 @@ msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(pare
 
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsInterface::~msvQVTKButtonsInterface()
 {
   if(m_ButtonCallback)
@@ -139,12 +145,14 @@ msvQVTKButtonsInterface::~msvQVTKButtonsInterface()
     button()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,m_HighlightCallback);
 }
 
+//------------------------------------------------------------------------------
 vtkButtonWidget *msvQVTKButtonsInterface::button()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->button();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setIconFileName(QString iconFileName)
 {
   Q_D(msvQVTKButtonsInterface);
@@ -163,6 +171,7 @@ void msvQVTKButtonsInterface::setIconFileName(QString iconFileName)
   update();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::update()
 {
   Q_D(msvQVTKButtonsInterface);
@@ -201,6 +210,7 @@ void msvQVTKButtonsInterface::update()
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setCurrentRenderer(vtkRenderer *renderer)
 {
   if(renderer)
@@ -217,6 +227,7 @@ void msvQVTKButtonsInterface::setCurrentRenderer(vtkRenderer *renderer)
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::bounds(double b[6])
 {
   Q_D(msvQVTKButtonsInterface);
@@ -228,6 +239,7 @@ void msvQVTKButtonsInterface::bounds(double b[6])
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setShowButton(bool visible)
 {
   Q_D(msvQVTKButtonsInterface);
@@ -245,54 +257,63 @@ void msvQVTKButtonsInterface::setShowTooltip(bool value)
   }
 }
 
+//------------------------------------------------------------------------------
 bool msvQVTKButtonsInterface::showButton()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->showButton();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setShowLabel(bool show)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setShowLabel(show);
 }
 
+//------------------------------------------------------------------------------
 bool msvQVTKButtonsInterface::showLabel()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->showLabel();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setLabel(QString text)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setLabel(text);
 }
 
+//------------------------------------------------------------------------------
 QString msvQVTKButtonsInterface::label()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->label();
 }
 
+//------------------------------------------------------------------------------
 QString msvQVTKButtonsInterface::toolTip()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->tooltip();
 }
 
+//------------------------------------------------------------------------------
 QString msvQVTKButtonsInterface::iconFileName()
 {
   Q_D(msvQVTKButtonsInterface);
   return d->iconFileName();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setToolTip(QString text)
 {
   Q_D(msvQVTKButtonsInterface);
   d->setTooltip(text);
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsInterface::setBounds(double b[6])
 {
   Q_D(msvQVTKButtonsInterface);
