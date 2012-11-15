@@ -141,16 +141,19 @@ public:
   void setCurrentRenderer(vtkRenderer* renderer);
 };
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& object) : m_Slider(NULL), q_ptr(&object)
 {
 
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsGroupPrivate::~msvQVTKButtonsGroupPrivate()
 {
 
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
 {
   Q_Q(msvQVTKButtonsGroup);
@@ -177,6 +180,7 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
   m_Elements.push_back(buttons);
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroupPrivate::removeElement(msvQVTKButtonsInterface* buttons)
 {
   int index = 0;
@@ -191,6 +195,7 @@ void msvQVTKButtonsGroupPrivate::removeElement(msvQVTKButtonsInterface* buttons)
   }
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsInterface* msvQVTKButtonsGroupPrivate::getElement(int index)
 {
   if(index > m_Elements.size() - 1)
@@ -200,6 +205,7 @@ msvQVTKButtonsInterface* msvQVTKButtonsGroupPrivate::getElement(int index)
   return m_Elements.at(index);
 }
 
+//------------------------------------------------------------------------------
 vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
 {
   Q_Q(msvQVTKButtonsGroup);
@@ -240,6 +246,7 @@ vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
   return m_Slider;
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroupPrivate::setElementProperty(QString name, QVariant value)
 {
   for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
@@ -248,6 +255,7 @@ void msvQVTKButtonsGroupPrivate::setElementProperty(QString name, QVariant value
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroupPrivate::setCurrentRenderer(vtkRenderer* renderer)
 {
   for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
@@ -272,16 +280,19 @@ msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent) : msvQVTKButtonsInterf
   button()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,m_HighlightCallback);
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsGroup::~msvQVTKButtonsGroup()
 {
 
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::setElementProperty(QString name, QVariant value) {
   Q_D(msvQVTKButtonsGroup);
   d->setElementProperty(name,value);
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::setCurrentRenderer(vtkRenderer *renderer) {
   msvQVTKButtonsInterface::setCurrentRenderer(renderer);
   if(renderer)
@@ -304,24 +315,28 @@ void msvQVTKButtonsGroup::setCurrentRenderer(vtkRenderer *renderer) {
   d->setCurrentRenderer(renderer);
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::addElement(msvQVTKButtonsInterface* buttons)
 {
   Q_D(msvQVTKButtonsGroup);
   d->addElement(buttons);
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::removeElement(msvQVTKButtonsInterface* buttons)
 {
   Q_D(msvQVTKButtonsGroup);
   d->removeElement(buttons);
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsInterface* msvQVTKButtonsGroup::getElement(int index)
 {
   Q_D(msvQVTKButtonsGroup);
   return d->getElement(index);
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtonsGroup* msvQVTKButtonsGroup::createGroup()
 {
   Q_D(msvQVTKButtonsGroup);
@@ -330,6 +345,7 @@ msvQVTKButtonsGroup* msvQVTKButtonsGroup::createGroup()
   return element;
 }
 
+//------------------------------------------------------------------------------
 msvQVTKButtons* msvQVTKButtonsGroup::createButtons()
 {
   Q_D(msvQVTKButtonsGroup);
@@ -338,12 +354,14 @@ msvQVTKButtons* msvQVTKButtonsGroup::createButtons()
   return element;
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::update()
 {
   calculatePosition();
   msvQVTKButtonsInterface::update();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::calculatePosition()
 {
   //modify position of the vtkButton
@@ -362,12 +380,14 @@ void msvQVTKButtonsGroup::calculatePosition()
   button()->SetRepresentation(rep);
 }
 
+//------------------------------------------------------------------------------
 vtkSliderWidget* msvQVTKButtonsGroup::slider()
 {
   Q_D(msvQVTKButtonsGroup);
   return d->slider();
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::showSlider(bool show)
 {
   if(slider())
@@ -377,6 +397,7 @@ void msvQVTKButtonsGroup::showSlider(bool show)
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::show(bool val) {
   if(val)
   {
@@ -385,6 +406,7 @@ void msvQVTKButtonsGroup::show(bool val) {
   }
 }
 
+//------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::setCameraPoistionOnPath(double ratio) {
   // get the number of buttons
   Q_D(msvQVTKButtonsGroup);
@@ -427,6 +449,7 @@ void msvQVTKButtonsGroup::setCameraPoistionOnPath(double ratio) {
   slider()->GetCurrentRenderer()->ResetCamera(resetBounds);
 }
 
+//------------------------------------------------------------------------------
 vtkCommand* msvQVTKButtonsGroup::getSliderCallback()
 {
   return m_SliderCallback;
