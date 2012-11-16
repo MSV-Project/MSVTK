@@ -72,10 +72,12 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkTexturedButtonRepresentation2D *rep = reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
+    vtkTexturedButtonRepresentation2D *rep =
+      reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
     int highlightState = rep->GetHighlightState();
 
-    if ( highlightState == vtkButtonRepresentation::HighlightHovering && previousHighlightState == vtkButtonRepresentation::HighlightNormal )
+    if ( highlightState == vtkButtonRepresentation::HighlightHovering
+      && previousHighlightState == vtkButtonRepresentation::HighlightNormal )
     {
       //show tooltip (not if previous state was selecting
       toolButton->setShowTooltip(true);
@@ -88,7 +90,8 @@ public:
     previousHighlightState = highlightState;
   }
 
-  vtkButtonHighLightCallbackGroup():toolButton(NULL), previousHighlightState(0) {}
+  vtkButtonHighLightCallbackGroup()
+    : toolButton(NULL), previousHighlightState(0) {}
   msvQVTKButtonsGroup *toolButton;
   int previousHighlightState;
 
@@ -106,7 +109,8 @@ public:
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
     vtkSliderWidget *sliderWidget = reinterpret_cast<vtkSliderWidget*>(caller);
-    double ratio = reinterpret_cast<vtkSliderRepresentation*>(sliderWidget->GetRepresentation())->GetValue();
+    double ratio = reinterpret_cast<vtkSliderRepresentation*>(
+      sliderWidget->GetRepresentation())->GetValue();
     toolButton->setCameraPoistionOnPath(ratio);
   }
 
@@ -142,7 +146,8 @@ public:
 };
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& object) : m_Slider(NULL), q_ptr(&object)
+msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& object)
+  : m_Slider(NULL), q_ptr(&object)
 {
 
 }
@@ -162,7 +167,8 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
   buttons->bounds(b);
   double dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
   q->connect(buttons, SIGNAL(show(bool)), q, SLOT(show(bool)));
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin();
+    buttonsIt != m_Elements.end(); buttonsIt++)
   {
     if(*buttonsIt == buttons)
     {
@@ -184,7 +190,8 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
 void msvQVTKButtonsGroupPrivate::removeElement(msvQVTKButtonsInterface* buttons)
 {
   int index = 0;
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin();
+    buttonsIt != m_Elements.end(); buttonsIt++)
   {
     if(*buttonsIt == buttons)
     {
@@ -211,7 +218,8 @@ vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
   Q_Q(msvQVTKButtonsGroup);
   if(!m_Slider)
   {
-    msvVTKSliderFixedRepresentation2D* sliderRep = msvVTKSliderFixedRepresentation2D::New();
+    msvVTKSliderFixedRepresentation2D* sliderRep =
+      msvVTKSliderFixedRepresentation2D::New();
     sliderRep->SetMinimumValue(0.0);
     sliderRep->SetMaximumValue(100.0);
     sliderRep->SetLabelFormat("%0.f%%");
@@ -249,7 +257,8 @@ vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsGroupPrivate::setElementProperty(QString name, QVariant value)
 {
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin();
+    buttonsIt != m_Elements.end(); buttonsIt++)
   {
     (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
   }
@@ -258,26 +267,31 @@ void msvQVTKButtonsGroupPrivate::setElementProperty(QString name, QVariant value
 //------------------------------------------------------------------------------
 void msvQVTKButtonsGroupPrivate::setCurrentRenderer(vtkRenderer* renderer)
 {
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin();
+    buttonsIt != m_Elements.end(); buttonsIt++)
   {
     (*buttonsIt)->setCurrentRenderer(renderer);
   }
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent) : msvQVTKButtonsInterface(), m_SliderCallback(NULL), d_ptr(new msvQVTKButtonsGroupPrivate(*this))
+msvQVTKButtonsGroup::msvQVTKButtonsGroup(QObject *parent)
+  : msvQVTKButtonsInterface(), m_SliderCallback(NULL),
+    d_ptr(new msvQVTKButtonsGroupPrivate(*this))
 {
   Q_D(msvQVTKButtonsGroup);
   m_ButtonCallback = vtkButtonCallbackGroup::New();
   reinterpret_cast<vtkButtonCallbackGroup*>(m_ButtonCallback)->toolButton = this;
   m_HighlightCallback = vtkButtonHighLightCallbackGroup::New();
-  reinterpret_cast<vtkButtonHighLightCallbackGroup*>(m_HighlightCallback)->toolButton = this;
+  reinterpret_cast<vtkButtonHighLightCallbackGroup*>(
+    m_HighlightCallback)->toolButton = this;
 
   m_SliderCallback = vtkSliderCallback::New();
   reinterpret_cast<vtkSliderCallback*>(m_SliderCallback)->toolButton = this;
 
   button()->AddObserver(vtkCommand::StateChangedEvent,m_ButtonCallback);
-  button()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,m_HighlightCallback);
+  button()->GetRepresentation()->AddObserver(
+    vtkCommand::HighlightEvent,m_HighlightCallback);
 }
 
 //------------------------------------------------------------------------------
@@ -374,7 +388,8 @@ void msvQVTKButtonsGroup::calculatePosition()
   bds[4] = 0;
   bds[5] = 2;
 
-  vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(button()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep =
+    static_cast<vtkTexturedButtonRepresentation2D *>(button()->GetRepresentation());
   rep->PlaceWidget(bds);
   rep->Modified();
   button()->SetRepresentation(rep);
@@ -418,7 +433,9 @@ void msvQVTKButtonsGroup::setCameraPoistionOnPath(double ratio) {
   double ratioPerButton = 100. / double(numOfButtons-1);
   int targetButton = int(ratio / ratioPerButton);
 
-  double subPathRatio = (ratio - (double(targetButton) * ratioPerButton)) / ratioPerButton; // (0-1 value)
+  double subPathRatio =
+    (ratio - (double(targetButton) * ratioPerButton)) / ratioPerButton;
+  // (0-1 value)
 
   // calculate intermediate bounds
   double resetBounds[6];

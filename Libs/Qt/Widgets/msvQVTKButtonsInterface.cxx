@@ -88,7 +88,8 @@ public:
 };
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object) : m_ShowButton(false), m_ShowLabel(true), m_ButtonWidget(NULL), q_ptr(&object)
+msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object)
+  : m_ShowButton(false), m_ShowLabel(true), m_ButtonWidget(NULL), q_ptr(&object)
 {
   vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
   rep->SetNumberOfStates(1);
@@ -131,7 +132,9 @@ void msvQVTKButtonsInterfacePrivate::bounds(double bds[6])
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent) : QObject(parent), m_ButtonCallback(NULL), m_HighlightCallback(NULL), d_ptr(new msvQVTKButtonsInterfacePrivate(*this))
+msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent)
+  : QObject(parent), m_ButtonCallback(NULL), m_HighlightCallback(NULL),
+    d_ptr(new msvQVTKButtonsInterfacePrivate(*this))
 {
 
 }
@@ -142,7 +145,10 @@ msvQVTKButtonsInterface::~msvQVTKButtonsInterface()
   if(m_ButtonCallback)
     button()->AddObserver(vtkCommand::StateChangedEvent,m_ButtonCallback);
   if(m_HighlightCallback)
-    button()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,m_HighlightCallback);
+  {
+    button()->GetRepresentation()->AddObserver(
+      vtkCommand::HighlightEvent,m_HighlightCallback);
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -162,7 +168,9 @@ void msvQVTKButtonsInterface::setIconFileName(QString iconFileName)
   vtkQImageToImageSource *imageToVTK = vtkQImageToImageSource::New();
   imageToVTK->SetQImage(&image);
   imageToVTK->Update();
-  vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(button()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep =
+    static_cast<vtkTexturedButtonRepresentation2D *>(
+      button()->GetRepresentation());
   rep->SetButtonTexture(0, imageToVTK->GetOutput());
   imageToVTK->Delete();
   int size[2]; size[0] = 16; size[1] = 16;
@@ -175,7 +183,9 @@ void msvQVTKButtonsInterface::setIconFileName(QString iconFileName)
 void msvQVTKButtonsInterface::update()
 {
   Q_D(msvQVTKButtonsInterface);
-  vtkTexturedButtonRepresentation2D *rep = reinterpret_cast<vtkTexturedButtonRepresentation2D*>(button()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep =
+    reinterpret_cast<vtkTexturedButtonRepresentation2D*>(
+      button()->GetRepresentation());
 
   if (d->showLabel())
   {
@@ -215,7 +225,8 @@ void msvQVTKButtonsInterface::setCurrentRenderer(vtkRenderer *renderer)
 {
   if(renderer)
   {
-    button()->SetInteractor(renderer->GetRenderWindow()->GetInteractor());
+    button()->SetInteractor(
+      renderer->GetRenderWindow()->GetInteractor());
     button()->SetCurrentRenderer(renderer); //to check
     button()->EnabledOn();
   }
