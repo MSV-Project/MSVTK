@@ -93,7 +93,7 @@ public:
   /// Set the position on the path at the specified ratio
   void setCameraPoistionOnPath(double ratio);
 
-  vtkCommand *getSliderCallback();
+  vtkCommand *sliderCallback() const;
 
 public slots:
 
