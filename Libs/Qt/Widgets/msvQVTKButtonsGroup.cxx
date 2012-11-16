@@ -249,7 +249,7 @@ vtkSliderWidget* msvQVTKButtonsGroupPrivate::slider()
     m_Slider->SetRepresentation(sliderRep);
     m_Slider->SetAnimationModeToAnimate();
     sliderRep->Delete();
-    m_Slider->AddObserver(vtkCommand::InteractionEvent,q->getSliderCallback());
+    m_Slider->AddObserver(vtkCommand::InteractionEvent,q->sliderCallback());
   }
   return m_Slider;
 }
@@ -467,7 +467,7 @@ void msvQVTKButtonsGroup::setCameraPoistionOnPath(double ratio) {
 }
 
 //------------------------------------------------------------------------------
-vtkCommand* msvQVTKButtonsGroup::getSliderCallback()
+vtkCommand* msvQVTKButtonsGroup::sliderCallback() const
 {
   return m_SliderCallback;
 }
