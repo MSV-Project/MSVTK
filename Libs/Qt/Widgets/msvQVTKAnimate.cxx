@@ -33,7 +33,8 @@ msvQVTKAnimate::msvQVTKAnimate()
 
 }
 
-void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps)
+void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6],
+  int numberOfSteps)
 {
   assert(renderer);
   //vtkRenderer *renderer = widget->renderer("tool");
@@ -110,8 +111,9 @@ void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6], int number
   double pi = vtkMath::Pi();
 
   //flyTo only if camera parameters has changed
-  if (fabs(fly0[0]-fly1[0]) < 0.0000001 && fabs(fly0[1]-fly1[1]) < 0.0000001 && fabs(fly0[2]-fly1[2]) < 0.0000001
-    && fabs(fly0[3]-fly1[3]) < 0.0000001 && fabs(fly0[4]-fly1[4]) < 0.0000001 && fabs(fly0[5]-fly1[5]) < 0.0000001
+  if (fabs(fly0[0]-fly1[0]) < 0.0000001 && fabs(fly0[1]-fly1[1]) < 0.0000001
+    && fabs(fly0[2]-fly1[2]) < 0.0000001 && fabs(fly0[3]-fly1[3]) < 0.0000001
+    && fabs(fly0[4]-fly1[4]) < 0.0000001 && fabs(fly0[5]-fly1[5]) < 0.0000001
     && fabs(fly0[6]-fly1[6]) < 0.0000001)
   {
           return;

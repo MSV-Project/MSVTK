@@ -115,9 +115,11 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkTexturedButtonRepresentation2D *rep = reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
+    vtkTexturedButtonRepresentation2D *rep =
+      reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
     int highlightState = rep->GetHighlightState();
-    if ( highlightState == vtkButtonRepresentation::HighlightHovering && previousHighlightState == vtkButtonRepresentation::HighlightNormal )
+    if ( highlightState == vtkButtonRepresentation::HighlightHovering
+      && previousHighlightState == vtkButtonRepresentation::HighlightNormal )
     {
       //show tooltip (not if previous state was selecting
       toolButton->setShowTooltip(true);
@@ -130,7 +132,8 @@ public:
     previousHighlightState = highlightState;
   }
 
-  vtkButtonHighLightCallback():toolButton(NULL), previousHighlightState(0) {}
+  vtkButtonHighLightCallback()
+    : toolButton(NULL), previousHighlightState(0) {}
   msvQVTKButtons *toolButton;
   int previousHighlightState;
 };
@@ -166,7 +169,8 @@ public:
 };
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object) : m_FlyTo(true), m_OnCenter(false), m_Window(NULL), q_ptr(&object)
+msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object)
+  : m_FlyTo(true), m_OnCenter(false), m_Window(NULL), q_ptr(&object)
 {
 
 }
@@ -191,13 +195,15 @@ vtkRenderWindow* msvQVTKButtonsPrivate::window()
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtons::msvQVTKButtons(QObject *parent) : msvQVTKButtonsInterface(), d_ptr(new msvQVTKButtonsPrivate(*this))
+msvQVTKButtons::msvQVTKButtons(QObject *parent)
+  : msvQVTKButtonsInterface(), d_ptr(new msvQVTKButtonsPrivate(*this))
 {
   Q_D(msvQVTKButtons);
   m_ButtonCallback = vtkButtonCallback::New();
   reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->toolButton = this;
   m_HighlightCallback = vtkButtonHighLightCallback::New();
-  reinterpret_cast<vtkButtonHighLightCallback*>(m_HighlightCallback)->toolButton = this;
+  reinterpret_cast<vtkButtonHighLightCallback*>(
+    m_HighlightCallback)->toolButton = this;
 
   button()->AddObserver(vtkCommand::StateChangedEvent,m_ButtonCallback);
   button()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,m_HighlightCallback);
@@ -246,7 +252,8 @@ void msvQVTKButtons::update()
     reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->flyTo = d->m_FlyTo;
     if(reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->renderer)
     {
-      reinterpret_cast<vtkButtonCallback*>(m_ButtonCallback)->renderer->GetRenderWindow()->Render();
+      reinterpret_cast<vtkButtonCallback*>(
+        m_ButtonCallback)->renderer->GetRenderWindow()->Render();
     }
   }
 }
@@ -299,7 +306,10 @@ QImage msvQVTKButtons::getPreview(int width, int height)
     vtkImageData* vtkImage = previewer->GetOutput();
     if(!vtkImage)
         return QImage();
-    vtkUnsignedCharArray* scalars = vtkUnsignedCharArray::SafeDownCast(vtkImage->GetPointData()->GetScalars());
+    vtkUnsignedCharArray* scalars =
+      vtkUnsignedCharArray::SafeDownCast(
+        vtkImage->GetPointData()->GetScalars());
+
     if(!width || !height || !scalars)
         return QImage();
     QImage qImage(width, height, QImage::Format_ARGB32);
@@ -387,7 +397,9 @@ void msvQVTKButtons::calculatePosition()
     coord[2] = bds[4];
   }
   int size[2]; size[0] = 16; size[1] = 16;
-  vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(button()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep =
+    static_cast<vtkTexturedButtonRepresentation2D*>(
+    button()->GetRepresentation());
 
   rep->PlaceWidget(coord, size);
   rep->Modified();

@@ -41,7 +41,8 @@ public:
   msvQVTKAnimate();
 
   /// Animate the camera to zoom on the passed bounding box.
-  void execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120);
+  void execute(vtkRenderer *renderer, double bounds[6],
+    int numberOfSteps = 120);
 
   /// Object destructor.
   virtual ~msvQVTKAnimate();

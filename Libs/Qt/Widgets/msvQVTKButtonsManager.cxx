@@ -42,7 +42,8 @@ public:
 };
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsManagerPrivate::msvQVTKButtonsManagerPrivate(msvQVTKButtonsManager& object) : q_ptr(&object)
+msvQVTKButtonsManagerPrivate::msvQVTKButtonsManagerPrivate(msvQVTKButtonsManager& object)
+  : q_ptr(&object)
 {
 
 }
@@ -56,7 +57,8 @@ msvQVTKButtonsManagerPrivate::~msvQVTKButtonsManagerPrivate()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant value)
 {
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin(); buttonsIt != m_Elements.end(); buttonsIt++)
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin();
+    buttonsIt != m_Elements.end(); buttonsIt++)
   {
     (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
   }
@@ -77,7 +79,8 @@ msvQVTKButtons *msvQVTKButtonsManagerPrivate::createButtons()
 }
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent) : d_ptr(new msvQVTKButtonsManagerPrivate(*this))
+msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent)
+  : d_ptr(new msvQVTKButtonsManagerPrivate(*this))
 {
 
 }
