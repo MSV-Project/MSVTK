@@ -17,9 +17,9 @@ include_directories(${include_dirs})
 add_definitions( -DDATA_TESTING_PATH="${PROJECT_SOURCE_DIR}/../Data/" )
 
 # msvQTimePlayerWidget
-add_executable(TimePlayerWidget msvQTimePlayerWidget.cxx)
-target_link_libraries(TimePlayerWidget msvQtWidgets)
+add_executable(TimePlayerWidgetExample msvQTimePlayerWidgetExample.cxx)
+target_link_libraries(TimePlayerWidgetExample msvQtWidgets)
 
 # msvVTKFileSeriesReader
-add_executable(FileSeriesReader msvVTKFileSeriesReader.cxx)
-target_link_libraries(FileSeriesReader msvVTKParallel)
+add_executable(FileSeriesReaderExample msvVTKFileSeriesReaderExample.cxx)
+target_link_libraries(FileSeriesReaderExample msvVTKParallel)
