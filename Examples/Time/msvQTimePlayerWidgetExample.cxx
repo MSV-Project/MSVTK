@@ -38,12 +38,15 @@
 #include <cstdlib>
 #include <iostream>
 
-// This example shows the usage of the msvQTimePlayerWidget
-// It uses the msvVTKPolyDataFileSeriesReader module and two ".vtk" files which
+// This example shows the usage of msvQTimePlayerWidget, a utility widget that
+// controls time step for any VTK demand-driven filter pipeline.
+// It uses a msvVTKPolyDataFileSeriesReader and two ".vtk" files which
 // each contains sparse points (PolyData).
 // The pipeline is defined as follow:
 // [msvVTKPolyDataFileSeriesReader]-[vtkPolyDataMapper]
 //              |- vtkPolyDataReader        |- msvQTimePlayerWidget
+// Refer to msvVTKFileSeriesReaderExample for more details on
+// msvVTKPolyDataFileSeriesReader and msvVTKFileSeriesReader.
 
 // -----------------------------------------------------------------------------
 int main(int argc, char * argv[])

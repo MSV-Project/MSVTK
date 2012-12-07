@@ -19,7 +19,7 @@
 ==============================================================================*/
 
 // MSVTK
-#include "msvVTKFileSeriesReader.h"
+#include "msvVTKPolyDataFileSeriesReader.h"
 
 // VTK includes
 #include "vtkActor.h"
@@ -62,98 +62,20 @@
 // UseMetaFile toggles between these two methods of specifying files.
 
 // This example shows the usage of the msvVTKFileSeriesReader
-// It defines an implementation of the msvVTKFileSeriesReader through
+// It uses a concrete implementation of msvVTKFileSeriesReader through
 // msvVTKPolyDataFileSeriesReader
 // and uses two ".vtk" files which each contains sparse points (PolyData).
 // The pipeline is defined as follow:
 //          [msvVTKFileSeriesReader]
 //                    ^
 //                    |
-// [msvVTKExamplePolyDataFileSeriesReader]-[vtkPolyDataMapper]->[vtkActor]
+// [msvVTKPolyDataFileSeriesReader]-[vtkPolyDataMapper]->[vtkActor]
 //                    |- vtkPolyDataReader
-
-// We first define an implementation of the msvVTKFileSeriesReader as it is an
-// abstract class. We here implement the file series reader for polydata files.
-class msvVTKExamplePolyDataFileSeriesReader : public msvVTKFileSeriesReader
-{
-public:
-  vtkTypeMacro(msvVTKExamplePolyDataFileSeriesReader, msvVTKFileSeriesReader);
-  static msvVTKExamplePolyDataFileSeriesReader *New();
-  virtual void PrintSelf(ostream &os, vtkIndent indent)
-    {this->Superclass::PrintSelf(os, indent);}
-
-  // We force the FileSeriesReader to only use a vtkPolyDataReader here.
-  virtual void SetReader(vtkAlgorithm* reader)
-    {this->Superclass::SetReader(vtkPolyDataReader::SafeDownCast(reader));}
-
-  virtual int CanReadFile(const char* filename)
-  {
-    if (!this->Reader)
-      {
-      return 0;
-      }
-
-    if (this->UseMetaFile)
-      {
-      // filename really points to a metafile.
-      vtkNew<vtkStringArray> dataFiles;
-      if (this->ReadMetaDataFile(filename, dataFiles.GetPointer(), 1))
-        {
-        if (dataFiles->GetNumberOfValues() > 0)
-          {
-          return msvVTKExamplePolyDataFileSeriesReader::
-            CanReadFile(this->Reader,dataFiles->GetValue(0).c_str());
-          }
-        }
-      return 0;
-      }
-    else
-      {
-      return msvVTKExamplePolyDataFileSeriesReader::CanReadFile(this->Reader,
-                                                             filename);
-      }
-  }
-  static int CanReadFile(vtkAlgorithm* algo, const char* filename)
-    {
-    vtkPolyDataReader* reader = vtkPolyDataReader::SafeDownCast(algo);
-    if(!reader || !filename)
-      {
-      return 0;
-      }
-
-    reader->SetFileName(filename);
-    return reader->IsFileValid("polydata");
-    }
-
-protected:
-  msvVTKExamplePolyDataFileSeriesReader(){}
-  virtual ~msvVTKExamplePolyDataFileSeriesReader(){}
-  virtual void SetReaderFileName(const char* fname)
-    {
-    vtkPolyDataReader* reader = vtkPolyDataReader::SafeDownCast(this->Reader);
-    if (reader)
-      {
-      // We want to suppress the modification time change in the Reader.  See
-      // msvVTKFileSeriesReader::GetMTime() for details on how this works.
-      this->SavedReaderModification = this->GetMTime();
-      reader->SetFileName(fname);
-      this->HiddenReaderModification = this->Reader->GetMTime();
-      }
-    this->SetCurrentFileName(fname);
-    }
-
-private:
-  msvVTKExamplePolyDataFileSeriesReader
-    (const msvVTKExamplePolyDataFileSeriesReader&);
-  void operator=(const msvVTKExamplePolyDataFileSeriesReader&);
-};
-vtkStandardNewMacro(msvVTKExamplePolyDataFileSeriesReader);
 
 // -----------------------------------------------------------------------------
 int main(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   // Create the RenderWindow, Renderer and Interactor style
-  //
   vtkNew<vtkRenderer> ren1;
   ren1->SetBackground(0.1, 0.2, 0.4);
   vtkNew<vtkRenderWindow> renWin;
@@ -165,7 +87,7 @@ int main(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
   iren->SetInteractorStyle(irenStyle.GetPointer());
 
   // Create the Pipeline.
-  vtkNew<msvVTKExamplePolyDataFileSeriesReader> polyDataSeriesReader;
+  vtkNew<msvVTKPolyDataFileSeriesReader> polyDataSeriesReader;
   // The reader associated to our fileSeriesReader.
   vtkNew<vtkPolyDataReader> polyDataReader;
   // The mapper mapping data to graphics primitives.
@@ -225,7 +147,12 @@ int main(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
     SafeDownCast(polyDataMapper->GetInputConnection(0,0)->
                  GetProducer()->GetExecutive());
 
-  sdd->SetUpdateTimeStep(0, 1.);  // Request a time update at t = 1.
+  // Request a time update at t = 1.
+  // This is the application's role to decide which time step must be visible.
+  // Refer to msvQTimePlayerWidget for a time aware application widget that
+  // controls such paramater.
+  sdd->SetUpdateTimeStep(0, 1.);
+  //sdd->SetUpdateTimeStep(0, 0.);
 
   // Render
   polyDataActor->VisibilityOn();
