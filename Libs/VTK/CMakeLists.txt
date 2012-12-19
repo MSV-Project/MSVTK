@@ -10,9 +10,9 @@ set(dirs
   )
 
 list(APPEND dirs
+  Filtering
   Parallel
   Widgets
-  Filtering
   )
 
 #-----------------------------------------------------------------------------

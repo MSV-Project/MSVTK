@@ -260,7 +260,7 @@ private:
      * \brief Read the spring data from one or more vtk datasets.
      */
     void
-    AddPolyDataSet(int ln, vtkSmartPointer<vtkDataSet> data_set);
+    AddPolyDataSet(int ln, vtkDataSet *data_set);
     
 //     /*!
 //      * \brief Read the beam data from one or more input files.
@@ -411,7 +411,7 @@ private:
     void
     getFromInput(
         SAMRAI::tbox::Pointer<SAMRAI::tbox::Database> db,
-        vtkSmartPointer<vtkDataSet> data
+        vtkDataSet* data
                 );
 
     /*

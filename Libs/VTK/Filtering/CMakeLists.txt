@@ -48,8 +48,7 @@ endif()
 # Sources
 # --------------------------------------------------------------------------
 set(msvVTKFiltering_SRCS
-  msvVTKPolyDataBoundaryEdgeCaps.cxx
-  msvVTKEdgeLengthSubdivisionCriterion.cxx
+  msvVTKBoundaryEdgeSources.cxx
   )
 
 # Abstract/pure virtual classes

@@ -19,7 +19,7 @@
  * ==============================================================================*/
 
 // MSVTK
-#include "msvVTKPolyDataBoundaryEdgeCaps.h"
+#include "msvVTKBoundaryEdgeSources.h"
 
 // VTK includes
 #include "vtkNew.h"
@@ -37,7 +37,7 @@ int msvVTKPolyDataBoundaryEdgeCapsTest1(int argc, char* argv[])
 {
   // Get the data test files
   const char* in_file =
-  vtkTestUtilities::ExpandDataFileName(argc,argv,"amr_lagrangian_dataset.vtp");
+  vtkTestUtilities::ExpandDataFileName(argc,argv,"geometry.vtp");
   const char* out_file =
   vtkTestUtilities::ExpandDataFileName(argc,argv,"amr_caps_dataset.vtp");
   
@@ -46,13 +46,11 @@ int msvVTKPolyDataBoundaryEdgeCapsTest1(int argc, char* argv[])
   
   // Create the PolyDataReader
   vtkNew<vtkXMLPolyDataReader> polyDataReader;
-  vtkNew<msvVTKPolyDataBoundaryEdgeCaps> boundaryCaps;
+  vtkNew<msvVTKBoundaryEdgeSources> boundaryCaps;
   
   polyDataReader->SetFileName(in_file);
   polyDataReader->Update();
   
-  boundaryCaps->SetNumberOfSubdivisions(4);
-  boundaryCaps->SetTriangulationTolerance(.01);
   boundaryCaps->SetInputConnection(polyDataReader->GetOutputPort());  
   boundaryCaps->Update();
   

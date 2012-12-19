@@ -64,8 +64,8 @@ if(NOT DEFINED IBAMR_DIR)
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
-    GIT_REPOSITORY ${git_protocol}@bitbucket.org:ricortiz/ibamr.git
-    GIT_TAG "master"
+    GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/IBAMR.git
+    GIT_TAG "msvtk"
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}

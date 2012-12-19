@@ -1,6 +1,5 @@
-set(KIT ECG)
+set(KIT FFS)
 project(msv${KIT})
-
 # --------------------------------------------------------------------------
 
 # Find IBTK and add config and use files
@@ -15,23 +14,23 @@ include_directories(${IBAMR_INCLUDE_DIRS})
 # --------------------------------------------------------------------------
 
 set(msv${KIT}_SRCS
-  msvQECGMainWindow.cxx
-  msvQECGAboutDialog.cxx
+  msvQFFSMainWindow.cxx
+  msvQFFSAboutDialog.cxx
   msvFluidSimulator.cxx
   )
 
 set(msv${KIT}_MOC_SRCS
-  msvQECGMainWindow.h
-  msvQECGAboutDialog.h
+  msvQFFSMainWindow.h
+  msvQFFSAboutDialog.h
   )
 
 set(msv${KIT}_UI_SRCS
-  Resources/UI/msvQECGMainWindow.ui
-  Resources/UI/msvQECGAboutDialog.ui
+  Resources/UI/msvQFFSMainWindow.ui
+  Resources/UI/msvQFFSAboutDialog.ui
   )
 
 set(msv${KIT}_QRC
-  Resources/msvQECG.qrc
+  Resources/msvQFFS.qrc
   )
 
 QT4_WRAP_CPP(msv${KIT}_SRCS ${msv${KIT}_MOC_SRCS})
@@ -41,7 +40,6 @@ QT4_ADD_RESOURCES(msv${KIT}_QRC_SRCS ${msv${KIT}_QRC})
 # --------------------------------------------------------------------------
 # Include dirs
 # --------------------------------------------------------------------------
-
 set(include_dirs
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -50,6 +48,7 @@ set(include_dirs
   ${CTK_INCLUDE_DIRS}
   ${msvVTKParallel_INCLUDE_DIRS}
   ${msvVTKWidgets_INCLUDE_DIRS}
+  ${msvVTKFiltering_INCLUDE_DIRS}
   ${msvQtWidgets_INCLUDE_DIRS}
   ${msvIBTK_INCLUDE_DIRS}
   ${msvIBAMR_INCLUDE_DIRS}
@@ -81,13 +80,19 @@ target_link_libraries(msv${KIT}
   msvIBAMR
   )
 
+install(TARGETS msv${KIT}
+  RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
+  LIBRARY DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
+  ARCHIVE DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT Development
+  )
+
 # --------------------------------------------------------------------------
 # Build the executable
 # --------------------------------------------------------------------------
 add_executable(${KIT}
-  ecg.cxx
+  ffs.cxx
   )
-set_target_properties(${KIT} PROPERTIES OUTPUT_NAME ecg)
+set_target_properties(${KIT} PROPERTIES OUTPUT_NAME ffs)
 
 target_link_libraries(${KIT}
   msv${KIT}
@@ -114,3 +119,16 @@ set(dynamicHeaders
 if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif()
+
+# --------------------------------------------------------------------------
+# Install
+# --------------------------------------------------------------------------
+if(NOT APPLE)
+  set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR})
+else()
+  set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ".")
+endif()
+
+install(TARGETS ${KIT}
+  ${${KIT}_INSTALL_DESTINATION_ARGS}
+  COMPONENT Runtime)

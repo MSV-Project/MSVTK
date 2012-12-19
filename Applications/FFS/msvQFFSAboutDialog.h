@@ -18,55 +18,33 @@
 
 ==============================================================================*/
 
-#ifndef __msvECGMainWindow_h
-#define __msvECGMainWindow_h
+#ifndef __msvQFFSAboutDialog_h
+#define __msvQFFSAboutDialog_h
 
 // Qt includes
-#include <QMainWindow>
-// class QListWidgetItem;
+#include <QDialog>
 
 // CTK includes
-#include <ctkVTKObject.h>
+#include <ctkPimpl.h>
 
-// ECG includes
-#include "msvECGExport.h"
+// FFS includes
+#include "msvFFSExport.h"
 
-// SAMRAI includes
-#include<tbox/Pointer.h>
+class msvQFFSAboutDialogPrivate;
 
-class msvQECGMainWindowPrivate;
-
-namespace SAMRAI {
-  namespace tbox {
-    class MemoryDatabase;
-  }
-}
-
-class MSV_ECG_EXPORT msvQECGMainWindow : public QMainWindow
+class MSV_FFS_EXPORT msvQFFSAboutDialog : public QDialog
 {
   Q_OBJECT
-  QVTK_OBJECT
 public:
-  typedef QMainWindow Superclass;
-  msvQECGMainWindow(QWidget *parent=0);
-  virtual ~msvQECGMainWindow();
-
-public slots:
-  void openData();
-  void closeData();
-  void aboutApplication();
-  void updateView();
+  msvQFFSAboutDialog(QWidget* parentWidget = 0);
+  virtual ~msvQFFSAboutDialog();
 
 protected:
-  QScopedPointer<msvQECGMainWindowPrivate> d_ptr;
-  
+  QScopedPointer<msvQFFSAboutDialogPrivate> d_ptr;
 
 private:
-  
-//   SAMRAI::tbox::Pointer<SAMRAI::tbox::MemoryDatabase> input_db;
-  
-  Q_DECLARE_PRIVATE(msvQECGMainWindow);
-  Q_DISABLE_COPY(msvQECGMainWindow);
+  Q_DECLARE_PRIVATE(msvQFFSAboutDialog);
+  Q_DISABLE_COPY(msvQFFSAboutDialog);
 };
 
 #endif

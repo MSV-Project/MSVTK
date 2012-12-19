@@ -32,9 +32,9 @@ endif()
 set(include_dirs
   ${CMAKE_CURRENT_SOURCE_DIR}/IB
   ${CMAKE_CURRENT_BINARY_DIR}/IB
+  ${msvVTKFiltering_INCLUDE_DIRS}
   )
 include_directories(${include_dirs})
-
 # --------------------------------------------------------------------------
 # Install headers
 # --------------------------------------------------------------------------
@@ -53,6 +53,7 @@ endif()
 # --------------------------------------------------------------------------
 set(msvIBAMR_SRCS
   IB/msvIBInitializer.C
+  IB/msvVTKIBSourceGen.C
   )
 
 # --------------------------------------------------------------------------
@@ -67,6 +68,7 @@ set_target_properties(${lib_name} PROPERTIES COMPILE_DEFINITIONS NDIM=3)
 
 target_link_libraries(${lib_name}
   ${IBAMR_LIBRARIES}
+  msvVTKFiltering
   )
 
 # Apply user-defined properties to the library target.

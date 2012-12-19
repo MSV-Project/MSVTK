@@ -13,6 +13,7 @@ list(APPEND dirs
   VTK
   Qt
   IBTK
+  IBAMR
   )
 
 #-----------------------------------------------------------------------------
@@ -40,6 +41,3 @@ set(MSVTK_Libs_INCLUDE_DIRS ${include_dirs} CACHE INTERNAL "MSVTK Libs includes"
 set(MSVTK_Libs_VTK_WRAPPED_LIBRARIES
   VTK
   CACHE INTERNAL "MSVTK Libs VTK wrapped" FORCE)
-
-
-add_subdirectory(IBAMR)

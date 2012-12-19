@@ -21,22 +21,19 @@
 // Qt includes
 #include <QApplication>
 
-// msvECG includes
-#include "msvQECGMainWindow.h"
-#include "petsc.h"
+// msvFFS includes
+#include "msvQFFSMainWindow.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  QCoreApplication::setApplicationName("MSV ECG");
+  QCoreApplication::setApplicationName("MSV FFS");
   QApplication app(argc, argv);
-  
-  PetscInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
-  msvQECGMainWindow mainWindow;
+  msvQFFSMainWindow mainWindow;
   mainWindow.show();
 
   // Look at QApplication::exec() documentation, it is recommended to connect
   // clean up code to the aboutToQuit() signal
   return app.exec();
-  PetscFinalize();
+  
 }

@@ -2,13 +2,15 @@
 #include<sstream>
 
 #include<vtkPolyData.h>
+#include<vtkSmartPointer.h>
+#include<vtkNew.h>
 #include<vtkXMLPolyDataReader.h>
 #include<vtkXMLPolyDataWriter.h>
 #include <vtkTestUtilities.h>
 
 #include "msvFluidSimulator.h"
 
-int msvMSISimulatorTest1(int ac, char **av)
+int msvFFSTest1(int ac, char **av)
 {
   // Get the data test files
   const char* in_file =
@@ -27,13 +29,8 @@ int msvMSISimulatorTest1(int ac, char **av)
   
   vtkPolyData *data = reader->GetOutput();
 
-  msvFluidSimulator simulator;
-  simulator.setBoundaryEdges(data,15,.001);
-  
-  writer->SetInput(simulator.getDataCaps());
-  writer->SetDataModeToBinary();
-  writer->SetFileName(out_file);
-  writer->Write();
+  vtkNew<msvFluidSimulator> simulator;
+  simulator->Init(data);
 
   return 0;
 }

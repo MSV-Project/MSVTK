@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>msvQECGAboutDialog</class>
- <widget class="QDialog" name="msvQECGAboutDialog">
+ <class>msvQFFSAboutDialog</class>
+ <widget class="QDialog" name="msvQFFSAboutDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>About MSV ECG Application</string>
+   <string>About MSV FFS Application</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -21,9 +21,9 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="msvQECGLabel">
+    <widget class="QLabel" name="msvQFFSLabel">
      <property name="pixmap">
-      <pixmap resource="../msvQECG.qrc">:/Logo/msv-logo.png</pixmap>
+      <pixmap resource="../msvQFFS.qrc">:/Logo/msv-logo.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>
@@ -47,9 +47,9 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;VTK &lt;a href=&quot;http://www.vtk.org/copyright.php&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.vtk.org/copyright.php&lt;/span&gt;&lt;/a&gt; &lt;br /&gt;CTK &lt;a href=&quot;https://github.com/commontk/CTK/blob/master/LICENSE&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/commontk/CTK/blob/master/LICENSE&lt;/span&gt;&lt;/a&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The application has been written by Michael Jeulin-Lagarrigue and Julien Finet.&lt;br /&gt;Funding for this work comes from the European Commission within the MSV project (FP7-IST-248032)&lt;br /&gt;Different spatial scales (Challenge #Ch1), heterogeneous data type (Challenge #Ch5) and time varying issues(Challenge #Ch9) are handled by the application.&lt;br /&gt;It uses Electro-physiological dataset structured as the following: &lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoPoints: collection of .vtk files describing sparse 3D points localized on the heart surface for each time step. &lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoSignals: collection of .csv files corresponding to the entire ECG of a subset of points with each parameter being I, II, III, AvR, AvL, AvF, V1, V2, V3, V4, V5 and V6 derivations. &lt;/li&gt;&lt;/ul&gt;
+&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoSignals: collection of .csv files corresponding to the entire FFS of a subset of points with each parameter being I, II, III, AvR, AvL, AvF, V1, V2, V3, V4, V5 and V6 derivations. &lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It makes the usage of the new VTK pipeline architecture and its temporal pipeline extensions through new modules and widgets added in MSVTK. It also shows and implements the vtkButtons and vtkCharts widgets. &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The VTK (&amp;gt;5.0) pipeline architecture is needed in order to have time support. Utility classes have been added to MSVTK to ease the use of time in VTK. vtkButtons and vtkCharts widgets are also demo-ed. &lt;br /&gt;Time is represented differently depending on the data type: 3D point clouds are displayed in the VTK render window and animated depending on the ECG coupled time, while the ECGs are represented in a separate VTK chart view(s) as static representations. &lt;br /&gt;3D points for which ECG measurements are recorded are clickable through vtkButtons. vtkButtons are displayed in the VTK render window as cube and linked to the point cloud. Buttons are the connection between the 3D points and the ECG. They are used to display the ECG chart corresponding to the clicked point. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The VTK (&amp;gt;5.0) pipeline architecture is needed in order to have time support. Utility classes have been added to MSVTK to ease the use of time in VTK. vtkButtons and vtkCharts widgets are also demo-ed. &lt;br /&gt;Time is represented differently depending on the data type: 3D point clouds are displayed in the VTK render window and animated depending on the FFS coupled time, while the FFSs are represented in a separate VTK chart view(s) as static representations. &lt;br /&gt;3D points for which FFS measurements are recorded are clickable through vtkButtons. vtkButtons are displayed in the VTK render window as cube and linked to the point cloud. Buttons are the connection between the 3D points and the FFS. They are used to display the FFS chart corresponding to the clicked point. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -69,13 +69,13 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
-  <include location="../msvQECG.qrc"/>
+  <include location="../msvQFFS.qrc"/>
  </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>msvQECGAboutDialog</receiver>
+   <receiver>msvQFFSAboutDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -91,7 +91,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>msvQECGAboutDialog</receiver>
+   <receiver>msvQFFSAboutDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

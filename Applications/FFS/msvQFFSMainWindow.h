@@ -18,33 +18,46 @@
 
 ==============================================================================*/
 
-#ifndef __msvQECGAboutDialog_h
-#define __msvQECGAboutDialog_h
+#ifndef __msvFFSMainWindow_h
+#define __msvFFSMainWindow_h
 
 // Qt includes
-#include <QDialog>
+#include <QMainWindow>
 
 // CTK includes
-#include <ctkPimpl.h>
+#include <ctkVTKObject.h>
 
-// ECG includes
-#include "msvECGExport.h"
+// FFS includes
+#include "msvFFSExport.h"
 
-class msvQECGAboutDialogPrivate;
+class msvQFFSMainWindowPrivate;
 
-class MSV_ECG_EXPORT msvQECGAboutDialog : public QDialog
+class MSV_FFS_EXPORT msvQFFSMainWindow : public QMainWindow
 {
   Q_OBJECT
+  QVTK_OBJECT
 public:
-  msvQECGAboutDialog(QWidget* parentWidget = 0);
-  virtual ~msvQECGAboutDialog();
+  typedef QMainWindow Superclass;
+  msvQFFSMainWindow(QWidget *parent=0);
+  virtual ~msvQFFSMainWindow();
+
+public slots:
+  void openData();
+  void closeData();
+  void aboutApplication();
+  void updateView();
+
+  void on_showSurface_stateChanged(int state);
+  void on_showCartesianGrid_stateChanged(int state);
+  void on_showOutlineCorners_stateChanged(int state);
+  void on_showBoundaryEdges_stateChanged(int state);
 
 protected:
-  QScopedPointer<msvQECGAboutDialogPrivate> d_ptr;
-
-private:
-  Q_DECLARE_PRIVATE(msvQECGAboutDialog);
-  Q_DISABLE_COPY(msvQECGAboutDialog);
+  QScopedPointer<msvQFFSMainWindowPrivate> d_ptr;
+  
+private: 
+  Q_DECLARE_PRIVATE(msvQFFSMainWindow);
+  Q_DISABLE_COPY(msvQFFSMainWindow);
 };
 
 #endif

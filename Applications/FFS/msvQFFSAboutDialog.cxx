@@ -18,34 +18,34 @@
 
 ==============================================================================*/
 
-// ECG includes
-#include "msvQECGAboutDialog.h"
-#include "ui_msvQECGAboutDialog.h"
+// FFS includes
+#include "msvQFFSAboutDialog.h"
+#include "ui_msvQFFSAboutDialog.h"
 
 //------------------------------------------------------------------------------
-// msvQECGAboutDialogPrivate methods
+// msvQFFSAboutDialogPrivate methods
 
 //------------------------------------------------------------------------------
-class msvQECGAboutDialogPrivate: public Ui_msvQECGAboutDialog
+class msvQFFSAboutDialogPrivate: public Ui_msvQFFSAboutDialog
 {
 public:
 };
 
 //------------------------------------------------------------------------------
-// msvQECGAboutDialog methods
+// msvQFFSAboutDialog methods
 
 //------------------------------------------------------------------------------
-// msvQECGAboutDialog methods
-msvQECGAboutDialog::msvQECGAboutDialog(QWidget* parentWidget)
-  : QDialog(parentWidget), d_ptr(new msvQECGAboutDialogPrivate)
+// msvQFFSAboutDialog methods
+msvQFFSAboutDialog::msvQFFSAboutDialog(QWidget* parentWidget)
+  : QDialog(parentWidget), d_ptr(new msvQFFSAboutDialogPrivate)
 {
-  Q_D(msvQECGAboutDialog);
+  Q_D(msvQFFSAboutDialog);
   d->setupUi(this);
 
   d->CreditsTextEdit->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
 }
 
 //------------------------------------------------------------------------------
-msvQECGAboutDialog::~msvQECGAboutDialog()
+msvQFFSAboutDialog::~msvQFFSAboutDialog()
 {
 }

@@ -1,4 +1,4 @@
-// Filename: msvIBSourceGenerator.h
+// Filename: msvVTKIBSourceGen.h
 // Created on 28 Apr 2011 by Boyce Griffith
 //
 // Copyright (c) 2002-2010, Boyce Griffith
@@ -30,23 +30,27 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef included_msvIBSourceGenerator
-#define included_msvIBSourceGenerator
+#ifndef included_msvVTKIBSourceGen
+#define included_msvVTKIBSourceGen
 
 /////////////////////////////// INCLUDES /////////////////////////////////////
 
 // IBAMR INCLUDES
 #include <ibamr/IBLagrangianSourceStrategy.h>
 
+// VTK INCLUDES
+#include <vtkSmartPointer.h>
 /////////////////////////////// CLASS DEFINITION /////////////////////////////
+
+class vtkDataSet;
 
 namespace IBAMR
 {
 /*!
- * \brief Class msvIBSourceGenerator provides support for distributed internal
+ * \brief Class msvVTKIBSourceGen provides support for distributed internal
  * fluid sources/sinks.
  */
-class msvIBSourceGenerator
+class msvVTKIBSourceGen
     : public IBLagrangianSourceStrategy,
       public SAMRAI::tbox::Serializable
 {
@@ -54,12 +58,12 @@ public:
     /*!
      * \brief Default constructor.
      */
-    msvIBSourceGenerator();
+    msvVTKIBSourceGen();
 
     /*!
      * \brief Destructor.
      */
-    ~msvIBSourceGenerator();
+    ~msvVTKIBSourceGen();
 
     /*!
      * \brief Returns a boolean indicating whether the class has been registered
@@ -83,23 +87,6 @@ public:
      */
     static unsigned int
     getNumSources(
-        int ln);
-
-    /*!
-     * \brief Set the names of the internal sources and sinks on the specified
-     * level of the patch hierarchy.
-     */
-    static void
-    setSourceNames(
-        int ln,
-        const std::vector<std::string>& names);
-
-    /*!
-     * \brief Get the names of the internal sources and sinks on the specified
-     * level of the patch hierarchy.
-     */
-    static const std::vector<std::string>&
-    getSourceNames(
         int ln);
 
     /*!
@@ -141,6 +128,12 @@ public:
     const std::vector<double>&
     getSourcePressures(
         int ln) const;
+
+    /*!
+     * \brief Set VTK dataset
+     */
+    static void setDataSet(int ln, vtkDataSet *dataSet);
+
 
     /*!
      * \brief Setup the data needed to compute source/sink data on the specified
@@ -232,8 +225,8 @@ private:
      *
      * \param from The value to copy to this object.
      */
-    msvIBSourceGenerator(
-        const msvIBSourceGenerator& from);
+    msvVTKIBSourceGen(
+        const msvVTKIBSourceGen& from);
 
     /*!
      * \brief Assignment operator.
@@ -244,9 +237,9 @@ private:
      *
      * \return A reference to this object.
      */
-    msvIBSourceGenerator&
+    msvVTKIBSourceGen&
     operator=(
-        const msvIBSourceGenerator& that);
+        const msvVTKIBSourceGen& that);
 
     /*!
      * Read object state from the restart file and initialize class data
@@ -261,30 +254,20 @@ private:
     static std::vector<int> s_num_sources;
 
     /*!
-     * The names of the sources and sinks.
-     */
-    static std::vector<std::vector<std::string> > s_source_names;
-
-    /*!
      * The sizes of the sources and sinks.
      */
     static std::vector<std::vector<double> > s_source_radii;
 
+    static std::vector<vtkSmartPointer<vtkDataSet> > polyData;
     /*
      * Source/sink data.
      */
     std::vector<int> d_n_src;
-    std::vector<std::vector<std::string> >d_source_names;
-    std::vector<std::vector<double> > d_r_src;
     std::vector<std::vector<int> > d_num_perimeter_nodes;
+    std::vector<std::vector<double> > d_r_src;
     std::vector<std::vector<double> > d_Q_src, d_P_src;
+
 };
 }// namespace IBAMR
 
-/////////////////////////////// INLINE ///////////////////////////////////////
-
-//#include <ibamr/msvIBSourceGenerator.I>
-
-//////////////////////////////////////////////////////////////////////////////
-
-#endif //#ifndef included_msvIBSourceGenerator
+#endif //#ifndef included_msvVTKIBSourceGen

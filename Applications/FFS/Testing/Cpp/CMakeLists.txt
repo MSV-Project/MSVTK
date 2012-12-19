@@ -1,8 +1,7 @@
-set(KIT ECG)
+set(KIT FFS)
 set(KIT_TEST_SRCS
-  msvMSISimulatorTest1.cxx
-  msvMSISimulatorTest2.cxx
-  msvMSISimulatorTest3.cxx
+  msvFFSTest1.cxx
+  msvFFSTest2.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
@@ -26,10 +25,9 @@ endmacro()
 #
 
 add_test(
-  NAME ecgTest1
-  COMMAND $<TARGET_FILE:${KIT}CxxTests> ecgTest1
-  --ecg $<TARGET_FILE_DIR:${KIT}CxxTests>
+  NAME ffsTest1
+  COMMAND $<TARGET_FILE:${KIT}CxxTests> ffsTest1
+  --ffs $<TARGET_FILE_DIR:${KIT}CxxTests>
 )
 
-SIMPLE_TEST( msvQECGMainWindowTest1 )
-SIMPLE_TEST( msvVTKECGButtonsManagerTest1 )
+SIMPLE_TEST( msvQFFSMainWindowTest1 )

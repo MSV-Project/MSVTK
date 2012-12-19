@@ -3,6 +3,7 @@
 #include<fstream>
 
 #include<vtkSmartPointer.h>
+#include<vtkNew.h>
 #include<vtkPolyData.h>
 #include<vtkXMLPolyDataReader.h>
 #include<vtkXMLPolyDataWriter.h>
@@ -16,7 +17,7 @@
 
 void dump_boundary(vtkPolyData *data);
 
-int msvMSISimulatorTest2(int ac, char **av)
+int msvFFSTest2(int ac, char **av)
 {
   // Get the data test files
   const char* in_file =
@@ -36,9 +37,12 @@ int msvMSISimulatorTest2(int ac, char **av)
   
   PetscInitialize(&ac,&av,PETSC_NULL,PETSC_NULL);
   {
-    msvFluidSimulator simulator;
-    simulator.msvInitializeAMR(in_database,4,5,data);
-    simulator.amrToVTK(dataset);
+    vtkNew<msvFluidSimulator> simulator;
+    simulator->SetInitFile(in_database);
+    simulator->SetMaxLevels(4);
+    simulator->SetCoarsestGridSpacing(8);
+    simulator->SetAMRDataset(dataset);
+    simulator->Init(data);
     // AMR writer
     writer->SetInput(dataset);
     writer->SetDataModeToBinary();
