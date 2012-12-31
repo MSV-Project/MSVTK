@@ -53,9 +53,7 @@ endif()
 # --------------------------------------------------------------------------
 set(msvQtWidgets_SRCS
   msvQTimePlayerWidget.cxx
-  msvQVTKAnimate.cxx
   msvQVTKButtons.cxx
-  msvQVTKButtonsAction.cxx
   msvQVTKButtonsGroup.cxx
   msvQVTKButtonsInterface.cxx
   msvQVTKButtonsManager.cxx

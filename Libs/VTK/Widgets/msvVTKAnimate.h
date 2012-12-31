@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
-  Copyright (c) SCS s.r.l. (B3C)
+  Copyright (c) Kitware Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,13 +17,27 @@
   limitations under the License.
 
 ==============================================================================*/
+/*=========================================================================
 
-#ifndef msvQVTKAnimate_H
-#define msvQVTKAnimate_H
+  Program:   Visualization Toolkit
+  Module:    msvVTKAnimate.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifndef msvVTKAnimate_H
+#define msvVTKAnimate_H
 
 // MSVTK includes
-#include "msvQtWidgetsExport.h"
-#include "msvQVTKButtonsAction.h"
+#include "msvVTKWidgetsExport.h"
+#include "msvVTKButtonsAction.h"
 
 // forward references
 class vtkRenderer;
@@ -33,20 +47,20 @@ Class name: msvQVTKAnimate
 This is an utility class to animate VTKCamera.
 */
 
-class MSV_QT_WIDGETS_EXPORT msvQVTKAnimate : public msvQVTKButtonsAction
+class MSV_VTK_WIDGETS_EXPORT msvVTKAnimate : public msvVTKButtonsAction
 {
 
 public:
   /// Object constructor.
-  msvQVTKAnimate();
+  msvVTKAnimate();
 
   /// Animate the camera to zoom on the passed bounding box.
-  void execute(vtkRenderer *renderer, double bounds[6],
+  void Execute(vtkRenderer *renderer, double bounds[6],
     int numberOfSteps = 120);
 
   /// Object destructor.
-  virtual ~msvQVTKAnimate();
+  virtual ~msvVTKAnimate();
 
 };
 
-#endif // msvQVTKAnimate_H
+#endif // msvVTKAnimate_H

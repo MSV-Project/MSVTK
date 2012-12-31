@@ -50,6 +50,11 @@ endif()
 set(msvVTKWidgets_SRCS
   msvVTKProp3DButtonRepresentation.cxx
   msvVTKSliderFixedRepresentation2D.cxx
+  msvVTKButtonsInterface.cxx
+  msvVTKButtons.cxx
+  msvVTKButtonsGroup.cxx
+  msvVTKAnimate.cxx
+  msvVTKButtonsAction.cxx
   )
 
 # Abstract/pure virtual classes
