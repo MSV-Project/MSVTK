@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
-  Copyright (c) SCS s.r.l. (B3C)
+  Copyright (c) Kitware Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,6 +17,20 @@
   limitations under the License.
 
 ==============================================================================*/
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    msvVTKAnimate.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 // VTK includes
 #include <vtkCamera.h>
@@ -26,14 +40,16 @@
 #include <vtkRenderWindow.h>
 
 // MSVTK includes
-#include "msvQVTKAnimate.h"
+#include "msvVTKAnimate.h"
 
-msvQVTKAnimate::msvQVTKAnimate()
+//------------------------------------------------------------------------------
+msvVTKAnimate::msvVTKAnimate()
 {
 
 }
 
-void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6],
+//------------------------------------------------------------------------------
+void msvVTKAnimate::Execute(vtkRenderer *renderer, double bounds[6],
   int numberOfSteps)
 {
   assert(renderer);
@@ -137,7 +153,8 @@ void msvQVTKAnimate::execute(vtkRenderer *renderer, double bounds[6],
   }
 }
 
-msvQVTKAnimate::~msvQVTKAnimate()
+//------------------------------------------------------------------------------
+msvVTKAnimate::~msvVTKAnimate()
 {
 
 }

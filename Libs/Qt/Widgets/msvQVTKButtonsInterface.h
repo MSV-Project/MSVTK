@@ -32,6 +32,7 @@ class vtkRenderer;
 class vtkButtonWidget;
 class vtkCommand;
 class msvQVTKButtonsAction;
+class msvVTKButtonsInterface;
 
 // Pimpl
 class msvQVTKButtonsInterfacePrivate;
@@ -103,6 +104,12 @@ public:
 
   /// set the element bounds
   void setBounds(double b[6]);
+
+  /// get vtk buttons interface widget
+  msvVTKButtonsInterface* getVTKButtonsInterface();
+
+  /// set the associated vtk buttons
+  void setVTKButtons(msvVTKButtonsInterface* buttons);
 
 signals:
 

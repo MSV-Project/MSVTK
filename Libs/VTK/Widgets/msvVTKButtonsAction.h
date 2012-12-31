@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
-  Copyright (c) SCS s.r.l. (B3C)
+  Copyright (c) Kitware Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,33 +17,47 @@
   limitations under the License.
 
 ==============================================================================*/
+/*=========================================================================
 
-#ifndef msvQVTKButtonsAction_H
-#define msvQVTKButtonsAction_H
+  Program:   Visualization Toolkit
+  Module:    msvVTKButtonsAction.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifndef msvVTKButtonsAction_H
+#define msvVTKButtonsAction_H
 
 // MSVTK includes
-#include "msvQtWidgetsExport.h"
+#include "msvVTKWidgetsExport.h"
 
 // Forward references
 class vtkRenderer;
 
 /**
-Class name: msvQVTKButtonsAction
+Class name: msvVTKButtonsAction
 Interface abstract class for buttons actions
 */
 
-class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsAction
+class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsAction
 {
 
 public:
   /// Object constructor.
-  msvQVTKButtonsAction();
+  msvVTKButtonsAction();
 
   /// Animate the camera to zoom on the passed bounding box.
-  virtual void execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120)=0;
+  virtual void Execute(vtkRenderer *renderer, double bounds[6], int numberOfSteps = 120)=0;
 
   /// Object destructor.
-  virtual ~msvQVTKButtonsAction();
+  virtual ~msvVTKButtonsAction();
 
 };
 

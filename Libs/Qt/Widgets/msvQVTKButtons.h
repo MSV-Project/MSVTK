@@ -87,9 +87,6 @@ public:
 protected:
   QScopedPointer<msvQVTKButtonsPrivate> d_ptr;
 
-  /// Calculate position (center or corner)
-  void calculatePosition();
-
 private:
   Q_DECLARE_PRIVATE(msvQVTKButtons);
   Q_DISABLE_COPY(msvQVTKButtons);

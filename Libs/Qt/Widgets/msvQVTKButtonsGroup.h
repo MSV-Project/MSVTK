@@ -33,6 +33,7 @@ class vtkRenderer;
 class msvQVTKButtons;
 class vtkSliderWidget;
 class vtkSliderCallback;
+class vtkSliderCallback2;
 class vtkCommand;
 
 // Pimpl
@@ -87,14 +88,6 @@ public:
   /// Get the slider widget
   vtkSliderWidget* slider();
 
-  /// Show/hide the slider widget
-  void showSlider(bool show);
-
-  /// Set the position on the path at the specified ratio
-  void setCameraPoistionOnPath(double ratio);
-
-  vtkCommand *sliderCallback() const;
-
 public slots:
 
   /// hide/show group
@@ -112,32 +105,11 @@ protected:
 //   QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
 //   vtkSliderWidget* m_Slider; //< Slider widget
   vtkSliderCallback* m_SliderCallback; //< Slider callback function
+  vtkSliderCallback2* m_SliderCallback2; //< Slider callback function
 
 private:
   Q_DECLARE_PRIVATE(msvQVTKButtonsGroup);
   Q_DISABLE_COPY(msvQVTKButtonsGroup);
 };
-
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-inline void msvQVTKButtonsGroup::setShowButton(bool show)
-{
-  msvQVTKButtonsInterface::setShowButton(show);
-  setElementProperty("showButton",show);
-}
-
-inline void msvQVTKButtonsGroup::setShowLabel(bool show)
-{
-  msvQVTKButtonsInterface::setShowLabel(show);
-  setElementProperty("showLabel",show);
-}
-
-inline void msvQVTKButtonsGroup::setIconFileName(QString iconFileName)
-{
-  msvQVTKButtonsInterface::setIconFileName(iconFileName);
-  setElementProperty("iconFileName",iconFileName);
-}
 
 #endif // msvQVTKButtonsGroup_H
