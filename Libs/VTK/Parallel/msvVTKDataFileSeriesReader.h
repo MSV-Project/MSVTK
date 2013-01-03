@@ -3,6 +3,7 @@
   Library: MSVTK
 
   Copyright (c) Kitware Inc.
+  Copyright (c) The University of Auckland.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -18,21 +19,21 @@
 
 ==============================================================================*/
 
-#ifndef __msvVTKPolyDataFileSeriesReader_h
-#define __msvVTKPolyDataFileSeriesReader_h
+#ifndef __msvVTKDataFileSeriesReader_h
+#define __msvVTKDataFileSeriesReader_h
 
 // VTK_PARALLEL includes
 #include "msvVTKParallelExport.h"
 
 // VTK includes
 #include "msvVTKFileSeriesReader.h"
-#include "vtkPolyDataReader.h"
+#include "vtkDataReader.h"
 
-class MSV_VTK_PARALLEL_EXPORT msvVTKPolyDataFileSeriesReader : public msvVTKFileSeriesReader
+class MSV_VTK_PARALLEL_EXPORT msvVTKDataFileSeriesReader : public msvVTKFileSeriesReader
 {
 public:
-  vtkTypeMacro(msvVTKPolyDataFileSeriesReader, msvVTKFileSeriesReader);
-  static msvVTKPolyDataFileSeriesReader *New();
+  vtkTypeMacro(msvVTKDataFileSeriesReader, msvVTKFileSeriesReader);
+  static msvVTKDataFileSeriesReader *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
@@ -43,13 +44,13 @@ public:
   static int CanReadFile(vtkAlgorithm*, const char*);
 
 protected:
-  msvVTKPolyDataFileSeriesReader();
-  virtual ~msvVTKPolyDataFileSeriesReader();
+  msvVTKDataFileSeriesReader();
+  virtual ~msvVTKDataFileSeriesReader();
   virtual void SetReaderFileName(const char* fname);
 
 private:
-  msvVTKPolyDataFileSeriesReader(const msvVTKPolyDataFileSeriesReader&);// Not implemented.
-  void operator=(const msvVTKPolyDataFileSeriesReader&);                // Not implemented.
+  msvVTKDataFileSeriesReader(const msvVTKDataFileSeriesReader&);// Not implemented.
+  void operator=(const msvVTKDataFileSeriesReader&);                // Not implemented.
 };
 
 #endif
