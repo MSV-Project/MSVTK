@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,20 +17,10 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtonsInterface.h
+#ifndef __msvVTKButonsInterface_h
+#define __msvVTKButonsInterface_h
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 // .NAME msvVTKButtonsInterface -
 // .SECTION Description
 //
@@ -38,18 +28,16 @@
 // .SECTION See Also
 //
 
-#include "vtkObject.h"
+// VTK includes
+#include <vtkObject.h>
 
-// VTK_WIDGET includes
+// MSVTK includes
 #include "msvVTKWidgetsExport.h"
 
 // Forward references
 class vtkButtonWidget;
 class vtkImageData;
 class vtkRenderer;
-
-#ifndef __msvVTKButonsInterface_h
-#define __msvVTKButonsInterface_h
 
 //----------------------------------------------------------------------
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsInterface : public vtkObject

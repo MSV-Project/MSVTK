@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsGroup_H
-#define msvQVTKButtonsGroup_H
+#ifndef __msvQVTKButtonsGroup_h
+#define __msvQVTKButtonsGroup_h
 
 // Qt includes
 #include <QVariant>
@@ -112,4 +112,4 @@ private:
   Q_DISABLE_COPY(msvQVTKButtonsGroup);
 };
 
-#endif // msvQVTKButtonsGroup_H
+#endif // __msvQVTKButtonsGroup_h

@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,20 +17,6 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtonsAction.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 
 // MSVTK includes
 #include "msvVTKButtonsAction.h"
