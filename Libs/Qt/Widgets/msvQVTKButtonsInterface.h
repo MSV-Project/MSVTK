@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsInterface_H
-#define msvQVTKButtonsInterface_H
+#ifndef __msvQVTKButtonsInterface_h
+#define __msvQVTKButtonsInterface_h
 
 // Qt includes
 #include <QImage>
@@ -41,7 +41,8 @@ class msvQVTKButtonsInterfacePrivate;
  Class name: msvQVTKButtonsInterface
  Interface class for buttons generalization
  */
-class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsInterface : public QObject {
+class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsInterface : public QObject
+{
   Q_OBJECT
   Q_PROPERTY(QString label READ label WRITE setLabel);
   Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip);
@@ -137,4 +138,4 @@ private:
 };
 
 
-#endif // msvQVTKButtonsInterface_H
+#endif // __msvQVTKButtonsInterface_h

@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,21 +17,8 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtons.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-
+// VTK includes
 #include "vtkButtonRepresentation.h"
 #include "vtkButtonWidget.h"
 #include "vtkCommand.h"
@@ -48,11 +35,12 @@
 
 vtkStandardNewMacro(msvVTKButtons);
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
  // Callback respondign to vtkCommand::StateChangedEvent
 class vtkButtonCallback : public vtkCommand
 {
 public:
+  vtkTypeMacro(vtkButtonCallback, vtkCommand)
   static vtkButtonCallback *New()
   {
     return new vtkButtonCallback;
@@ -61,34 +49,34 @@ public:
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
     msvVTKAnimate* animateCamera = new msvVTKAnimate();
-    if (FlyTo)
-    {
-      animateCamera->Execute(Renderer, Bounds, 200);
-    }
+    if (this->FlyTo)
+      {
+      animateCamera->Execute(this->Renderer, Bounds, 200);
+      }
     else
-    {
-      Renderer->ResetCamera(Bounds);
-    }
+      {
+      this->Renderer->ResetCamera(this->Bounds);
+      }
     if(animateCamera)
-    {
+      {
       delete animateCamera;
-    }
+      }
     //selection
   }
 
-  void setBounds(double b[6])
+  void SetBounds(double b[6])
   {
-    Bounds[0] = b[0];
-    Bounds[1] = b[1];
-    Bounds[2] = b[2];
-    Bounds[3] = b[3];
-    Bounds[4] = b[4];
-    Bounds[5] = b[5];
+    this->Bounds[0] = b[0];
+    this->Bounds[1] = b[1];
+    this->Bounds[2] = b[2];
+    this->Bounds[3] = b[3];
+    this->Bounds[4] = b[4];
+    this->Bounds[5] = b[5];
   }
 
   void SetFlyTo(bool fly)
   {
-    FlyTo = fly;
+    this->FlyTo = fly;
   }
 
   vtkButtonCallback():ToolButton(NULL), Renderer(0), FlyTo(true) {}
@@ -98,58 +86,52 @@ public:
   bool FlyTo;
 };
 
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 msvVTKButtons::msvVTKButtons() : msvVTKButtonsInterface()
 {
-  this->Data=NULL;
-  this->Window=NULL;
-  this->FlyTo=true;
-  this->OnCenter=false;
+  this->Data = NULL;
+  this->Window = NULL;
+  this->FlyTo = true;
+  this->OnCenter = false;
 
   this->ButtonCallback = vtkButtonCallback::New();
-  reinterpret_cast<vtkButtonCallback*>(this->ButtonCallback)->ToolButton = this;
+  vtkButtonCallback::SafeDownCast(this->ButtonCallback)->ToolButton = this;
 
-  this->GetButton()->AddObserver(vtkCommand::StateChangedEvent,this->ButtonCallback);
+  this->GetButton()->AddObserver(vtkCommand::StateChangedEvent,
+                                 this->ButtonCallback);
 }
 
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 msvVTKButtons::~msvVTKButtons()
 {
-  if(this->Window)
-  {
+  if (this->Window)
+    {
     this->Window->Delete();
-  }
+    }
 }
 
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void msvVTKButtons::SetBounds(double b[6])
 {
-  msvVTKButtonsInterface::SetBounds(b);
-  reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->setBounds(b);
+  this->Superclass::SetBounds(b);
+  vtkButtonCallback::SafeDownCast(this->ButtonCallback)->SetBounds(b);
   //this->Update();
 }
 
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void msvVTKButtons::SetCurrentRenderer(vtkRenderer *renderer)
 {
-  msvVTKButtonsInterface::SetCurrentRenderer(renderer);
-  if(renderer)
-  {
-    reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer = renderer;
-  }
-  else
-  {
-    reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer = NULL;
-  }
+  this->Superclass::SetCurrentRenderer(renderer);
+  vtkButtonCallback::SafeDownCast(ButtonCallback)->Renderer = renderer;
 }
 
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkImageData* msvVTKButtons::GetPreview(int width, int height)
 {
-  if(Data)
-  {
+  if (this->Data)
+    {
     double bounds[6];
-    Data->GetBounds(bounds);
+    this->Data->GetBounds(bounds);
 
     // create pipe
     vtkWindowToImageFilter *previewer = vtkWindowToImageFilter::New();
@@ -196,27 +178,27 @@ vtkImageData* msvVTKButtons::GetPreview(int width, int height)
     //this->GetWindow()->Delete();
 
     return vtkImage;
-  }
+    }
   return NULL;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void msvVTKButtons::Update()
 {
-  msvVTKButtonsInterface::Update();
+  this->Superclass::Update();
   this->CalculatePosition();
-  if(ButtonCallback)
-  {
-    reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->FlyTo = FlyTo;
-    if(reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer)
+  if (this->ButtonCallback)
     {
-      reinterpret_cast<vtkButtonCallback*>(
+    vtkButtonCallback::SafeDownCast(ButtonCallback)->FlyTo = this->FlyTo;
+    if (vtkButtonCallback::SafeDownCast(ButtonCallback)->Renderer)
+      {
+      vtkButtonCallback::SafeDownCast(
         ButtonCallback)->Renderer->GetRenderWindow()->Render();
+      }
     }
-  }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void msvVTKButtons::CalculatePosition()
 {
   //modify position of the vtkButton
@@ -224,21 +206,21 @@ void msvVTKButtons::CalculatePosition()
   double coord[3];
   this->GetBounds(bds);
   if (this->OnCenter)
-  {
+    {
     coord[0] = (bds[1] + bds[0])*.5;
     coord[1] = (bds[3] + bds[2])*.5;
     coord[2] = (bds[5] + bds[4])*.5;
-  }
+    }
   else
-  {
+    {
     //on the corner of the bounding box of the VME.
     coord[0] = bds[0];
     coord[1] = bds[2];
     coord[2] = bds[4];
-  }
+    }
   int size[2]; size[0] = 16; size[1] = 16;
   vtkTexturedButtonRepresentation2D *rep =
-    static_cast<vtkTexturedButtonRepresentation2D*>(
+    vtkTexturedButtonRepresentation2D::SafeDownCast(
     this->GetButton()->GetRepresentation());
 
   rep->PlaceWidget(coord, size);
@@ -246,12 +228,12 @@ void msvVTKButtons::CalculatePosition()
   this->GetButton()->SetRepresentation(rep);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkRenderWindow* msvVTKButtons::GetWindow()
 {
-  if(Window == NULL)
-  {
-    Window = vtkRenderWindow::New();
-  }
+  if (this->Window == NULL)
+    {
+    this->Window = vtkRenderWindow::New();
+    }
   return Window;
 }

@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,20 +17,7 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtons.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 // .NAME msvVTKButtons -
 // .SECTION Description
 //
@@ -38,7 +25,8 @@
 // .SECTION See Also
 //
 
-#include "vtkObject.h"
+#ifndef __msvVTKButtons_h
+#define __msvVTKButtons_h
 
 // VTK_WIDGET includes
 #include "msvVTKButtonsInterface.h"
@@ -48,15 +36,16 @@ class vtkDataSet;
 class vtkImageData;
 class vtkRenderWindow;
 
-#ifndef __msvVTKButtons_h
-#define __msvVTKButtons_h
-
 //----------------------------------------------------------------------
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtons : public msvVTKButtonsInterface
 {
 public:
   // Instantiate the class.
   static msvVTKButtons *New();
+
+  // Description:
+  // Standard methods for instances of the class.
+  vtkTypeMacro(msvVTKButtons, msvVTKButtonsInterface);
 
   // Allow to activate FlyTo animation
   vtkSetMacro(FlyTo,bool);

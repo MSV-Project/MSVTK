@@ -65,16 +65,18 @@ public:
 };
 
 //------------------------------------------------------------------------------
-msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object)
-  : m_VTKButtons(NULL), q_ptr(&object)
+msvQVTKButtonsInterfacePrivate
+::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object)
+  : m_VTKButtons(NULL)
+  , q_ptr(&object)
 {
   //m_VTKButtonsInterface = msvVTKButtonsInterface::New();
 }
 
 //------------------------------------------------------------------------------
-/*virtual*/ msvVTKButtonsInterface* msvQVTKButtonsInterfacePrivate::getVTKButtons()
+msvVTKButtonsInterface* msvQVTKButtonsInterfacePrivate::getVTKButtons()
 {
-    return m_VTKButtons;
+  return m_VTKButtons;
 }
 
 //------------------------------------------------------------------------------
@@ -86,7 +88,8 @@ msvQVTKButtonsInterfacePrivate::~msvQVTKButtonsInterfacePrivate()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsInterfacePrivate::setIconFileName(QString iconfilename)
 {
-  m_IconFileName = iconfilename;  QImage image;
+  this->m_IconFileName = iconfilename;
+  QImage image;
   image.load(m_IconFileName);
   vtkQImageToImageSource *imageToVTK = vtkQImageToImageSource::New();
   imageToVTK->SetQImage(&image);
@@ -97,7 +100,8 @@ void msvQVTKButtonsInterfacePrivate::setIconFileName(QString iconfilename)
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsInterface::msvQVTKButtonsInterface(QObject *parent)
-  : QObject(parent), d_ptr(new msvQVTKButtonsInterfacePrivate(*this))
+  : QObject(parent)
+  , d_ptr(new msvQVTKButtonsInterfacePrivate(*this))
 {
 
 }
@@ -155,11 +159,14 @@ void msvQVTKButtonsInterface::setShowButton(bool visible)
 void msvQVTKButtonsInterface::setShowTooltip(bool value)
 {
   Q_D(msvQVTKButtonsInterface);
-  if(value) {
+  if(value)
+    {
     Q_EMIT showTooltip(d->tooltip());
-  } else {
+    }
+  else
+    {
     Q_EMIT hideTooltip();
-  }
+    }
 }
 
 //------------------------------------------------------------------------------

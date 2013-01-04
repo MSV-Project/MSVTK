@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,20 +17,7 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtonsGroup.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 // .NAME msvVTKButtonsGroup -
 // .SECTION Description
 //
@@ -38,12 +25,14 @@
 // .SECTION See Also
 //
 
-#include "vtkObject.h"
+#ifndef __msvVTKButtonsGroup_h
+#define __msvVTKButtonsGroup_h
 
-#include <vector>
-
-// VTK_WIDGET includes
+// MSVTK includes
 #include "msvVTKButtonsInterface.h"
+
+// STD includes
+#include <vector>
 
 // Forward references
 class vtkSliderInteractionCallback;
@@ -52,15 +41,16 @@ class vtkSliderWidget;
 
 class msvVTKButtons;
 
-#ifndef __msvVTKButtonsGroup_h
-#define __msvVTKButtonsGroup_h
-
 //----------------------------------------------------------------------
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsGroup : public msvVTKButtonsInterface
 {
 public:
   // Instantiate the class.
   static msvVTKButtonsGroup *New();
+
+  // Description:
+  // Standard methods for instances of the class.
+  vtkTypeMacro(msvVTKButtonsGroup, msvVTKButtonsInterface);
 
   // Add a buttons to the buttons' vector
   void AddElement(msvVTKButtonsInterface* buttons);
@@ -105,7 +95,7 @@ public:
   vtkCommand *GetSliderStartInteractionCallback() const;
 
   // Set the current renderer
-  void SetCurrentRenderer(vtkRenderer *renderer);
+  virtual void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Perform update
   void Update();
