@@ -19,10 +19,11 @@
 ==============================================================================*/
 
 // MSVTK
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 // VTK includes
 #include "vtkNew.h"
+#include "vtkPolyDataReader.h"
 #include "vtkTestUtilities.h"
 
 // STD includes
@@ -30,7 +31,7 @@
 #include <string>
 
 // -----------------------------------------------------------------------------
-int msvVTKPolyDataFileSeriesReaderTest1(int argc, char* argv[])
+int msvVTKDataFileSeriesReaderTest1(int argc, char* argv[])
 {
   // Get the data test files
   const char* file0 =
@@ -40,73 +41,73 @@ int msvVTKPolyDataFileSeriesReaderTest1(int argc, char* argv[])
 
   // Create the fileSeriesReader
   vtkNew<vtkPolyDataReader> polyDataReader;
-  vtkNew<msvVTKPolyDataFileSeriesReader> polyDataFileSeriesReader;
+  vtkNew<msvVTKDataFileSeriesReader> dataFileSeriesReader;
 
-  if (polyDataFileSeriesReader->CanReadFile(file0))
+  if (dataFileSeriesReader->CanReadFile(file0))
     {
     std::cerr << "Error: method CanReadFile must return 0 when no reader set."
               << std::endl;
     return EXIT_FAILURE;
     }
-  if (polyDataFileSeriesReader->CanReadFile(polyDataReader.GetPointer(),0))
+  if (dataFileSeriesReader->CanReadFile(polyDataReader.GetPointer(),0))
     {
     std::cerr << "Error: method CanReadFile must return 0 when no file set."
               << std::endl;
     return EXIT_FAILURE;
     }
 
-  polyDataFileSeriesReader->SetReader(polyDataReader.GetPointer());
+  dataFileSeriesReader->SetReader(polyDataReader.GetPointer());
 
-  polyDataFileSeriesReader->GetMTime();
-  polyDataFileSeriesReader->RemoveAllFileNames();
+  dataFileSeriesReader->GetMTime();
+  dataFileSeriesReader->RemoveAllFileNames();
 
-  polyDataFileSeriesReader->AddFileName(file0);
-  polyDataFileSeriesReader->AddFileName(file1);
+  dataFileSeriesReader->AddFileName(file0);
+  dataFileSeriesReader->AddFileName(file1);
 
-  if (polyDataFileSeriesReader->GetNumberOfFileNames() != 2)
+  if (dataFileSeriesReader->GetNumberOfFileNames() != 2)
     {
     std::cerr << "Error: NumberOfFileNames != to the number of file added"
               << std::endl;
     return EXIT_FAILURE;
     }
 
-  polyDataFileSeriesReader->GetFileName(5);
-  if (strcmp(polyDataFileSeriesReader->GetFileName(1),file1) != 0)
+  dataFileSeriesReader->GetFileName(5);
+  if (strcmp(dataFileSeriesReader->GetFileName(1),file1) != 0)
     {
     std::cerr << "Error: GetFileName different than expected: " << std::endl
               << "Expected fileName: " << file1 << std::endl
-              << "Filename retrived: " << polyDataFileSeriesReader->GetFileName(1)
+              << "Filename retrived: " << dataFileSeriesReader->GetFileName(1)
               << std::endl;
     return EXIT_FAILURE;
     }
 
   // Set the default reader
-  polyDataFileSeriesReader->CanReadFile(file1);
-  polyDataFileSeriesReader->SetReader(polyDataReader.GetPointer());
+  dataFileSeriesReader->CanReadFile(file1);
+  dataFileSeriesReader->SetReader(polyDataReader.GetPointer());
 
-  polyDataFileSeriesReader->SetUseMetaFile(true);
-  if (!polyDataFileSeriesReader->GetUseMetaFile())
+  dataFileSeriesReader->SetUseMetaFile(true);
+  if (!dataFileSeriesReader->GetUseMetaFile())
     {
     std::cerr << "Error: UseMetaFile true not set." << std::endl;
     return EXIT_FAILURE;
     }
 
-  if (polyDataFileSeriesReader->CanReadFile(file0))
+  if (dataFileSeriesReader->CanReadFile(file0))
     {
     std::cerr << "Error: filename doesn not really points to a metafile, "
               << "must return 0" << std::endl;
     return EXIT_FAILURE;
     }
-  polyDataFileSeriesReader->UseMetaFileOff();
+  dataFileSeriesReader->UseMetaFileOff();
 
-  polyDataFileSeriesReader->GetMTime();
+  dataFileSeriesReader->GetMTime();
 
-  if (!polyDataFileSeriesReader->CanReadFile(file1))
+  if (!dataFileSeriesReader->CanReadFile(file1))
     {
     std::cerr << "CanReadFile return false on proper vtk file" << std::endl;
     return EXIT_FAILURE;
     }
 
-  polyDataFileSeriesReader->Print(std::cout);
+  dataFileSeriesReader->Print(std::cout);
   return EXIT_SUCCESS;
 }

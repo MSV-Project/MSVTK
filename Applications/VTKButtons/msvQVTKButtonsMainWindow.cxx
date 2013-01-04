@@ -31,7 +31,7 @@
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 #include "ui_msvQVTKButtonsMainWindow.h"
 #include "msvQVTKButtonsAboutDialog.h"
 
