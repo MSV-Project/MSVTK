@@ -3,6 +3,7 @@
   Library: MSVTK
 
   Copyright (c) Kitware Inc.
+  Copyright (c) The University of Auckland.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,34 +21,34 @@
 
 // VTK includes
 #include <vtkNew.h>
+#include <vtkDataReader.h>
 #include <vtkObjectFactory.h>
-#include <vtkPolyDataReader.h>
 #include <vtkStringArray.h>
 
 // MSVTK includes
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 //------------------------------------------------------------------------------
-vtkStandardNewMacro(msvVTKPolyDataFileSeriesReader);
+vtkStandardNewMacro(msvVTKDataFileSeriesReader);
 
 //------------------------------------------------------------------------------
-msvVTKPolyDataFileSeriesReader::msvVTKPolyDataFileSeriesReader()
+msvVTKDataFileSeriesReader::msvVTKDataFileSeriesReader()
 {
 }
 
 //------------------------------------------------------------------------------
-msvVTKPolyDataFileSeriesReader::~msvVTKPolyDataFileSeriesReader()
+msvVTKDataFileSeriesReader::~msvVTKDataFileSeriesReader()
 {
 }
 
 //------------------------------------------------------------------------------
-void msvVTKPolyDataFileSeriesReader::SetReader(vtkAlgorithm* reader)
+void msvVTKDataFileSeriesReader::SetReader(vtkAlgorithm* reader)
 {
-  this->Superclass::SetReader(vtkPolyDataReader::SafeDownCast(reader));
+  this->Superclass::SetReader(vtkDataReader::SafeDownCast(reader));
 }
 
 //------------------------------------------------------------------------------
-int msvVTKPolyDataFileSeriesReader::CanReadFile(const char* filename)
+int msvVTKDataFileSeriesReader::CanReadFile(const char* filename)
 {
   if (!this->Reader)
     {
@@ -63,7 +64,7 @@ int msvVTKPolyDataFileSeriesReader::CanReadFile(const char* filename)
       {
       if (dataFiles->GetNumberOfValues() > 0)
         {
-        return msvVTKPolyDataFileSeriesReader::
+        return msvVTKDataFileSeriesReader::
           CanReadFile(this->Reader,dataFiles->GetValue(0).c_str());
         }
       }
@@ -71,28 +72,56 @@ int msvVTKPolyDataFileSeriesReader::CanReadFile(const char* filename)
     }
   else
     {
-    return msvVTKPolyDataFileSeriesReader::CanReadFile(this->Reader, filename);
+    return msvVTKDataFileSeriesReader::CanReadFile(this->Reader, filename);
     }
 }
 
 //------------------------------------------------------------------------------
-int msvVTKPolyDataFileSeriesReader::CanReadFile(vtkAlgorithm* algo,
+int msvVTKDataFileSeriesReader::CanReadFile(vtkAlgorithm* algo,
                                             const char* filename)
 {
-  vtkPolyDataReader* reader = vtkPolyDataReader::SafeDownCast(algo);
+  vtkDataReader* reader = vtkDataReader::SafeDownCast(algo);
   if(!reader || !filename)
     {
     return 0;
     }
 
   reader->SetFileName(filename);
-  return reader->IsFileValid("polydata");
+
+  if (reader->IsA("vtkPolyDataReader"))
+    {
+    return reader->IsFilePolyData();
+    }
+  else if (reader->IsA("vtkRectilinearGridReader"))
+    {
+    return reader->IsFileRectilinearGrid();
+    }
+  else if (reader->IsA("vtkStructuredPointsReader"))
+    {
+    return reader->IsFileStructuredPoints();
+    }
+  else if (reader->IsA("vtkStructuredGridReader"))
+    {
+    return reader->IsFileStructuredGrid();
+    }
+  else if (reader->IsA("vtkUnstructuredGridReader"))
+    {
+    return reader->IsFileUnstructuredGrid();
+    }
+  else
+    {
+    // there is no other type specific check method for other derived classes.
+    // Always return 1.
+    return 1;
+    }
+
+  return 0;
 }
 
 //------------------------------------------------------------------------------
-void msvVTKPolyDataFileSeriesReader::SetReaderFileName(const char* fname)
+void msvVTKDataFileSeriesReader::SetReaderFileName(const char* fname)
 {
-  vtkPolyDataReader* reader = vtkPolyDataReader::SafeDownCast(this->Reader);
+  vtkDataReader* reader = vtkDataReader::SafeDownCast(this->Reader);
   if (reader)
     {
     // We want to suppress the modification time change in the Reader.  See
@@ -105,7 +134,7 @@ void msvVTKPolyDataFileSeriesReader::SetReaderFileName(const char* fname)
 }
 
 //------------------------------------------------------------------------------
-void msvVTKPolyDataFileSeriesReader::PrintSelf(ostream &os, vtkIndent indent)
+void msvVTKDataFileSeriesReader::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

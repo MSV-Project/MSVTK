@@ -19,7 +19,7 @@
 ==============================================================================*/
 
 // MSVTK
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 // VTK includes
 #include "vtkActor.h"
@@ -63,13 +63,13 @@
 
 // This example shows the usage of the msvVTKFileSeriesReader
 // It uses a concrete implementation of msvVTKFileSeriesReader through
-// msvVTKPolyDataFileSeriesReader
+// msvVTKDataFileSeriesReader
 // and uses two ".vtk" files which each contains sparse points (PolyData).
 // The pipeline is defined as follow:
 //          [msvVTKFileSeriesReader]
 //                    ^
 //                    |
-// [msvVTKPolyDataFileSeriesReader]-[vtkPolyDataMapper]->[vtkActor]
+// [msvVTKDataFileSeriesReader]-[vtkPolyDataMapper]->[vtkActor]
 //                    |- vtkPolyDataReader
 
 // -----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ int main(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
   iren->SetInteractorStyle(irenStyle.GetPointer());
 
   // Create the Pipeline.
-  vtkNew<msvVTKPolyDataFileSeriesReader> polyDataSeriesReader;
+  vtkNew<msvVTKDataFileSeriesReader> polyDataSeriesReader;
   // The reader associated to our fileSeriesReader.
   vtkNew<vtkPolyDataReader> polyDataReader;
   // The mapper mapping data to graphics primitives.
