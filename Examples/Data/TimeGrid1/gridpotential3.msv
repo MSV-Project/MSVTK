@@ -1,0 +1,18 @@
+# Crashes using vtkTemporalDataSetCache
+#
+msvVTKDataFileSeriesReader(potentialField
+  READER vtkDataObjectReader TIMERANGE 0.0 10.0 FILES
+  potential00.vtk potential01.vtk potential02.vtk potential03.vtk
+  potential04.vtk potential05.vtk potential06.vtk potential07.vtk
+  potential08.vtk potential09.vtk potential10.vtk)
+# vtkStructuredGridReader(potentialField FILE grid.vtk)
+msvVTKDataFileSeriesReader(gridReader
+  READER vtkStructuredGridReader TIMERANGE 0.0 10.0 FILES
+  grid.vtk grid.vtk grid.vtk grid.vtk grid.vtk grid.vtk
+  grid.vtk grid.vtk grid.vtk grid.vtk grid.vtk)
+vtkTemporalDataSetCache(timeCachedGridReader CACHESIZE 20 INPUT gridReader)
+vtkMergeDataObjectFilter(mergeGridFields INPUT timeCachedGridReader DATAINPUT potentialField OUTPUTPOINTDATA)
+vtkFieldDataToAttributeDataFilter(scalarMergeGridFields INPUT mergeGridFields INPUTPOINTDATA OUTPUTPOINTDATA SCALAR "potential")
+vtkDataSetSurfaceFilter(gridSurfaceFilter INPUT scalarMergeGridFields)
+vtkPolyDataMapper(gridMapper INPUT gridSurfaceFilter SCALARVISIBILITYON)
+vtkActor("Grid with potential" MAPPER gridMapper COLOR 0.89 0.36 0.37 VISIBILITY 1)
