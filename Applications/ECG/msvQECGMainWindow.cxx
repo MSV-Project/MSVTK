@@ -27,8 +27,8 @@
 // MSV includes
 #include "msvQECGMainWindow.h"
 #include "msvQTimePlayerWidget.h"
+#include "msvVTKDataFileSeriesReader.h"
 #include "msvVTKECGButtonsManager.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
 #include "ui_msvQECGMainWindow.h"
 #include "msvQECGAboutDialog.h"
 
@@ -50,6 +50,7 @@
 #include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPolyDataReader.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
@@ -88,7 +89,7 @@ protected:
   vtkSmartPointer<vtkTable> currentTimeLine;
 
   // CartoPoints Pipeline
-  vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
+  vtkSmartPointer<msvVTKDataFileSeriesReader> cartoPointsReader;
   vtkSmartPointer<vtkPolyDataReader>              polyDataReader;
   vtkSmartPointer<vtkPolyDataMapper>              cartoPointsMapper;
   vtkSmartPointer<vtkActor>                       cartoPointsActor;
@@ -165,7 +166,7 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   // CartoPoints Readers
   this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
   this->cartoPointsReader =
-    vtkSmartPointer<msvVTKPolyDataFileSeriesReader>::New();
+    vtkSmartPointer<msvVTKDataFileSeriesReader>::New();
   this->cartoPointsReader->SetReader(this->polyDataReader);
 
   this->delaunayFilter = vtkSmartPointer<vtkDelaunay3D>::New();

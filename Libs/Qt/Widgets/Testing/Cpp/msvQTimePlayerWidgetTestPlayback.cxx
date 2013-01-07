@@ -25,7 +25,7 @@
 
 // MSVTK
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 // VTK includes
 #include "vtkNew.h"
@@ -51,7 +51,7 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
 
   // Create the pipeline
   vtkNew<vtkPolyDataReader> polyDataReader;
-  vtkNew<msvVTKPolyDataFileSeriesReader> fileSeriesReader;
+  vtkNew<msvVTKDataFileSeriesReader> fileSeriesReader;
   fileSeriesReader->SetReader(polyDataReader.GetPointer());
 
   vtkNew<vtkPolyDataMapper> polyMapper;
