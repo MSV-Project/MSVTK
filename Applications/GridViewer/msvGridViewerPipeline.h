@@ -30,7 +30,6 @@
 #include "msvGridViewerExport.h"
 
 // VTK includes
-// GRC review/reduce:
 #include "vtkAlgorithm.h"
 #include "vtkAxesActor.h"
 #include "vtkMapper.h"
@@ -53,7 +52,7 @@ public:
   void addToRenderWindow(vtkRenderWindow *renderWindow);
 
 private:
-  vtkObject *msvGridViewerPipeline::createReader(std::string &readerName);
+  vtkObject *createReader(std::string &readerName);
   int checkOption(const char *token, std::string &name,
     std::vector<std::string> &options, int &i, int minArgs);
   vtkAlgorithm *checkAlgorithmOption(const char *token, std::string &name,
