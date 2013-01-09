@@ -10,6 +10,7 @@ set(dirs
   )
 
 list(APPEND dirs
+  Graphics
   Parallel
   Widgets
   )
