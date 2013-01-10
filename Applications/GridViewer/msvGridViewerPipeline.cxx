@@ -24,12 +24,14 @@
 // MSV includes
 #include "msvGridViewerPipeline.h"
 #include "msvVTKDataFileSeriesReader.h"
+#include "msvVTKEmbeddedProbeFilter.h"
 
 // VTK includes
 #include "vtkActor.h"
 //#include "vtkAppendFilter.h"
 #include "vtkDataObjectReader.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkExtractEdges.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
 //#include "vtkMergeFilter.h"
 #include "vtkMergeDataObjectFilter.h"
@@ -37,12 +39,14 @@
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPolyDataReader.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkStructuredGridReader.h"
 #include "vtkTemporalDataSetCache.h"
+#include "vtkUnstructuredGridReader.h"
 
 //------------------------------------------------------------------------------
 // msvGridViewerPipeline methods
@@ -194,12 +198,17 @@ int msvGridViewerPipeline::readCommand(std::istream &gridFile,
 }
 
 //------------------------------------------------------------------------------
-vtkObject *msvGridViewerPipeline::createReader(std::string &readerName)
+// Caller is responsible for calling Delete on any returned pointer
+vtkDataReader *msvGridViewerPipeline::createDataReader(std::string &readerName)
 {
   if (readerName == "vtkDataObjectReader")
     return vtkDataObjectReader::New();
+  else if (readerName == "vtkPolyDataReader")
+    return vtkPolyDataReader::New();
   else if (readerName == "vtkStructuredGridReader")
     return vtkStructuredGridReader::New();
+  else if (readerName == "vtkUnstructuredGridReader")
+    return vtkUnstructuredGridReader::New();
   return 0;
 }
 
@@ -280,8 +289,26 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
       }
     vtkSmartPointer<vtkObject> object;
     int optionIndex = 1;
+    vtkDataReader *tmpDataReader;
 
-    if (command == "msvVTKDataFileSeriesReader")
+    if (0 != (tmpDataReader = this->createDataReader(command)))
+      {
+      object = tmpDataReader;
+      vtkSmartPointer<vtkDataReader> dataReader;
+      dataReader.TakeReference(tmpDataReader);
+      if (this->checkOption("FILE", name, options, optionIndex, /*minArgs*/1))
+        {
+        dataReader->SetFileName(options[optionIndex].c_str());
+        ++optionIndex;
+        }
+      if ((0 == dataReader->GetFileName()) || (optionIndex < options.size()))
+        {
+          cerr << "'" << name << "' requires only FILE <filename> option.\n";
+          return 0;
+        }
+      }
+
+    else if (command == "msvVTKDataFileSeriesReader")
       {
       vtkNew<msvVTKDataFileSeriesReader> fileSeriesReader;
       object = fileSeriesReader.GetPointer();
@@ -289,14 +316,8 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
         {
         if (this->checkOption("READER", name, options, optionIndex, /*numArgs*/1))
           {
-          vtkObject *reader = this->createReader(options[optionIndex]);
-          if (!reader)
-            {
-            cerr << "Unrecognised reader '" << options[optionIndex] << "'\n";
-            return 0;
-            }
-          vtkSmartPointer<vtkDataReader> dataReader = vtkDataReader::SafeDownCast(reader);
-          reader->Delete();
+          vtkSmartPointer<vtkDataReader> dataReader;
+          dataReader.TakeReference(this->createDataReader(options[optionIndex]));
           if (0 == dataReader.GetPointer())
             {
             cerr << "Unrecognised reader '" << options[optionIndex] << "'\n";
@@ -321,6 +342,42 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
             fileSeriesReader->AddFileName(options[optionIndex].c_str());
             ++optionIndex;
             }
+          }
+        else
+          {
+          if (optionIndex < options.size())
+            {
+            cerr << "'" << name << "' has unrecognised token '" << options[optionIndex] << "'\n";
+            return 0;
+            }
+          }
+        }
+      }
+
+    else if (command == "msvVTKEmbeddedProbeFilter")
+      {
+      vtkNew<msvVTKEmbeddedProbeFilter> embeddedProbe;
+      object = embeddedProbe.GetPointer();
+      while (optionIndex < options.size())
+        {
+        vtkAlgorithm *inputAlgorithm = 0;
+        if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
+          {
+          embeddedProbe->SetInputConnection(inputAlgorithm->GetOutputPort());
+          }
+        else if (0 != (inputAlgorithm = this->checkAlgorithmOption("SOURCE", name, options, optionIndex, objects)))
+          {
+          embeddedProbe->SetSourceConnection(inputAlgorithm->GetOutputPort());
+          }
+        else if (this->checkOption("PARAMETRICCOORDINATEARRAYNAME", name, options, optionIndex, /*minArgs*/1))
+          {
+          embeddedProbe->SetParametricCoordinateArrayName(options[optionIndex].c_str());
+          ++optionIndex;
+          }
+        else if (this->checkOption("CELLIDARRAYNAME", name, options, optionIndex, /*minArgs*/1))
+          {
+          embeddedProbe->SetCellIdArrayName(options[optionIndex].c_str());
+          ++optionIndex;
           }
         else
           {
@@ -369,6 +426,12 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
             }
           actor->GetProperty()->SetColor(color);
           }
+        else if (this->checkOption("OPACITY", name, options, optionIndex, /*minArgs*/1))
+          {
+          double opacity = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          actor->GetProperty()->SetOpacity(opacity);
+          }
         else if (this->checkOption("VISIBILITY", name, options, optionIndex, /*minArgs*/1))
           {
           int vis = atoi(options[optionIndex].c_str());
@@ -399,6 +462,21 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
       if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
         {
         dataSetSurface->SetInputConnection(inputAlgorithm->GetOutputPort());
+        }
+      if (!inputAlgorithm || (optionIndex < options.size()))
+        {
+          cerr << "'" << name << "' requires only INPUT <algorithm> option.\n";
+        }
+      }
+
+    else if (command == "vtkExtractEdges")
+      {
+      vtkNew<vtkExtractEdges> edges;
+      object = edges.GetPointer();
+      vtkAlgorithm *inputAlgorithm = 0;
+      if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
+        {
+        edges->SetInputConnection(inputAlgorithm->GetOutputPort());
         }
       if (!inputAlgorithm || (optionIndex < options.size()))
         {
@@ -515,22 +593,6 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
             return 0;
             }
           }
-        }
-      }
-
-    else if (command == "vtkStructuredGridReader")
-      {
-      vtkNew<vtkStructuredGridReader> reader;
-      object = reader.GetPointer();
-      if (this->checkOption("FILE", name, options, optionIndex, /*minArgs*/1))
-        {
-        reader->SetFileName(options[optionIndex].c_str());
-        ++optionIndex;
-        }
-      if ((0 == reader->GetFileName()) || (optionIndex < options.size()))
-        {
-          cerr << "'" << name << "' requires only FILE <filename> option.\n";
-          return 0;
         }
       }
 

@@ -37,6 +37,8 @@
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 
+class vtkDataReader;
+
 class MSV_GridViewer_EXPORT msvGridViewerPipeline
 {
 typedef std::map<std::string,vtkSmartPointer<vtkObject> > vtkNameMap;
@@ -52,7 +54,7 @@ public:
   void addToRenderWindow(vtkRenderWindow *renderWindow);
 
 private:
-  vtkObject *createReader(std::string &readerName);
+  vtkDataReader *createDataReader(std::string &readerName);
   int checkOption(const char *token, std::string &name,
     std::vector<std::string> &options, int &i, int minArgs);
   vtkAlgorithm *checkAlgorithmOption(const char *token, std::string &name,
