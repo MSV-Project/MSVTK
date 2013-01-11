@@ -28,6 +28,7 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPointSet.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vector>
@@ -118,11 +119,27 @@ void msvVTKEmbeddedProbeFilter::InitializeForProbing(vtkDataSet* input,
   // First, copy the input to the output as a starting point
   output->CopyStructure(input);
 
+  // Pass here so that the attributes/fields can be over-written later
+  output->GetPointData()->PassData(input->GetPointData());
+  output->GetCellData()->PassData(input->GetCellData());
+  output->GetFieldData()->PassData(input->GetFieldData());
+
+  // vtkPointSet-derived outputs have points coordinates probed,
+  // so allocate and replace the referenced ones set by CopyStructure()
+  vtkPointSet *pointSet = vtkPointSet::SafeDownCast(output);
+  if (pointSet)
+    {
+    vtkPoints *points = vtkPoints::New();
+    points->DeepCopy(pointSet->GetPoints());
+    pointSet->SetPoints(points);
+    points->Delete();
+    }
+
   vtkPointData* outPD = output->GetPointData();
 
   // Allocate storage for output PointData
-  // All input PD is passed to output as PD. Those arrays in input CD that are
-  // not present in output PD will be passed as output PD.
+  // All source PD is sampled to output as PD. Those arrays in source CD that
+  // are not present in output PD will be passed as output PD.
   outPD = output->GetPointData();
   outPD->InterpolateAllocate((*this->PointList), numPts, numPts);
 
@@ -241,6 +258,15 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
   double pcoords[3] = { 0.0, 0.0, 0.0 };
   vtkIdType cellId = 0;
   vtkCell *cell = 0;
+  // vtkPointSet-derived outputs have point coordinates probed
+  vtkPointSet *pointSet = vtkPointSet::SafeDownCast(output);
+  int subId = 0;
+  double coords[3];
+  vtkPoints *points = 0;
+  if (pointSet)
+    {
+    points = pointSet->GetPoints();
+    }
   for (vtkIdType ptId = 0; ptId < numPts; ++ptId)
     {
     if (ptId < cellIdArrayNumberOfTuples)
@@ -262,7 +288,16 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
       }
     pcoordArray->GetTuple(ptId, pcoords);
     const int cellNumberOfPoints = cell->GetNumberOfPoints();
-    cell->InterpolateFunctions(pcoords, weights);
+
+    if (points)
+      {
+      cell->EvaluateLocation(subId, pcoords, coords, weights);
+      points->SetPoint(ptId, coords);
+      }
+    else
+      {
+      cell->InterpolateFunctions(pcoords, weights);
+      }
 
     // Interpolate the point data
     outputPD->InterpolatePoint((*this->PointList), sourcePD, srcIdx, ptId,
