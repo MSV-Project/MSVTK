@@ -52,6 +52,7 @@ public:
   vtkAlgorithm *getEndMapper()
     { return this->endMapper; }
   void addToRenderWindow(vtkRenderWindow *renderWindow);
+  void updateTime(double);
 
 private:
   vtkDataReader *createDataReader(std::string &readerName);

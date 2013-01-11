@@ -53,6 +53,7 @@ public:
   virtual void setupView();
   virtual void update();
   virtual void updateView();
+  virtual void updateTime(double);
 
   virtual void clear();
 
@@ -140,6 +141,13 @@ void msvQGridViewerMainWindowPrivate::updateView()
 }
 
 //------------------------------------------------------------------------------
+void msvQGridViewerMainWindowPrivate::updateTime(double time)
+{
+  this->gridPipeline.updateTime(time);
+  this->updateView();
+}
+
+//------------------------------------------------------------------------------
 void msvQGridViewerMainWindowPrivate::readGridData(const QString& gridFileName)
 {
   Q_Q(msvQGridViewerMainWindow);
@@ -215,5 +223,5 @@ void msvQGridViewerMainWindow::onCurrentTimeChanged(double time)
 {
   Q_D(msvQGridViewerMainWindow);
   // update 3D view
-  this->updateView();
+  d->updateTime(time);
 }

@@ -28,7 +28,8 @@
 
 // VTK includes
 #include "vtkActor.h"
-//#include "vtkAppendFilter.h"
+#include "vtkActorCollection.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkDataObjectReader.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkExtractEdges.h"
@@ -44,6 +45,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGridReader.h"
 #include "vtkTemporalDataSetCache.h"
 #include "vtkUnstructuredGridReader.h"
@@ -97,9 +99,7 @@ int msvGridViewerPipeline::readCommand(std::istream &gridFile,
       do
         {
         gridFile.getline(comment, sizeof(comment));
-        cout << comment;
         } while (gridFile.fail());
-        cout << "\n";
       }
     else
       {
@@ -189,11 +189,11 @@ int msvGridViewerPipeline::readCommand(std::istream &gridFile,
       options.push_back(token);
       }
     }
-  cout << command << "\n";
-  for (int i = 0; i < options.size(); i++)
-    {
-    cout << "  " << options[i] << "\n";
-    }
+  //cout << command << "\n";
+  //for (int i = 0; i < options.size(); i++)
+  //  {
+  //  cout << "  " << options[i] << "\n";
+  //  }
   return 1;
 }
 
@@ -653,4 +653,40 @@ void msvGridViewerPipeline::addToRenderWindow(vtkRenderWindow *renderWindow)
     (this->threeDRenderer->GetRenderWindow()->GetInteractor());
   this->orientationMarker->SetEnabled(1);
   this->orientationMarker->InteractiveOn();
+}
+
+void msvGridViewerPipeline::updateTime(double time)
+{
+  // request update at time for all visible actors' mappers
+  vtkActorCollection *actors = this->threeDRenderer->GetActors();
+  if (actors)
+    {
+    actors->InitTraversal();
+    vtkActor *actor = 0;
+    while (0 != (actor = actors->GetNextActor()))
+      {
+      if (actor->GetVisibility())
+        {
+        vtkMapper *mapper = actor->GetMapper();
+        if (mapper)
+          {
+          for (int portIndex = 0;
+              portIndex < mapper->GetNumberOfInputPorts();
+              ++portIndex)
+            {
+            for (int connectionIndex = 0;
+              connectionIndex < mapper->GetNumberOfInputConnections(portIndex);
+              ++connectionIndex)
+              {
+                vtkStreamingDemandDrivenPipeline* sdd = vtkStreamingDemandDrivenPipeline::
+                  SafeDownCast(mapper->GetInputConnection(portIndex, connectionIndex)
+                    ->GetProducer()->GetExecutive());
+
+                sdd->SetUpdateTimeStep(portIndex, time);  // Request a time update
+              }
+            }
+          }
+        }
+      }
+    }
 }
