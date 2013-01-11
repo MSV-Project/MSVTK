@@ -18,23 +18,23 @@
 
 ==============================================================================*/
 
-// .NAME msvVTKEmbeddedProbeFilter - sample data values at embedded locations.
+// .NAME msvVTKEmbeddedProbeFilter - sample points and data values at embedded
+// locations.
 // .SECTION Description
-// msvVTKEmbeddedProbeFilter is a filter that computes point field arrays at
-// embedded locations i.e. prescribed cell indexes and parametric coordinates in
-// those cells. The filter has two inputs: the Input and Source. The Input
-// geometric structure is passed through the filter. Arguments specify Input
-// point data fields giving cell index and parametric coordinates at which
-// fields from the Source are sampled. Sampled Source fields replace point data
-// fields of the same name in the output, but it is an error if they have
-// different numbers of components.
-// The cell data of the source data is copied to the output based on in
-// which source cell each input point is. If an array of the same name exists
-// both in source's point and cell data, only the one from the point data is
-// probed.
+// msvVTKEmbeddedProbeFilter is a filter that computes point coordinates and
+// point field arrays at prescribed locations in cells of another dataset.
+// The filter has two inputs: the Input and Source. The Input geometric
+// structure is passed through the filter, and if the Input is a vtkPointSet,
+// point coordinates in the output are probed from the Source. All field arrays
+// from the Input are passed through by reference before probing.
+// Arguments specify Input point data fields giving cell index and parametric
+// coordinates at which fields from the Source are sampled. Both point data and
+// cell data fields from the Source are sampled, but where the same-named field
+// array exists in both, only the point data is sampled. Sampled fields replace
+// point data fields of the same name in the output.
 //
-// This filter allows a dataset to inherit fields from a host dataset which it
-// is considered embedding in, for example, time-varying geometry.
+// This filter allows a dataset to inherit fields and point coordinates from a
+// host dataset, simulating topological embedding.
 
 #ifndef __msvVTKEmbeddedProbeFilter_h
 #define __msvVTKEmbeddedProbeFilter_h
