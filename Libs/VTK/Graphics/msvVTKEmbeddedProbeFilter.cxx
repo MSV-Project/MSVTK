@@ -375,7 +375,7 @@ void msvVTKEmbeddedProbeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   vtkDataObject *source = 0;
-  if (this->GetNumberOfInputConnections(1) >= 2)
+  if (this->GetNumberOfInputConnections(1) > 0)
     {
     source = this->GetExecutive()->GetInputData(1, 0);
     }
