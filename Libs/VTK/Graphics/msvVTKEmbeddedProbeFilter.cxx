@@ -328,13 +328,11 @@ int msvVTKEmbeddedProbeFilter::RequestInformation(
   vtkInformation *sourceInfo = inputVector[1]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // GRC: consider INPUT and SOURCE having time
   outInfo->CopyEntry(sourceInfo, 
                      vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo->CopyEntry(sourceInfo, 
                      vtkStreamingDemandDrivenPipeline::TIME_RANGE());
 
-  // GRC: check following:
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
                inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()),
                6);
