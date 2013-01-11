@@ -2,7 +2,7 @@ set(KIT VTKParallel)
 
 set(KIT_TEST_SRCS
   msvVTKFileSeriesReaderTest1.cxx
-  msvVTKPolyDataFileSeriesReaderTest1.cxx
+  msvVTKDataFileSeriesReaderTest1.cxx
   )
 
 create_test_sourcelist(Tests ${KIT}CxxTests.cxx
@@ -18,4 +18,4 @@ target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
 # Add Tests
 #
 simple_test_with_data( msvVTKFileSeriesReaderTest1 )
-simple_test_with_data( msvVTKPolyDataFileSeriesReaderTest1 )
+simple_test_with_data( msvVTKDataFileSeriesReaderTest1 )

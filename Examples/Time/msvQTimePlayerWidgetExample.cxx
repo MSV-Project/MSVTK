@@ -25,7 +25,7 @@
 
 // MSVTK
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 // VTK includes
 #include "vtkNew.h"
@@ -40,13 +40,13 @@
 
 // This example shows the usage of msvQTimePlayerWidget, a utility widget that
 // controls time step for any VTK demand-driven filter pipeline.
-// It uses a msvVTKPolyDataFileSeriesReader and two ".vtk" files which
+// It uses a msvVTKDataFileSeriesReader and two ".vtk" files which
 // each contains sparse points (PolyData).
 // The pipeline is defined as follow:
-// [msvVTKPolyDataFileSeriesReader]-[vtkPolyDataMapper]
+// [msvVTKDataFileSeriesReader]-[vtkPolyDataMapper]
 //              |- vtkPolyDataReader        |- msvQTimePlayerWidget
 // Refer to msvVTKFileSeriesReaderExample for more details on
-// msvVTKPolyDataFileSeriesReader and msvVTKFileSeriesReader.
+// msvVTKDataFileSeriesReader and msvVTKFileSeriesReader.
 
 // -----------------------------------------------------------------------------
 int main(int argc, char * argv[])
@@ -61,9 +61,9 @@ int main(int argc, char * argv[])
 
   // Create the pipeline:
   // A polydata reader is instantiated and associated to
-  // the msvVTKPolyDataFileSeriesReader.
+  // the msvVTKDataFileSeriesReader.
   vtkNew<vtkPolyDataReader> polyDataReader;
-  vtkNew<msvVTKPolyDataFileSeriesReader> fileSeriesReader;
+  vtkNew<msvVTKDataFileSeriesReader> fileSeriesReader;
   fileSeriesReader->SetReader(polyDataReader.GetPointer());
 
   // A vtkPolyDataMapper is then connected to the output of the file series

@@ -49,7 +49,7 @@ endif()
 # --------------------------------------------------------------------------
 set(msvVTKParallel_SRCS
   msvVTKFileSeriesReader.cxx
-  msvVTKPolyDataFileSeriesReader.cxx
+  msvVTKDataFileSeriesReader.cxx
   )
 
 # Abstract/pure virtual classes
