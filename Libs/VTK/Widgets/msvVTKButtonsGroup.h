@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
-  Copyright (c) SCS s.r.l. (B3C)
+  Copyright (c) Kitware Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +17,20 @@
   limitations under the License.
 
 ==============================================================================*/
+/*=========================================================================
 
+  Program:   Visualization Toolkit
+  Module:    msvVTKButtonsGroup.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 // .NAME msvVTKButtonsGroup -
 // .SECTION Description
 //
@@ -25,14 +38,12 @@
 // .SECTION See Also
 //
 
-#ifndef __msvVTKButtonsGroup_h
-#define __msvVTKButtonsGroup_h
+#include "vtkObject.h"
 
-// MSVTK includes
-#include "msvVTKButtonsInterface.h"
-
-// STD includes
 #include <vector>
+
+// VTK_WIDGET includes
+#include "msvVTKButtonsInterface.h"
 
 // Forward references
 class vtkSliderInteractionCallback;
@@ -41,16 +52,15 @@ class vtkSliderWidget;
 
 class msvVTKButtons;
 
+#ifndef __msvVTKButtonsGroup_h
+#define __msvVTKButtonsGroup_h
+
 //----------------------------------------------------------------------
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsGroup : public msvVTKButtonsInterface
 {
 public:
   // Instantiate the class.
   static msvVTKButtonsGroup *New();
-
-  // Description:
-  // Standard methods for instances of the class.
-  vtkTypeMacro(msvVTKButtonsGroup, msvVTKButtonsInterface);
 
   // Add a buttons to the buttons' vector
   void AddElement(msvVTKButtonsInterface* buttons);
@@ -68,7 +78,7 @@ public:
   msvVTKButtons* CreateButtons();
 
   // Allow to show/hide button
-  void SetShowButton(bool show);
+  void SetShowButtons(bool show);
 
   // Allow to show/hide label
   void SetShowLabel(bool show);
@@ -83,10 +93,10 @@ public:
   void ShowSlider(bool show);
 
   // Get the position on the path at the specified ratio
-  void GetCameraPoistionOnPath(double ratio, double b[6]);
+  void GetCameraPositionOnPath(double ratio, double b[6]);
 
   // Set the position on the path at the specified ratio
-  void SetCameraPoistionOnPath(double ratio);
+  void SetCameraPositionOnPath(double ratio);
 
   // Get the interaction callback for slicer
   vtkCommand *GetSliderInteractionCallback() const;
@@ -95,10 +105,13 @@ public:
   vtkCommand *GetSliderStartInteractionCallback() const;
 
   // Set the current renderer
-  virtual void SetCurrentRenderer(vtkRenderer *renderer);
+  void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Perform update
   void Update();
+
+  // Calculate position (center or corner)
+  void CalculatePosition();
 
 protected:
   // Object constructor
@@ -106,9 +119,6 @@ protected:
 
   // Object destructor.
   virtual ~msvVTKButtonsGroup();
-
-  // Calculate position (center or corner)
-  void CalculatePosition();
 
   // Set the specified property
   ///---> void SetElementProperty(QString name, QVariant value);

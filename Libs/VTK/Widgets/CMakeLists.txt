@@ -55,6 +55,7 @@ set(msvVTKWidgets_SRCS
   msvVTKButtonsGroup.cxx
   msvVTKAnimate.cxx
   msvVTKButtonsAction.cxx
+  msvVTKButtonsManager.cxx
   )
 
 # Abstract/pure virtual classes

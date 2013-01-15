@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
-  Copyright (c) SCS s.r.l. (B3C)
+  Copyright (c) Kitware Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +17,20 @@
   limitations under the License.
 
 ==============================================================================*/
+/*=========================================================================
 
+  Program:   Visualization Toolkit
+  Module:    msvVTKButtons.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 // .NAME msvVTKButtons -
 // .SECTION Description
 //
@@ -25,8 +38,7 @@
 // .SECTION See Also
 //
 
-#ifndef __msvVTKButtons_h
-#define __msvVTKButtons_h
+#include "vtkObject.h"
 
 // VTK_WIDGET includes
 #include "msvVTKButtonsInterface.h"
@@ -35,6 +47,10 @@
 class vtkDataSet;
 class vtkImageData;
 class vtkRenderWindow;
+class vtkCommand;
+
+#ifndef __msvVTKButtons_h
+#define __msvVTKButtons_h
 
 //----------------------------------------------------------------------
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtons : public msvVTKButtonsInterface
@@ -43,33 +59,42 @@ public:
   // Instantiate the class.
   static msvVTKButtons *New();
 
-  // Description:
-  // Standard methods for instances of the class.
-  vtkTypeMacro(msvVTKButtons, msvVTKButtonsInterface);
+  vtkTypeMacro(msvVTKButtons,msvVTKButtonsInterface);
 
   // Allow to activate FlyTo animation
   vtkSetMacro(FlyTo,bool);
   vtkGetMacro(FlyTo,bool);
 
-  /// Allow to set button position on center or on corner
+  // Allow to set button position on center or on corner
   vtkSetMacro(OnCenter,bool);
   vtkGetMacro(OnCenter,bool);
 
-  /// set bounds
+  // set bounds
   void SetBounds(double b[6]);
 
-  /// Get the button preview image
+  // Get the button preview image
   vtkImageData* GetPreview(int width, int height);
 
-  /// Data for preview
+  // Data for preview
   vtkSetMacro(Data,vtkDataSet*);
   vtkGetMacro(Data,vtkDataSet*);
+
+  // Determine if is a "corner" button
+  vtkSetMacro(OnCorner,bool);
+  vtkGetMacro(OnCorner,bool);
+
+  // Determine if is a "corner" button
+  vtkSetMacro(CornerIndex,int);
+  vtkGetMacro(CornerIndex,int);
 
   // Set the current renderer
   void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Perform update
   void Update();
+
+  // Calculate position (center or corner)
+  void CalculatePosition();
 
 protected:
   // Object constructor
@@ -78,15 +103,29 @@ protected:
   // Object destructor.
   virtual ~msvVTKButtons();
 
+  //
   vtkRenderWindow* GetWindow();
 
-  /// Calculate position (center or corner)
-  void CalculatePosition();
+  // dataset associated with the button
+  vtkDataSet* Data;
 
-  vtkDataSet* Data; ///< dataset associated with the button
-  vtkRenderWindow *Window; ///< render window for offscreen rendering
-  bool FlyTo; ///< Flag to activate FlyTo animation
-  bool OnCenter; ///< Flag to set button position on center or on corner (can be refactored with a enum??)
+  // render window for offscreen rendering
+  vtkRenderWindow *Window;
+
+  // Flag to activate FlyTo animation
+  bool FlyTo;
+
+  // Flag to set button position on center or on corner
+  bool OnCenter;
+
+  //
+  //vtkCommand* RWICallback;
+
+  //
+  bool OnCorner;
+
+  //
+  int CornerIndex;
 
 private:
   msvVTKButtons(const msvVTKButtons&);  //Not implemented

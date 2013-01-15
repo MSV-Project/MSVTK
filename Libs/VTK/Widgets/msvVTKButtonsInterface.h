@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Library: MSVTK
+  Program: MSVTK
 
-  Copyright (c) SCS s.r.l. (B3C)
+  Copyright (c) Kitware Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,10 +17,20 @@
   limitations under the License.
 
 ==============================================================================*/
+/*=========================================================================
 
-#ifndef __msvVTKButonsInterface_h
-#define __msvVTKButonsInterface_h
+  Program:   Visualization Toolkit
+  Module:    msvVTKButtonsInterface.h
 
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 // .NAME msvVTKButtonsInterface -
 // .SECTION Description
 //
@@ -28,16 +38,18 @@
 // .SECTION See Also
 //
 
-// VTK includes
-#include <vtkObject.h>
+#include "vtkObject.h"
 
-// MSVTK includes
+// VTK_WIDGET includes
 #include "msvVTKWidgetsExport.h"
 
 // Forward references
 class vtkButtonWidget;
 class vtkImageData;
 class vtkRenderer;
+
+#ifndef __msvVTKButonsInterface_h
+#define __msvVTKButonsInterface_h
 
 //----------------------------------------------------------------------
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsInterface : public vtkObject
@@ -56,7 +68,7 @@ public:
   vtkGetMacro(ShowButton,bool);
 
   // Description:
-  /// Allow to show/hide label
+  // Allow to show/hide label
   vtkSetMacro(ShowLabel,bool);
   vtkGetMacro(ShowLabel,bool);
 
@@ -93,6 +105,9 @@ public:
   // update graphic objects
   void Update();
 
+  //
+  inline vtkRenderer* GetRenderer(){return Renderer;};
+
 protected:
   // Object constructor
   msvVTKButtonsInterface();
@@ -126,6 +141,12 @@ protected:
 
   // Bounds of the data related to the buttonWin
   double Bounds[6];
+
+  //
+  int BalloonLayout;
+
+  //
+  vtkRenderer* Renderer;
 
 private:
   msvVTKButtonsInterface(const msvVTKButtonsInterface&);  //Not implemented

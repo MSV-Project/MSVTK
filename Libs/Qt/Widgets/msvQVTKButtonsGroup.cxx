@@ -57,6 +57,8 @@ public:
   inline void setCurrentRenderer(vtkRenderer* renderer){return static_cast<msvVTKButtonsGroup*>(this->getVTKButtons())->SetCurrentRenderer(renderer);};
   inline void setShowButton(bool show){return static_cast<msvVTKButtonsGroup*>(this->getVTKButtons())->SetShowButton(show);};
   inline void setShowLabel(bool show){return static_cast<msvVTKButtonsGroup*>(this->getVTKButtons())->SetShowLabel(show);};
+  void update(){static_cast<msvVTKButtonsGroup*>(this->getVTKButtons())->Update();};
+
   msvQVTKButtonsInterface* getElement(int index);
   inline int numberOfElements(){return m_Elements.size();};
   void addElement(msvQVTKButtonsInterface* buttons);
@@ -80,7 +82,7 @@ msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& obje
     if(!this->m_VTKButtons)
     {
         this->m_VTKButtons = msvVTKButtonsGroup::New();
-        q->setVTKButtons(this->m_VTKButtons);
+        q->setVTKButtonsInterface(this->m_VTKButtons);
     }
     return this->m_VTKButtons;
 }
@@ -224,7 +226,9 @@ msvQVTKButtons* msvQVTKButtonsGroup::createButtons()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::update()
 {
+  Q_D(msvQVTKButtonsGroup);
   msvQVTKButtonsInterface::update();
+  d->update();
 }
 
 //------------------------------------------------------------------------------

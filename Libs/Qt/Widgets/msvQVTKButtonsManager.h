@@ -24,6 +24,7 @@
 // MSVTK includes
 #include "msvQVTKButtons.h"
 #include "msvQVTKButtonsGroup.h"
+#include "msvVTKButtonsManager.h"
 #include "msvQtWidgetsExport.h"
 
 class msvQVTKButtonsManagerPrivate;
@@ -55,6 +56,9 @@ public:
 
   /// Set show label property for children elements
   void setShowLabel(bool show);
+
+  /// Set the renderer
+  inline void setRenderer(vtkRenderer* renderer){msvVTKButtonsManager::GetInstance()->SetRenderer(renderer);};
 
 protected:
   QScopedPointer<msvQVTKButtonsManagerPrivate> d_ptr;

@@ -68,6 +68,7 @@ void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant val
 msvQVTKButtonsGroup *msvQVTKButtonsManagerPrivate::createGroup()
 {
   m_Elements.push_back(new msvQVTKButtonsGroup());
+  msvVTKButtonsManager::GetInstance()->AddElement(m_Elements.at(m_Elements.size()-1)->getVTKButtonsInterface());
   return static_cast<msvQVTKButtonsGroup*>(m_Elements.at(m_Elements.size()-1));
 }
 
@@ -75,6 +76,7 @@ msvQVTKButtonsGroup *msvQVTKButtonsManagerPrivate::createGroup()
 msvQVTKButtons *msvQVTKButtonsManagerPrivate::createButtons()
 {
   m_Elements.push_back(new msvQVTKButtons());
+  msvVTKButtonsManager::GetInstance()->AddElement(m_Elements.at(m_Elements.size()-1)->getVTKButtonsInterface());
   return static_cast<msvQVTKButtons*>(m_Elements.at(m_Elements.size()-1));
 }
 
