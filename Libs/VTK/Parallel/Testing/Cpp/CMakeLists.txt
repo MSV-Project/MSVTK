@@ -11,8 +11,8 @@ create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
 
 set(LIBRARY_NAME msv${KIT})
 
-add_executable(${KIT}CxxTests ${Tests})
-target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
+add_executable(msv${KIT}CxxTests ${Tests})
+target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
 
 #
 # Add Tests
