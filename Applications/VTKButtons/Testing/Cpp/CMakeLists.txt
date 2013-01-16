@@ -4,7 +4,7 @@ set(KIT_TEST_SRCS
   msvQVTKButtonsMainWindowTest1.cxx
   )
 
-create_test_sourcelist(Tests ${KIT}CxxTests.cxx
+create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
   ${KIT_TEST_SRCS}
   )
 
@@ -18,8 +18,8 @@ target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
 #
 
 msv_test(buttonsTest1
-  $<TARGET_FILE:${KIT}CxxTests> vtkButtonsTest1
-    --vtkbuttons $<TARGET_FILE_DIR:${KIT}CxxTests>
+  $<TARGET_FILE:msv${KIT}CxxTests> vtkButtonsTest1
+    --vtkbuttons $<TARGET_FILE_DIR:msv${KIT}CxxTests>
 )
 
 simple_test( msvQVTKButtonsMainWindowTest1 )

@@ -5,7 +5,7 @@ set(KIT_TEST_SRCS
   msvVTKDataFileSeriesReaderTest1.cxx
   )
 
-create_test_sourcelist(Tests ${KIT}CxxTests.cxx
+create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
   ${KIT_TEST_SRCS}
   )
 
