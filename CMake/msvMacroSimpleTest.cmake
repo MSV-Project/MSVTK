@@ -33,7 +33,7 @@ endmacro()
 
 macro(simple_test TEST_NAME)
   msv_test(${TEST_NAME}
-    $<TARGET_FILE:${KIT}CxxTests> ${TEST_NAME} ${ARGN}
+    $<TARGET_FILE:msv${KIT}CxxTests> ${TEST_NAME} ${ARGN}
     )
 endmacro()
 
