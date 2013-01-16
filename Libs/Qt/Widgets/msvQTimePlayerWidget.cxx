@@ -168,7 +168,8 @@ int msvQTimePlayerWidgetPrivate::PipelineInfoType::timeToFrame(double time) cons
   if (this->numberOfTimeSteps == 0 || period == 0)
     return -1;
 
-  return static_cast<int>(((this->numberOfTimeSteps-1)/period)*time);
+  unsigned int frame = qRound(((this->numberOfTimeSteps-1)/period)*time);
+  return frame;
 }
 
 //------------------------------------------------------------------------------
