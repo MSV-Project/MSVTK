@@ -55,6 +55,7 @@ class vtkRenderer;
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsInterface : public vtkObject
 {
 public:
+  // Description:
   // Instantiate the class.
   static msvVTKButtonsInterface *New();
 
@@ -93,35 +94,44 @@ public:
   vtkGetVectorMacro(Bounds,double,6);
   vtkSetVectorMacro(Bounds,double,6)
 
-  //
+  // Description:
+  // Get the opacity value (in 0 1 range)
   vtkGetMacro(Opacity, double);
+
+  // Description:
+  // Set the previous opacity
   vtkSetMacro(PreviousOpacity,double);
 
   // Description:
-  // Retrieve button pointer.
+  // Retrieve button widget pointer
   vtkButtonWidget *GetButton();
 
   // Description:
-  // add vtk button to Renderer
+  // Add vtk button to Renderer
   void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Description:
   // update graphic objects
   void Update();
 
-  //
+  // Description:
+  // Get the current renderer
   inline vtkRenderer* GetRenderer(){return Renderer;};
 
-  //
+  // Description:
+  // Set the opacity value (in 0 1 range)
   void SetOpacity(double opacity);
 
-  //
+  // Description:
+  // Restore the previous opacity
   void RestorePreviousOpacity();
 
 protected:
+  // Description:
   // Object constructor
   msvVTKButtonsInterface();
 
+  // Description:
   // Object destructor.
   virtual ~msvVTKButtonsInterface();
 
@@ -152,16 +162,16 @@ protected:
   // Bounds of the data related to the buttonWin
   double Bounds[6];
 
-  //
+  // Layout of the button's balloon
   int BalloonLayout;
 
-  //
+  // Current renderer
   vtkRenderer* Renderer;
 
-  //
+  // Button opacity
   double Opacity;
 
-  //
+  // Previous button opacity
   double PreviousOpacity;
 
 private:

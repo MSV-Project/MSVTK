@@ -52,41 +52,51 @@ class vtkCameraCallback;
 class  msvVTKButtonsManager : public vtkObject
 {
 public:
+  // Description:
   // Object constructor
   msvVTKButtonsManager();
 
-  // Object destructor.
+  // Description:
+  // Object destructor
   ~msvVTKButtonsManager();
 
+  // Description:
   // Get the singleton instance of the manager
   static msvVTKButtonsManager* GetInstance();
 
+  // Description:
   // Create a group
   msvVTKButtonsGroup *CreateGroup();
 
+  // Description:
   // Create a button
   msvVTKButtons *CreateButtons();
 
+  // Description:
   // Set show button property for children elements
   void SetShowButton(bool show);
 
+  // Description:
   // Set show label property for children elements
   void SetShowLabel(bool show);
 
+  // Description:
   // Add an element
   void AddElement(msvVTKButtonsInterface *element);
 
+  // Description:
   // Get an element
   msvVTKButtonsInterface * GetElement(int index);
 
+  // Description:
   // Get the number of elements
   inline int GetNumberOfElements(){return Elements.size();};
 
+  // Description:
   // Set the renderer
   void SetRenderer(vtkRenderer* renderer);
 
 private:
-
   // Vector of elements
   std::vector<msvVTKButtonsInterface*> Elements;
 

@@ -56,73 +56,93 @@ class vtkCommand;
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtons : public msvVTKButtonsInterface
 {
 public:
+  // Description:
   // Instantiate the class.
   static msvVTKButtons *New();
 
   vtkTypeMacro(msvVTKButtons,msvVTKButtonsInterface);
 
+  // Description:
   // Allow to activate FlyTo animation
   vtkSetMacro(FlyTo,bool);
   vtkGetMacro(FlyTo,bool);
 
+  // Description:
   // Allow to set button position on center or on corner
   vtkSetMacro(OnCenter,bool);
   vtkGetMacro(OnCenter,bool);
 
-  // set bounds
+  // Description:
+  // Set button bounds
   void SetBounds(double b[6]);
 
+  // Description:
   // Get the button preview image
   vtkImageData* GetPreview(int width, int height);
 
-  // Data for preview
+  // Description:
+  // Set/get data for preview
   vtkSetMacro(Data,vtkDataSet*);
   vtkGetMacro(Data,vtkDataSet*);
 
+  // Description:
   // Determine if is a "corner" button
   vtkSetMacro(OnCorner,bool);
   vtkGetMacro(OnCorner,bool);
 
+  // Description:
   // Determine if is a "corner" button
   vtkSetMacro(CornerIndex,int);
   vtkGetMacro(CornerIndex,int);
 
-  //
+  // Description:
+  // Set/get the Y axis offset of the button position
   vtkSetMacro(YOffset,int);
   vtkGetMacro(YOffset,int);
 
+  // Description:
   // Set the current renderer
   void SetCurrentRenderer(vtkRenderer *renderer);
 
+  // Description:
   // Perform update
   void Update();
 
+  // Description:
   // Calculate position (center or corner)
   void CalculatePosition();
 
+  // Description:
   // Delete offscreen rendering window (usefull in mac osx)
   void DeleteWindow();
 
-  //
+  // Description:
+  // Get button display position
   void GetDisplayPosition(double pos[2]);
 
-  //
+  // Description:
+  // Get button real display postion
   void GetRealDisplayPosition(double pos[2]);
 
 protected:
+  // Description:
   // Object constructor
   msvVTKButtons();
 
+  // Description:
   // Object destructor.
   virtual ~msvVTKButtons();
 
-  //
+  // Description:
+  // Get the offscreen rendering window
   vtkRenderWindow* GetWindow();
 
-  // dataset associated with the button
+  // Description:
+  // Dataset associated with the button
   vtkDataSet* Data;
 
-  // render window for offscreen rendering
+
+  // Render window for offscreen rendering
   vtkRenderWindow *Window;
 
   // Flag to activate FlyTo animation
@@ -131,16 +151,13 @@ protected:
   // Flag to set button position on center or on corner
   bool OnCenter;
 
-  //
-  //vtkCommand* RWICallback;
-
-  //
+  // Determine if the buttons will be listed in the view corner
   bool OnCorner;
 
-  //
+  // Index for corner buttons sorting
   int CornerIndex;
 
-  //
+  // Y axis button position offset
   int YOffset;
 
 private:

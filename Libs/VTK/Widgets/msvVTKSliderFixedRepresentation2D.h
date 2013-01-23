@@ -59,17 +59,31 @@ public:
   // Standard methods for instances of the class.
   vtkTypeMacro(msvVTKSliderFixedRepresentation2D,vtkSliderRepresentation2D);
 
-  //
+  // Description:
+  // Builds representation
   void BuildRepresentation();
 
+  // Description:
+  // Set Scale factor for the representation
   vtkSetVectorMacro(Scale,double,2);
+
+  // Description:
+  // Set translation coordinates
   vtkSetVectorMacro(Translate,double,2);
 
 protected:
+  // Description:
+  // Object constructor
   msvVTKSliderFixedRepresentation2D();
+
+  // Description:
+  // Object destructor
   ~msvVTKSliderFixedRepresentation2D();
 
+  // Scale factor
   double Scale[2];
+
+  // Translation coordinates
   double Translate[2];
 
 private:

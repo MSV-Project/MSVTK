@@ -34,13 +34,16 @@ class MSV_VTK_WIDGETS_EXPORT msvVTKAnimate : public msvVTKButtonsAction
 {
 
 public:
-  /// Object constructor.
+  // Description:
+  // Object constructor.
   msvVTKAnimate();
 
-  /// Object destructor.
+  // Description:
+  // Object destructor.
   virtual ~msvVTKAnimate();
 
-  /// Animate the camera to zoom on the passed bounding box.
+  // Description:
+  // Animate the camera to zoom on the passed bounding box.
   virtual void Execute(vtkRenderer *renderer, double bounds[6],
                        int numberOfSteps = 120);
 

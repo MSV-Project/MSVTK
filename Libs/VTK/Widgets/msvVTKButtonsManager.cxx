@@ -175,10 +175,6 @@ public:
         }
       }
     }
-//    for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin(); it != sortedElements.end(); it++)
-//    {
-//      (*it)->Update();
-//    }
   }
 
   vtkCameraCallback(): Renderer(0) {}
