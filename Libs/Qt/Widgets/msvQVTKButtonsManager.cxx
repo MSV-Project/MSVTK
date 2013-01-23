@@ -30,7 +30,7 @@ class msvQVTKButtonsManagerPrivate
 protected:
 
   msvQVTKButtonsManager* const q_ptr;
-  QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
+  QVector<msvQVTKButtonsInterface*> Elements; //< Vector of buttons
 
 public:
 
@@ -57,8 +57,8 @@ msvQVTKButtonsManagerPrivate::~msvQVTKButtonsManagerPrivate()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant value)
 {
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = m_Elements.begin();
-    buttonsIt != m_Elements.end(); buttonsIt++)
+  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+    buttonsIt != Elements.end(); buttonsIt++)
   {
     (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
   }
@@ -67,17 +67,17 @@ void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant val
 //------------------------------------------------------------------------------
 msvQVTKButtonsGroup *msvQVTKButtonsManagerPrivate::createGroup()
 {
-  m_Elements.push_back(new msvQVTKButtonsGroup());
-  msvVTKButtonsManager::GetInstance()->AddElement(m_Elements.at(m_Elements.size()-1)->vtkButtonsInterface());
-  return static_cast<msvQVTKButtonsGroup*>(m_Elements.at(m_Elements.size()-1));
+  Elements.push_back(new msvQVTKButtonsGroup());
+  msvVTKButtonsManager::GetInstance()->AddElement(Elements.at(Elements.size()-1)->vtkButtonsInterface());
+  return static_cast<msvQVTKButtonsGroup*>(Elements.at(Elements.size()-1));
 }
 
 //------------------------------------------------------------------------------
 msvQVTKButtons *msvQVTKButtonsManagerPrivate::createButtons()
 {
-  m_Elements.push_back(new msvQVTKButtons());
-  msvVTKButtonsManager::GetInstance()->AddElement(m_Elements.at(m_Elements.size()-1)->vtkButtonsInterface());
-  return static_cast<msvQVTKButtons*>(m_Elements.at(m_Elements.size()-1));
+  Elements.push_back(new msvQVTKButtons());
+  msvVTKButtonsManager::GetInstance()->AddElement(Elements.at(Elements.size()-1)->vtkButtonsInterface());
+  return static_cast<msvQVTKButtons*>(Elements.at(Elements.size()-1));
 }
 
 //------------------------------------------------------------------------------

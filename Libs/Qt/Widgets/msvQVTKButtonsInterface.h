@@ -50,7 +50,6 @@ class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsInterface : public QObject {
   Q_PROPERTY(bool showLabel READ showLabel WRITE setShowLabel);
 
 public:
-
   /// Object constructor
   msvQVTKButtonsInterface(QObject *parent = 0);
 
@@ -123,15 +122,9 @@ signals:
   void show(bool show);
 
 protected:
-
   QScopedPointer<msvQVTKButtonsInterfacePrivate> d_ptr;
-  vtkCommand *m_ButtonCallback; ///< Callback called by picking on vtkButton
-  vtkCommand *m_HighlightCallback; ///< Callback called by hovering over the button.
-
-  //virtual void calculatePosition() = 0;
 
 private:
-
   Q_DECLARE_PRIVATE(msvQVTKButtonsInterface);
   Q_DISABLE_COPY(msvQVTKButtonsInterface);
 };
