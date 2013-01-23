@@ -57,21 +57,25 @@ public:
     if ( highlightState == vtkButtonRepresentation::HighlightHovering
       && PreviousHighlightState == vtkButtonRepresentation::HighlightNormal )
     {
-      //show tooltip (not if previous state was selecting
+      //show tooltip (not if previous state was selecting)
       ToolButton->setShowTooltip(true);
+      ToolButton->getVTKButtonsInterface()->SetPreviousOpacity(ToolButton->getVTKButtonsInterface()->GetOpacity());
+      ToolButton->getVTKButtonsInterface()->SetOpacity(1);
     }
-    else if ( highlightState == vtkButtonRepresentation::HighlightNormal)
+    else if ( highlightState == vtkButtonRepresentation::HighlightNormal )
     {
-      //hide tooltip
+      // hide tooltip
       ToolButton->setShowTooltip(false);
+      ToolButton->getVTKButtonsInterface()->RestorePreviousOpacity();
     }
     PreviousHighlightState = highlightState;
   }
 
   vtkButtonHighLightCallback()
-    : ToolButton(NULL), PreviousHighlightState(0) {}
+    : ToolButton(NULL), PreviousHighlightState(0), PreviousOpacity(1) {}
   msvQVTKButtons *ToolButton;
   int PreviousHighlightState;
+  double PreviousOpacity;
 };
 
 //------------------------------------------------------------------------------

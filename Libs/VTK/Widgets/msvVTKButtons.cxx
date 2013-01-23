@@ -37,6 +37,7 @@
 #include "vtkButtonWidget.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkCoordinate.h"
 #include "vtkDataSetMapper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -65,10 +66,11 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    ToolButton->SetPreviousOpacity(0);
     msvVTKAnimate* animateCamera = new msvVTKAnimate();
     if (FlyTo)
     {
-      animateCamera->Execute(Renderer, Bounds, 200);
+      animateCamera->Execute(Renderer, Bounds, 100);
     }
     else
     {
@@ -122,15 +124,14 @@ msvVTKButtons::msvVTKButtons() : msvVTKButtonsInterface()
 
   this->OnCorner = false;
   this->CornerIndex = -1;
+
+  this->YOffset = 0;
 }
 
 //----------------------------------------------------------------------
 msvVTKButtons::~msvVTKButtons()
 {
-  if(this->Window)
-  {
-    this->Window->Delete();
-  }
+  this->DeleteWindow();
 }
 
 //----------------------------------------------------------------------
@@ -234,56 +235,23 @@ void msvVTKButtons::Update()
 //------------------------------------------------------------------------------
 void msvVTKButtons::CalculatePosition()
 {
-  if(!this->GetOnCorner())
-  {
-    //modify position of the vtkButton
-    double bds[6];
-    double coord[3];
-    this->GetBounds(bds);
-    if (this->OnCenter)
-    {
-      coord[0] = (bds[1] + bds[0])*.5;
-      coord[1] = (bds[3] + bds[2])*.5;
-      coord[2] = (bds[5] + bds[4])*.5;
-    }
-    else
-    {
-      //on the corner of the bounding box of the VME.
-      coord[0] = bds[0];
-      coord[1] = bds[2];
-      coord[2] = bds[4];
-    }
-    int size[2]; size[0] = 16; size[1] = 16;
-    vtkTexturedButtonRepresentation2D *rep =
-        static_cast<vtkTexturedButtonRepresentation2D*>(
-          this->GetButton()->GetRepresentation());
+  double pos[2];
+  double bds[6];
+  this->GetDisplayPosition(pos);
+  bds[0] = pos[0];
+  bds[1] = 16;
+  bds[2] = pos[1];
+  bds[3] = 16;
+  bds[4] = 0.0;
+  bds[5] = 0.0;
+  vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(this->GetButton()->GetRepresentation());
+  rep->SetPlaceFactor(1.);
+  rep->PlaceWidget(bds);
+  rep->Modified();
+  rep->GetBalloon()->SetImageSize(16,16);
+  this->GetButton()->SetRepresentation(rep);
+  this->GetButton()->Modified();
 
-    rep->PlaceWidget(coord, size);
-    vtkTextProperty *textProp = rep->GetBalloon()->GetTextProperty();
-    //textProp->BoldOff();
-    rep->Modified();
-    this->GetButton()->SetRepresentation(rep);
-  }
-  else
-  {
-    double bds[6];
-    int *RWSize;
-    RWSize = Renderer->GetSize();
-
-    bds[0] = 96;
-    bds[1] = 16;
-    bds[2] = (22 * (CornerIndex - 1)) + CornerIndex;
-    bds[3] = 16;
-    bds[4] = 0;
-    bds[5] = 0;
-
-    vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(this->GetButton()->GetRepresentation());
-    vtkTextProperty *textProp = rep->GetBalloon()->GetTextProperty();
-    //textProp->BoldOn();
-    rep->PlaceWidget(bds);
-    rep->Modified();
-    this->GetButton()->SetRepresentation(rep);
-  }
 }
 
 //------------------------------------------------------------------------------
@@ -294,4 +262,64 @@ vtkRenderWindow* msvVTKButtons::GetWindow()
     Window = vtkRenderWindow::New();
   }
   return Window;
+}
+
+//------------------------------------------------------------------------------
+void msvVTKButtons::DeleteWindow()
+{
+  if(this->Window)
+  {
+    this->Window->Delete();
+    this->Window = NULL;
+  }
+}
+
+//------------------------------------------------------------------------------
+void msvVTKButtons::GetDisplayPosition(double pos[2])
+{
+  if(!this->GetOnCorner())
+  {
+    this->GetRealDisplayPosition(pos);
+  }
+  else
+  {
+    pos[0] = 96;
+    pos[1] = (24 * (CornerIndex - 1)) + CornerIndex;
+  }
+}
+
+//------------------------------------------------------------------------------
+void msvVTKButtons::GetRealDisplayPosition(double pos[2])
+{
+  //modify position of the vtkButton
+  double bounds[6];
+  double coord[3];
+  this->GetBounds(bounds);
+  if (this->OnCenter)
+  {
+    coord[0] = (bounds[1] + bounds[0])*.5;
+    coord[1] = (bounds[3] + bounds[2])*.5;
+    coord[2] = (bounds[5] + bounds[4])*.5;
+  }
+  else
+  {
+  //on the corner of the bounding box of the VME.
+  coord[0] = bounds[0];
+  coord[1] = bounds[2];
+  coord[2] = bounds[4];
+  }
+
+  vtkCoordinate* anchor = vtkCoordinate::New();
+  anchor->SetCoordinateSystemToWorld();
+  anchor->SetValue(coord);
+
+  double *p = anchor->GetComputedDoubleDisplayValue(this->Renderer);
+  pos[0] = static_cast<double>(p[0]);
+  pos[1] = static_cast<double>(p[1]) + this->YOffset;
+  if(pos[0]<0 || pos[1]<0)
+  {
+    pos[0] = 0;
+    pos[1] = 0;
+  }
+  anchor->Delete();
 }

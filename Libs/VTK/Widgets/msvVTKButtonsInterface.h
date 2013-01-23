@@ -64,7 +64,7 @@ public:
 
   // Description:
   // Allow to show/hide button
-  vtkSetMacro(ShowButton,bool);
+  void SetShowButton(bool show);
   vtkGetMacro(ShowButton,bool);
 
   // Description:
@@ -93,6 +93,10 @@ public:
   vtkGetVectorMacro(Bounds,double,6);
   vtkSetVectorMacro(Bounds,double,6)
 
+  //
+  vtkGetMacro(Opacity, double);
+  vtkSetMacro(PreviousOpacity,double);
+
   // Description:
   // Retrieve button pointer.
   vtkButtonWidget *GetButton();
@@ -107,6 +111,12 @@ public:
 
   //
   inline vtkRenderer* GetRenderer(){return Renderer;};
+
+  //
+  void SetOpacity(double opacity);
+
+  //
+  void RestorePreviousOpacity();
 
 protected:
   // Object constructor
@@ -147,6 +157,12 @@ protected:
 
   //
   vtkRenderer* Renderer;
+
+  //
+  double Opacity;
+
+  //
+  double PreviousOpacity;
 
 private:
   msvVTKButtonsInterface(const msvVTKButtonsInterface&);  //Not implemented

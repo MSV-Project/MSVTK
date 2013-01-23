@@ -87,6 +87,10 @@ public:
   vtkSetMacro(CornerIndex,int);
   vtkGetMacro(CornerIndex,int);
 
+  //
+  vtkSetMacro(YOffset,int);
+  vtkGetMacro(YOffset,int);
+
   // Set the current renderer
   void SetCurrentRenderer(vtkRenderer *renderer);
 
@@ -95,6 +99,15 @@ public:
 
   // Calculate position (center or corner)
   void CalculatePosition();
+
+  // Delete offscreen rendering window (usefull in mac osx)
+  void DeleteWindow();
+
+  //
+  void GetDisplayPosition(double pos[2]);
+
+  //
+  void GetRealDisplayPosition(double pos[2]);
 
 protected:
   // Object constructor
@@ -126,6 +139,9 @@ protected:
 
   //
   int CornerIndex;
+
+  //
+  int YOffset;
 
 private:
   msvVTKButtons(const msvVTKButtons&);  //Not implemented

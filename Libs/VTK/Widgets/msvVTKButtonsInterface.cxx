@@ -34,6 +34,7 @@
 
 #include "vtkBalloonRepresentation.h"
 #include "vtkButtonWidget.h"
+#include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
@@ -75,6 +76,7 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
 //  }
   this->BalloonLayout = vtkBalloonRepresentation::ImageLeft;
   this->Renderer = NULL;
+  Opacity=1;
 }
 
 //----------------------------------------------------------------------
@@ -142,16 +144,18 @@ void msvVTKButtonsInterface::Update()
     rep->GetBalloon()->SetPadding(2);
     textProp->SetFontSize(13);
     textProp->SetFontFamilyToArial();
-    textProp->BoldOn();
+    textProp->BoldOff();
     textProp->ShadowOn();
-    textProp->SetColor(.9,.9,.9);
+    textProp->SetColor(1,1,1);
 
     //Set label position
     rep->GetBalloon()->SetBalloonLayout(BalloonLayout);
-
-    //This method allows to set the label's background opacity
+    //This method allows to set the label's backgroun
     rep->GetBalloon()->GetFrameProperty()->SetColor(.5,.5,.5);
-    rep->GetBalloon()->GetFrameProperty()->SetOpacity(0.4);
+
+    rep->GetBalloon()->GetTextProperty()->SetOpacity(0.3 + Opacity * 0.7);
+    rep->GetBalloon()->GetFrameProperty()->SetOpacity(.2 + Opacity * 0.3);
+    rep->GetProperty()->SetOpacity(0.3 + Opacity * 0.7);
     rep->Modified();
   }
   else
@@ -171,6 +175,7 @@ void msvVTKButtonsInterface::Update()
   }
 }
 
+//----------------------------------------------------------------------
 void msvVTKButtonsInterface::SetImage(vtkImageData* image)
 {
   Image = image;
@@ -181,4 +186,31 @@ void msvVTKButtonsInterface::SetImage(vtkImageData* image)
   int size[2]; size[0] = 16; size[1] = 16;
   rep->GetBalloon()->SetImageSize(size);
   //this->Update();
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsInterface::SetOpacity(double opacity)
+{
+  if(opacity > 1) opacity=1;
+  if(opacity < 0) opacity=0;
+
+  Opacity = opacity;
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsInterface::RestorePreviousOpacity()
+{
+  this->SetOpacity(PreviousOpacity);
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsInterface::SetShowButton(bool show)
+{
+  this->ShowButton = show;
+  if(this->Renderer)
+  {
+    this->Renderer->GetActiveCamera()->Modified();
+  }
 }
