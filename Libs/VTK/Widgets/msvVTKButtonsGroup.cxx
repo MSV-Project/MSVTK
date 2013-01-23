@@ -70,6 +70,7 @@ public:
     msvVTKAnimate* animateCamera = new msvVTKAnimate();
     this->ToolButton->GetCameraPositionOnPath(0,bounds);
     animateCamera->Execute(this->Renderer, bounds, 20);
+    delete animateCamera;
   }
 
   vtkButtonCallbackGroup() : ToolButton(NULL) , State (false), Renderer(0) {}
@@ -195,7 +196,8 @@ msvVTKButtonsGroup::msvVTKButtonsGroup() : msvVTKButtonsInterface()
 //----------------------------------------------------------------------
 msvVTKButtonsGroup::~msvVTKButtonsGroup()
 {
-
+  reinterpret_cast<vtkSliderInteractionCallback*>(
+    this->SliderInteractionCallback)->Delete();
 }
 
 //----------------------------------------------------------------------
@@ -289,7 +291,7 @@ void msvVTKButtonsGroup::SetShowLabel(bool show)
 }
 
 //----------------------------------------------------------------------
-void msvVTKButtonsGroup::SetImages(vtkImageData *image)
+void msvVTKButtonsGroup::SetImageToElements(vtkImageData *image)
 {
   for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
   {
