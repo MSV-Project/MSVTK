@@ -92,8 +92,8 @@ public:
   void SetShowLabel(bool show);
 
   // Description:
-  // set the icon path
-  void SetImages(vtkImageData *image);
+  // set the elements image
+  void SetImageToElements(vtkImageData *image);
 
   // Description:
   // Get the slider widget

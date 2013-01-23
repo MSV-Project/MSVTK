@@ -106,7 +106,7 @@ public:
   void setBounds(double b[6]);
 
   /// get vtk buttons interface widget
-  msvVTKButtonsInterface* getVTKButtonsInterface();
+  msvVTKButtonsInterface* vtkButtonsInterface();
 
   /// set the associated vtk buttons
   void setVTKButtonsInterface(msvVTKButtonsInterface* buttons);
