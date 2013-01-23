@@ -86,8 +86,8 @@ class msvQVTKButtonsPrivate
 protected:
 
   msvQVTKButtons* const q_ptr;
-  msvVTKButtons* m_VTKButtons;
-  vtkCommand* m_HighlightCallback;
+  msvVTKButtons* VtkButton;
+  vtkCommand* HighlightCallback;
 
 public:
   msvQVTKButtonsPrivate(msvQVTKButtons& object);
@@ -109,28 +109,25 @@ public:
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object)
-  : m_VTKButtons(NULL), q_ptr(&object)
+  : VtkButton(NULL), q_ptr(&object)
 {
-    Q_Q(msvQVTKButtons);
-    //static_cast<msvVTKButtons*>(this->vtkButtons());
-    //m_VTKButton = msvVTKButtons::New();
-    this->m_HighlightCallback = vtkButtonHighLightCallback::New();
-    reinterpret_cast<vtkButtonHighLightCallback*>(
-      this->m_HighlightCallback)->ToolButton = q;
+  Q_Q(msvQVTKButtons);
+  this->HighlightCallback = vtkButtonHighLightCallback::New();
+  reinterpret_cast<vtkButtonHighLightCallback*>(
+  this->HighlightCallback)->ToolButton = q;
 
-    static_cast<msvVTKButtons*>(this->vtkButtons())->GetButton()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,this->m_HighlightCallback);
+  q->setVTKButtonsInterface(this->vtkButtons());
+  static_cast<msvVTKButtons*>(this->vtkButtons())->GetButton()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,this->HighlightCallback);
 }
 
 //------------------------------------------------------------------------------
 /*virtual*/ msvVTKButtonsInterface* msvQVTKButtonsPrivate::vtkButtons()
 {
-    Q_Q(msvQVTKButtons);
-    if(!this->m_VTKButtons)
-    {
-        this->m_VTKButtons = msvVTKButtons::New();
-        q->setVTKButtonsInterface(this->m_VTKButtons);
-    }
-    return this->m_VTKButtons;
+  if(!this->VtkButton)
+  {
+    this->VtkButton = msvVTKButtons::New();
+  }
+  return this->VtkButton;
 }
 
 //------------------------------------------------------------------------------
@@ -200,7 +197,6 @@ QImage msvQVTKButtons::getPreview(int width, int height)
       vtkUnsignedCharArray::SafeDownCast(
         vtkImage->GetPointData()->GetScalars());
 
-    vtkImage->Delete();
     if(!width || !height || !scalars)
         return QImage();
     QImage qImage(width, height, QImage::Format_ARGB32);
@@ -217,7 +213,7 @@ QImage msvQVTKButtons::getPreview(int width, int height)
         *(qImageBits+(qImageBitIndex++))=color;
       }
     }
-
+    vtkImage->Delete();
     return qImage;
   }
   return QImage();

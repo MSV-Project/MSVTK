@@ -80,14 +80,13 @@ public:
 
   // Description:
   // Specify the button's label
-  void SetLabel(const char* label);
-  //vtkSetMacro(Label,const char*);
-  const char* GetLabel(){return LabelText;}
+  vtkSetStringMacro(LabelText);
+  vtkGetStringMacro(LabelText);
 
   // Description:
   // Specify the tooltip text
-  vtkSetMacro(Tooltip,const char*);
-  vtkGetMacro(Tooltip,const char*);
+  vtkSetStringMacro(Tooltip);
+  vtkGetStringMacro(Tooltip);
 
   // Description:
   // Represents the element bounds
@@ -145,7 +144,7 @@ protected:
   char * LabelText;
 
   // Tooltip associated to the button
-  const char * Tooltip;
+  char * Tooltip;
 
   // Flag to show/hide button
   bool ShowButton;

@@ -118,17 +118,6 @@ void msvVTKButtonsInterface::SetCurrentRenderer(vtkRenderer* renderer)
   }
 }
 
-void msvVTKButtonsInterface::SetLabel(const char* label)
-{
-  if(NULL!=this->LabelText)
-  {
-    delete[] this->LabelText;
-    this->LabelText = NULL;
-  }
-  this->LabelText = new char[strlen(label)+1];
-  strcpy(this->LabelText,label);
-}
-
 //----------------------------------------------------------------------
 void msvVTKButtonsInterface::Update()
 {
@@ -139,7 +128,7 @@ void msvVTKButtonsInterface::Update()
   if (this->GetShowLabel())
   {
     //Add a label to the button and change its text property
-    rep->GetBalloon()->SetBalloonText(this->GetLabel());
+    rep->GetBalloon()->SetBalloonText(this->GetLabelText());
     vtkTextProperty *textProp = rep->GetBalloon()->GetTextProperty();
     rep->GetBalloon()->SetPadding(2);
     textProp->SetFontSize(13);

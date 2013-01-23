@@ -32,8 +32,6 @@
 class vtkRenderer;
 class msvQVTKButtons;
 class vtkSliderWidget;
-class vtkSliderCallback;
-class vtkSliderCallback2;
 class vtkCommand;
 
 // Pimpl
@@ -101,11 +99,6 @@ protected:
 
   /// Calculate element position
   void calculatePosition();
-
-//   QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
-//   vtkSliderWidget* m_Slider; //< Slider widget
-  vtkSliderCallback* m_SliderCallback; //< Slider callback function
-  vtkSliderCallback2* m_SliderCallback2; //< Slider callback function
 
 private:
   Q_DECLARE_PRIVATE(msvQVTKButtonsGroup);
