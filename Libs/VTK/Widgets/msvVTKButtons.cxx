@@ -76,7 +76,7 @@ public:
     {
       Renderer->ResetCamera(Bounds);
     }
-    if(animateCamera)
+    if (animateCamera)
     {
       delete animateCamera;
     }
@@ -147,7 +147,7 @@ void msvVTKButtons::SetBounds(double b[6])
 void msvVTKButtons::SetCurrentRenderer(vtkRenderer *renderer)
 {
   Superclass::SetCurrentRenderer(renderer);
-  if(renderer)
+  if (renderer)
   {
     //renderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,RWICallback);
     //reinterpret_cast<vtkRWICallback*>(RWICallback)->Renderer = renderer;
@@ -163,7 +163,7 @@ void msvVTKButtons::SetCurrentRenderer(vtkRenderer *renderer)
 //----------------------------------------------------------------------
 vtkImageData* msvVTKButtons::GetPreview(int width, int height)
 {
-  if(Data)
+  if (Data)
   {
     double bounds[6];
     Data->GetBounds(bounds);
@@ -222,10 +222,10 @@ void msvVTKButtons::Update()
 {
   Superclass::Update();
   this->CalculatePosition();
-  if(ButtonCallback)
+  if (ButtonCallback)
   {
     reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->FlyTo = FlyTo;
-    if(reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer)
+    if (reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer)
     {
       Renderer->GetRenderWindow()->Render();
     }
@@ -244,7 +244,7 @@ void msvVTKButtons::CalculatePosition()
   bds[3] = 16;
   bds[4] = 0.0;
   bds[5] = 0.0;
-  vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(this->GetButton()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep = vtkTexturedButtonRepresentation2D::SafeDownCast(this->GetButton()->GetRepresentation());
   rep->SetPlaceFactor(1.);
   rep->PlaceWidget(bds);
   rep->Modified();
@@ -257,7 +257,7 @@ void msvVTKButtons::CalculatePosition()
 //------------------------------------------------------------------------------
 vtkRenderWindow* msvVTKButtons::GetWindow()
 {
-  if(Window == NULL)
+  if (Window == NULL)
   {
     Window = vtkRenderWindow::New();
   }
@@ -267,7 +267,7 @@ vtkRenderWindow* msvVTKButtons::GetWindow()
 //------------------------------------------------------------------------------
 void msvVTKButtons::DeleteWindow()
 {
-  if(this->Window)
+  if (this->Window)
   {
     this->Window->Delete();
     this->Window = NULL;
@@ -277,7 +277,7 @@ void msvVTKButtons::DeleteWindow()
 //------------------------------------------------------------------------------
 void msvVTKButtons::GetDisplayPosition(double pos[2])
 {
-  if(!this->GetOnCorner())
+  if (!this->GetOnCorner())
   {
     this->GetRealDisplayPosition(pos);
   }
@@ -316,7 +316,7 @@ void msvVTKButtons::GetRealDisplayPosition(double pos[2])
   double *p = anchor->GetComputedDoubleDisplayValue(this->Renderer);
   pos[0] = static_cast<double>(p[0]);
   pos[1] = static_cast<double>(p[1]) + this->YOffset;
-  if(pos[0]<0 || pos[1]<0)
+  if (pos[0]<0 || pos[1]<0)
   {
     pos[0] = 0;
     pos[1] = 0;

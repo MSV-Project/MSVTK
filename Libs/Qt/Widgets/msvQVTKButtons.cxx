@@ -96,25 +96,26 @@ public:
 
   // Getter and setter
   inline void setData(vtkDataSet* data){
-    static_cast<msvVTKButtons*>(this->vtkButtons())->SetData(data);};
+    msvVTKButtons::SafeDownCast(this->vtkButtons())->SetData(data);};
 
   inline vtkDataSet* data(){
-    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetData();};
+    msvVTKButtons::SafeDownCast(this->vtkButtons())->GetData();};
 
   inline void setFlyTo(bool flyTo){
-    static_cast<msvVTKButtons*>(this->vtkButtons())->SetFlyTo(flyTo);};
+    msvVTKButtons::SafeDownCast(this->vtkButtons())->SetFlyTo(flyTo);};
 
   inline bool flyTo(){
-    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetFlyTo();};
+    msvVTKButtons::SafeDownCast(this->vtkButtons())->GetFlyTo();};
 
   void setOnCenter(bool onCenter){
-    static_cast<msvVTKButtons*>(this->vtkButtons())->SetOnCenter(onCenter);};
+    msvVTKButtons::SafeDownCast(this->vtkButtons())->SetOnCenter(onCenter);};
 
   inline bool onCenter(){
-    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetOnCenter();};
+    msvVTKButtons::SafeDownCast(this->vtkButtons())->GetOnCenter();};
 
   inline void setCurrentRenderer(vtkRenderer *renderer){
-    static_cast<msvVTKButtons*>(this->vtkButtons())->SetCurrentRenderer(renderer);}
+    static_cast<msvVTKButtons*>(
+          this->vtkButtons())->SetCurrentRenderer(renderer);}
 
   inline void setBounds(double b[6]){
     static_cast<msvVTKButtons*>(this->vtkButtons())->SetBounds(b);};
@@ -122,7 +123,8 @@ public:
   inline void update(){static_cast<msvVTKButtons*>(this->vtkButtons())->Update();};
 
   inline vtkImageData* preview(int width,int height){
-    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetPreview(width,height);};
+    msvVTKButtons::SafeDownCast(
+          this->vtkButtons())->GetPreview(width,height);};
 
   virtual msvVTKButtonsInterface* vtkButtons();
 };
@@ -227,13 +229,13 @@ QImage msvQVTKButtons::getPreview(int width, int height)
     int qImageBitIndex=0;
     QRgb* qImageBits = (QRgb*)qImage.bits();
     unsigned char* scalarTuples = scalars->GetPointer(0);
-    for (int j=0; j<height; j++)
+    for (int j=0; j<height; ++j)
     {
-      for (int i=0; i<width; i++)
+      for (int i=0; i<width; ++i)
       {
-        unsigned char* tuple = scalarTuples+(tupleIndex++*3);
+        unsigned char* tuple = scalarTuples+(++tupleIndex*3);
         QRgb color = qRgba(tuple[0], tuple[1], tuple[2], 255);
-        *(qImageBits+(qImageBitIndex++))=color;
+        *(qImageBits+(++qImageBitIndex))=color;
       }
     }
     vtkImage->Delete();

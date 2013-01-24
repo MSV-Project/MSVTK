@@ -67,9 +67,9 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
   rep->SetNumberOfStates(1);
   GetButton()->SetRepresentation(rep);
   rep->Delete();
-//  if(ButtonCallback)
+//  if (ButtonCallback)
 //    this->GetButton()->AddObserver(vtkCommand::StateChangedEvent,ButtonCallback);
-//  if(HighlightCallback)
+//  if (HighlightCallback)
 //  {
 //    this->GetButton()->GetRepresentation()->AddObserver(
 //      vtkCommand::HighlightEvent,HighlightCallback);
@@ -82,7 +82,7 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
 //----------------------------------------------------------------------
 msvVTKButtonsInterface::~msvVTKButtonsInterface()
 {
-  if(NULL!=this->LabelText)
+  if (NULL!=this->LabelText)
   {
     delete[] this->LabelText;
     this->LabelText = NULL;
@@ -92,7 +92,7 @@ msvVTKButtonsInterface::~msvVTKButtonsInterface()
 //----------------------------------------------------------------------
 vtkButtonWidget *msvVTKButtonsInterface::GetButton()
 {
-  if(this->ButtonWidget == NULL)
+  if (this->ButtonWidget == NULL)
   {
     this->ButtonWidget = vtkButtonWidget::New();
   }
@@ -103,7 +103,7 @@ vtkButtonWidget *msvVTKButtonsInterface::GetButton()
 void msvVTKButtonsInterface::SetCurrentRenderer(vtkRenderer* renderer)
 {
   Renderer = renderer;
-  if(renderer)
+  if (renderer)
   {
     this->GetButton()->SetInteractor(
       renderer->GetRenderWindow()->GetInteractor());
@@ -152,7 +152,7 @@ void msvVTKButtonsInterface::Update()
     rep->GetBalloon()->SetBalloonText("");
   }
 
-  if(this->GetShowButton())
+  if (this->GetShowButton())
   {
     this->GetButton()->GetRepresentation()->SetVisibility(true);
     this->GetButton()->EnabledOn();
@@ -169,7 +169,7 @@ void msvVTKButtonsInterface::SetImage(vtkImageData* image)
 {
   Image = image;
   vtkTexturedButtonRepresentation2D *rep =
-    static_cast<vtkTexturedButtonRepresentation2D *>(
+    vtkTexturedButtonRepresentation2D::SafeDownCast(
     this->GetButton()->GetRepresentation());
   rep->SetButtonTexture(0,Image);
   int size[2]; size[0] = 16; size[1] = 16;
@@ -180,8 +180,8 @@ void msvVTKButtonsInterface::SetImage(vtkImageData* image)
 //----------------------------------------------------------------------
 void msvVTKButtonsInterface::SetOpacity(double opacity)
 {
-  if(opacity > 1) opacity=1;
-  if(opacity < 0) opacity=0;
+  if (opacity > 1) opacity=1;
+  if (opacity < 0) opacity=0;
 
   Opacity = opacity;
 
@@ -198,7 +198,7 @@ void msvVTKButtonsInterface::RestorePreviousOpacity()
 void msvVTKButtonsInterface::SetShowButton(bool show)
 {
   this->ShowButton = show;
-  if(this->Renderer)
+  if (this->Renderer)
   {
     this->Renderer->GetActiveCamera()->Modified();
   }

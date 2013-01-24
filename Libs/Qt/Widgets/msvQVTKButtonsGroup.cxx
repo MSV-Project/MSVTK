@@ -54,14 +54,14 @@ public:
   virtual ~msvQVTKButtonsGroupPrivate();
 
   inline vtkSliderWidget* slider(){
-    return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->GetSlider();};
+    msvVTKButtonsGroup::SafeDownCast(this->vtkButtons())->GetSlider();};
 
   inline void setCurrentRenderer(vtkRenderer* renderer){
-    return static_cast<msvVTKButtonsGroup*>(
+    return msvVTKButtonsGroup::SafeDownCast(
           this->vtkButtons())->SetCurrentRenderer(renderer);};
 
   inline void update(){
-    static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->Update();};
+    msvVTKButtonsGroup::SafeDownCast(this->vtkButtons())->Update();};
 
   inline int numberOfElements(){return Elements.size();};
 
@@ -101,7 +101,7 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
 {
   // add elements on both vectors
   Q_Q(msvQVTKButtonsGroup);
-  static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->AddElement(
+  msvVTKButtonsGroup::SafeDownCast(this->vtkButtons())->AddElement(
         buttons->vtkButtonsInterface());
   int i = 0;
   double b[6];
@@ -109,7 +109,7 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
   double dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
   q->connect(buttons, SIGNAL(show(bool)), q, SLOT(show(bool)));
   for (QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
-    buttonsIt != Elements.end(); buttonsIt++)
+    buttonsIt != Elements.end(); ++buttonsIt)
   {
     if (*buttonsIt == buttons)
     {
@@ -122,7 +122,7 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
       Elements.insert(i,buttons);
       return;
     }
-    i++;
+    ++i;
   }
   Elements.push_back(buttons);
 }
@@ -133,16 +133,16 @@ void msvQVTKButtonsGroupPrivate::removeElement(msvQVTKButtonsInterface* buttons)
   // remove elements on both vectors
   int index = 0;
   for (QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
-    buttonsIt != Elements.end(); buttonsIt++)
+    buttonsIt != Elements.end(); ++buttonsIt)
   {
     if (*buttonsIt == buttons)
     {
       Elements.remove(index);
       return;
     }
-    index++;
+    ++index;
   }
-  return static_cast<msvVTKButtonsGroup*>(
+  return msvVTKButtonsGroup::SafeDownCast(
         this->vtkButtons())->RemoveElement(buttons->vtkButtonsInterface());
 }
 
@@ -162,7 +162,7 @@ void msvQVTKButtonsGroupPrivate::setImage(QImage image)
   vtkQImageToImageSource *imageToVTK = vtkQImageToImageSource::New();
   imageToVTK->SetQImage(&image);
   imageToVTK->Update();
-  return static_cast<msvVTKButtonsGroup*>(
+  return msvVTKButtonsGroup::SafeDownCast(
         this->vtkButtons())->SetImage(imageToVTK->GetOutput());
   imageToVTK->Delete();
 }
