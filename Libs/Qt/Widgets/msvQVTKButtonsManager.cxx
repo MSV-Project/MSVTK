@@ -58,7 +58,7 @@ msvQVTKButtonsManagerPrivate::~msvQVTKButtonsManagerPrivate()
 void msvQVTKButtonsManagerPrivate::setElementProperty(QString name, QVariant value)
 {
   for (QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
-    buttonsIt != Elements.end(); buttonsIt++)
+    buttonsIt != Elements.end(); ++buttonsIt)
   {
     (*buttonsIt)->setProperty(name.toStdString().c_str(),value);
   }

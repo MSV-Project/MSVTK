@@ -210,18 +210,18 @@ void msvVTKButtonsGroup::AddElement(msvVTKButtonsInterface* buttons)
 
   for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
   {
-    if(*buttonsIt == buttons)
+    if (*buttonsIt == buttons)
     {
       return;
     }
     (*buttonsIt)->GetBounds(b);
     double cur_dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
-    if(dimension > cur_dimension)
+    if (dimension > cur_dimension)
     {
       Elements.insert(buttonsIt,buttons);
       return;
     }
-    //i++;
+    //++i;
   }
   Elements.push_back(buttons);
 }
@@ -230,9 +230,9 @@ void msvVTKButtonsGroup::AddElement(msvVTKButtonsInterface* buttons)
 void msvVTKButtonsGroup::RemoveElement(msvVTKButtonsInterface* buttons)
 {
   //int index = 0;
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
   {
-    if(*buttonsIt == buttons)
+    if (*buttonsIt == buttons)
     {
       Elements.erase(buttonsIt);
       return;
@@ -244,7 +244,7 @@ void msvVTKButtonsGroup::RemoveElement(msvVTKButtonsInterface* buttons)
 //----------------------------------------------------------------------
 msvVTKButtonsInterface* msvVTKButtonsGroup::GetElement(unsigned int index)
 {
-  if(index > Elements.size() - 1)
+  if (index > Elements.size() - 1)
   {
     return NULL;
   }
@@ -275,7 +275,7 @@ T *msvVTKButtonsGroup::CreateElement()
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetShowButtons(bool show)
 {
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
   {
     (*buttonsIt)->SetShowButton(show);
   }
@@ -284,7 +284,7 @@ void msvVTKButtonsGroup::SetShowButtons(bool show)
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetShowLabel(bool show)
 {
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
   {
     (*buttonsIt)->SetShowLabel(show);
   }
@@ -293,7 +293,7 @@ void msvVTKButtonsGroup::SetShowLabel(bool show)
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetImageToElements(vtkImageData *image)
 {
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
   {
     (*buttonsIt)->SetImage(image);
   }
@@ -302,7 +302,7 @@ void msvVTKButtonsGroup::SetImageToElements(vtkImageData *image)
 //----------------------------------------------------------------------
 vtkSliderWidget* msvVTKButtonsGroup::GetSlider()
 {
-  if(!this->SliderWidget)
+  if (!this->SliderWidget)
   {
     msvVTKSliderFixedRepresentation2D* sliderRep =
       msvVTKSliderFixedRepresentation2D::New();
@@ -349,7 +349,7 @@ vtkSliderWidget* msvVTKButtonsGroup::GetSlider()
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::ShowSlider(bool show)
 {
-  if(this->GetSlider())
+  if (this->GetSlider())
   {
     this->GetSlider()->GetRepresentation()->SetVisibility(show);
     this->GetSlider()->Render();
@@ -362,7 +362,7 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
 
   int numOfElements = this->Elements.size();
 
-  if(numOfElements < 1)
+  if (numOfElements < 1)
   {
     return;
   }
@@ -379,7 +379,7 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
   double b2[6];
 
   this->GetElement(targetElement)->GetBounds(b1);
-  if(ratio == 0 || targetElement == numOfElements - 1)
+  if (ratio == 0 || targetElement == numOfElements - 1)
   {
     b[0] = b1[0];
     b[1] = b1[1];
@@ -424,7 +424,7 @@ vtkCommand *msvVTKButtonsGroup::GetSliderStartInteractionCallback() const
 void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
 {
   Superclass::SetCurrentRenderer(renderer);
-  if(renderer)
+  if (renderer)
   {
     this->GetSlider()->SetInteractor(renderer->GetRenderWindow()->GetInteractor());
     this->GetSlider()->SetCurrentRenderer(renderer); //to check
@@ -452,7 +452,7 @@ void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
     GetSlider()->EnabledOff();
   }
   for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
-    buttonsIt != Elements.end(); buttonsIt++)
+    buttonsIt != Elements.end(); ++buttonsIt)
   {
     (*buttonsIt)->SetCurrentRenderer(renderer);
   }
@@ -477,7 +477,7 @@ void msvVTKButtonsGroup::CalculatePosition()
   bds[4] = 0;
   bds[5] = 0;
 
-  vtkTexturedButtonRepresentation2D *rep = static_cast<vtkTexturedButtonRepresentation2D *>(this->GetButton()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep = vtkTexturedButtonRepresentation2D::SafeDownCast(this->GetButton()->GetRepresentation());
   rep->PlaceWidget(bds);
   rep->Modified();
   this->GetButton()->SetRepresentation(rep);

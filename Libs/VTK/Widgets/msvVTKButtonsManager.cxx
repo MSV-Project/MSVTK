@@ -55,7 +55,7 @@ public:
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
     int onCornerCount = 0;
-    if(Renderer && Renderer->GetActiveCamera())
+    if (Renderer && Renderer->GetActiveCamera())
     {
       double cameraPosition[3];
       Renderer->GetActiveCamera()->GetPosition(cameraPosition);
@@ -65,10 +65,10 @@ public:
       rendererSize[0] = static_cast<double>(intRendererSize[0]);
       rendererSize[1] = static_cast<double>(intRendererSize[1]);
 
-      for(int i = 0; i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); i++)
+      for(int i = 0; i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
       {
         msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(msvVTKButtonsManager::GetInstance()->GetElement(i));
-        if(toolButton && toolButton->GetShowButton())
+        if (toolButton && toolButton->GetShowButton())
         {
           double pos[2];
           toolButton->GetRealDisplayPosition(pos);
@@ -92,24 +92,24 @@ public:
           bbCenter[2] = bounds[4] + (bounds[5]-bounds[4])/2.;
 
           double distance = sqrt(vtkMath::Distance2BetweenPoints(bbCenter,cameraPosition));
-          if((extBounds[0] < cameraPosition[0] && cameraPosition[0] < extBounds[1] &&
+          if ((extBounds[0] < cameraPosition[0] && cameraPosition[0] < extBounds[1] &&
              extBounds[2] < cameraPosition[1] && cameraPosition[1] < extBounds[3] &&
              extBounds[4] < cameraPosition[2] && cameraPosition[2] < extBounds[5]) ||
              pos[0] >= rendererSize[0] || pos[1] >= rendererSize[1] ||
              pos[0] <= 0 || pos[1] <= 0)
           {
 
-            if(toolButton->GetShowButton() == true)
+            if (toolButton->GetShowButton() == true)
             {
               // opacity = 1;
-              onCornerCount++;
+              ++onCornerCount;
               toolButton->SetOnCorner(true);
               toolButton->SetCornerIndex(onCornerCount);
               toolButton->CalculatePosition();
               opacity = distance / avgDistance;
             }
           }
-          else //if(toolButton->GetOnCorner() == true)
+          else //if (toolButton->GetOnCorner() == true)
           {
             toolButton->SetOnCorner(false);
             toolButton->CalculatePosition();
@@ -131,10 +131,10 @@ public:
     double yTolerance = 24;
     // Sort buttons along y axis
     std::vector<msvVTKButtons*> sortedElements;
-    for(int i = 0; i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); i++)
+    for(int i = 0; i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
     {
       msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(msvVTKButtonsManager::GetInstance()->GetElement(i));
-      if(toolButton && toolButton->GetShowButton())
+      if (toolButton && toolButton->GetShowButton())
       {
         double pos[2];
 
@@ -142,33 +142,33 @@ public:
         toolButton->SetYOffset(0);
         bool added = false;
 
-        for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin(); it != sortedElements.end(); it++)
+        for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin(); it != sortedElements.end(); ++it)
         {
           double curPos[2];
           (*it)->GetDisplayPosition(curPos);
-          if(pos[1] < curPos[1])
+          if (pos[1] < curPos[1])
           {
             sortedElements.insert(it,toolButton);
             added = true;
             break;
           }
         }
-        if(!added)
+        if (!added)
         {
           sortedElements.push_back(toolButton);
         }
       }
     }
 
-    for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin()+1; it != sortedElements.end(); it++)
+    for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin()+1; it != sortedElements.end(); ++it)
     {
-      for(std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin(); it2 != it; it2++)
+      for(std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin(); it2 != it; ++it2)
       {
         double pos[2];
         (*it)->GetDisplayPosition(pos);
         double prevPos[2];
         (*it2)->GetDisplayPosition(prevPos);
-        if(pos[0] >= prevPos[0] - xTolerance && pos[0] <= prevPos[0] + xTolerance &&
+        if (pos[0] >= prevPos[0] - xTolerance && pos[0] <= prevPos[0] + xTolerance &&
            pos[1] >= prevPos[1] - yTolerance && pos[1] <= prevPos[1] + yTolerance)
         {
           (*it)->SetYOffset((*it)->GetYOffset() + yTolerance - (pos[1] - prevPos[1]));
@@ -197,14 +197,14 @@ msvVTKButtonsManager::~msvVTKButtonsManager()
 msvVTKButtonsGroup *msvVTKButtonsManager::CreateGroup()
 {
   Elements.push_back(msvVTKButtonsGroup::New());
-  return static_cast<msvVTKButtonsGroup*>(Elements.at(Elements.size()-1));
+  return msvVTKButtonsGroup::SafeDownCast(Elements.at(Elements.size()-1));
 }
 
 //------------------------------------------------------------------------------
 msvVTKButtons *msvVTKButtonsManager::CreateButtons()
 {
   Elements.push_back(msvVTKButtons::New());
-  return static_cast<msvVTKButtons*>(Elements.at(Elements.size()-1));
+  return msvVTKButtons::SafeDownCast(Elements.at(Elements.size()-1));
 }
 
 //------------------------------------------------------------------------------
@@ -214,7 +214,7 @@ void msvVTKButtonsManager::AddElement(msvVTKButtonsInterface *element)
 
   // @ToDo change the way the manager retrives the renderer
   /*msvVTKButtons *button = reinterpret_cast<msvVTKButtons*>(element);
-  if(button && !this->CameraCallback)
+  if (button && !this->CameraCallback)
   {
     this->CameraCallback = vtkCameraCallback::New();
     button->GetRenderer()->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,CameraCallback);
