@@ -61,6 +61,8 @@ public:
     return new vtkButtonCallbackGroup;
   }
 
+  vtkTypeMacro(vtkButtonCallbackGroup,vtkCommand);
+
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
     State = !State;
@@ -90,24 +92,26 @@ public:
     return new vtkButtonHighLightCallbackGroup;
   }
 
+  vtkTypeMacro(vtkButtonHighLightCallbackGroup,vtkCommand);
+
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkTexturedButtonRepresentation2D *rep =
-      reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
-    int highlightState = rep->GetHighlightState();
+//    vtkTexturedButtonRepresentation2D *rep =
+//      vtkTexturedButtonRepresentation2D::SafeDownCast(caller);
+//    int highlightState = rep->GetHighlightState();
 
-    if ( highlightState == vtkButtonRepresentation::HighlightHovering
-      && PreviousHighlightState == vtkButtonRepresentation::HighlightNormal )
-    {
-      //show tooltip (not if previous state was selecting
-      //this->ToolButton->SetShowTooltip(true);
-    }
-    else if ( highlightState == vtkButtonRepresentation::HighlightNormal)
-    {
-      //hide tooltip
-      //ToolButton->SetShowTooltip(false);
-    }
-    this->PreviousHighlightState = highlightState;
+//    if ( highlightState == vtkButtonRepresentation::HighlightHovering
+//      && PreviousHighlightState == vtkButtonRepresentation::HighlightNormal )
+//      {
+//      //show tooltip (not if previous state was selecting
+//      //this->ToolButton->SetShowTooltip(true);
+//      }
+//    else if ( highlightState == vtkButtonRepresentation::HighlightNormal)
+//      {
+//      //hide tooltip
+//      //ToolButton->SetShowTooltip(false);
+//      }
+//    this->PreviousHighlightState = highlightState;
   }
 
   vtkButtonHighLightCallbackGroup()
@@ -126,10 +130,13 @@ public:
   {
     return new vtkSliderInteractionCallback;
   }
+
+  vtkTypeMacro(vtkSliderInteractionCallback,vtkCommand);
+
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkSliderWidget *sliderWidget = reinterpret_cast<vtkSliderWidget*>(caller);
-    double ratio = reinterpret_cast<vtkSliderRepresentation*>(
+    vtkSliderWidget *sliderWidget = vtkSliderWidget::SafeDownCast(caller);
+    double ratio = vtkSliderRepresentation::SafeDownCast(
       sliderWidget->GetRepresentation())->GetValue();
     this->ToolButton->SetCameraPositionOnPath(ratio);
   }
@@ -148,11 +155,15 @@ public:
   {
     return new vtkSliderStartInteractionCallback;
   }
+
+  vtkTypeMacro(vtkSliderStartInteractionCallback,vtkCommand);
+
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkSliderWidget *sliderWidget = reinterpret_cast<vtkSliderWidget*>(caller);
+    vtkSliderWidget *sliderWidget = vtkSliderWidget::SafeDownCast(caller);
     msvVTKAnimate* animateCamera = new msvVTKAnimate();
-    double ratio = reinterpret_cast<vtkSliderRepresentation*>(sliderWidget->GetRepresentation())->GetValue();
+    double ratio = vtkSliderRepresentation::SafeDownCast(
+          sliderWidget->GetRepresentation())->GetValue();
     double bounds[6];
     this->ToolButton->GetCameraPositionOnPath(ratio,bounds);
     animateCamera->Execute(this->Renderer, bounds, 20);
@@ -169,19 +180,19 @@ msvVTKButtonsGroup::msvVTKButtonsGroup() : msvVTKButtonsInterface()
   this->SliderWidget = NULL;
 
   this->ButtonCallback = vtkButtonCallbackGroup::New();
-  reinterpret_cast<vtkButtonCallbackGroup*>(
+  vtkButtonCallbackGroup::SafeDownCast(
     this->ButtonCallback)->ToolButton = this;
 
   this->HighlightCallback = vtkButtonHighLightCallbackGroup::New();
-  reinterpret_cast<vtkButtonHighLightCallbackGroup*>(
+  vtkButtonHighLightCallbackGroup::SafeDownCast(
     this->HighlightCallback)->ToolButton = this;
 
   this->SliderInteractionCallback = vtkSliderInteractionCallback::New();
-  reinterpret_cast<vtkSliderInteractionCallback*>(
+  vtkSliderInteractionCallback::SafeDownCast(
     this->SliderInteractionCallback)->ToolButton = this;
 
   this->SliderStartInteractionCallback = vtkSliderStartInteractionCallback::New();
-  reinterpret_cast<vtkSliderStartInteractionCallback*>(
+  vtkSliderStartInteractionCallback::SafeDownCast(
     this->SliderStartInteractionCallback)->ToolButton = this;
 
   this->GetButton()->AddObserver(
@@ -196,7 +207,7 @@ msvVTKButtonsGroup::msvVTKButtonsGroup() : msvVTKButtonsInterface()
 //----------------------------------------------------------------------
 msvVTKButtonsGroup::~msvVTKButtonsGroup()
 {
-  reinterpret_cast<vtkSliderInteractionCallback*>(
+  vtkSliderInteractionCallback::SafeDownCast(
     this->SliderInteractionCallback)->Delete();
 }
 
@@ -208,21 +219,21 @@ void msvVTKButtonsGroup::AddElement(msvVTKButtonsInterface* buttons)
   buttons->GetBounds(b);
   double dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
 
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); buttonsIt++)
-  {
-    if (*buttonsIt == buttons)
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); buttonsIt++)
     {
+    if (*buttonsIt == buttons)
+      {
       return;
-    }
+      }
     (*buttonsIt)->GetBounds(b);
     double cur_dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
     if (dimension > cur_dimension)
-    {
+      {
       Elements.insert(buttonsIt,buttons);
       return;
+      }
     }
-    //++i;
-  }
   Elements.push_back(buttons);
 }
 
@@ -230,24 +241,24 @@ void msvVTKButtonsGroup::AddElement(msvVTKButtonsInterface* buttons)
 void msvVTKButtonsGroup::RemoveElement(msvVTKButtonsInterface* buttons)
 {
   //int index = 0;
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
-  {
-    if (*buttonsIt == buttons)
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); ++buttonsIt)
     {
+    if (*buttonsIt == buttons)
+      {
       Elements.erase(buttonsIt);
       return;
+      }
     }
-    //index++;
-  }
 }
 
 //----------------------------------------------------------------------
 msvVTKButtonsInterface* msvVTKButtonsGroup::GetElement(unsigned int index)
 {
   if (index > Elements.size() - 1)
-  {
+    {
     return NULL;
-  }
+    }
   return Elements.at(index);
 }
 
@@ -275,35 +286,38 @@ T *msvVTKButtonsGroup::CreateElement()
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetShowButtons(bool show)
 {
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
-  {
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); ++buttonsIt)
+    {
     (*buttonsIt)->SetShowButton(show);
-  }
+    }
 }
 
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetShowLabel(bool show)
 {
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
-  {
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); ++buttonsIt)
+    {
     (*buttonsIt)->SetShowLabel(show);
-  }
+    }
 }
 
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetImageToElements(vtkImageData *image)
 {
-  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin(); buttonsIt != Elements.end(); ++buttonsIt)
-  {
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); ++buttonsIt)
+    {
     (*buttonsIt)->SetImage(image);
-  }
+    }
 }
 
 //----------------------------------------------------------------------
 vtkSliderWidget* msvVTKButtonsGroup::GetSlider()
 {
   if (!this->SliderWidget)
-  {
+    {
     msvVTKSliderFixedRepresentation2D* sliderRep =
       msvVTKSliderFixedRepresentation2D::New();
 
@@ -337,12 +351,14 @@ vtkSliderWidget* msvVTKButtonsGroup::GetSlider()
     this->SliderWidget->SetRepresentation(sliderRep);
     this->SliderWidget->SetAnimationModeToAnimate();
     sliderRep->Delete();
-    this->SliderWidget->AddObserver(vtkCommand::InteractionEvent,this->GetSliderInteractionCallback());
-    this->SliderWidget->AddObserver(vtkCommand::StartInteractionEvent,this->GetSliderStartInteractionCallback());
+    this->SliderWidget->AddObserver(
+          vtkCommand::InteractionEvent,this->GetSliderInteractionCallback());
+    this->SliderWidget->AddObserver(
+          vtkCommand::StartInteractionEvent,this->GetSliderStartInteractionCallback());
 
     // Show and hide the slider
     ShowSlider(true);
-  }
+    }
   return this->SliderWidget;
 }
 
@@ -350,10 +366,10 @@ vtkSliderWidget* msvVTKButtonsGroup::GetSlider()
 void msvVTKButtonsGroup::ShowSlider(bool show)
 {
   if (this->GetSlider())
-  {
+    {
     this->GetSlider()->GetRepresentation()->SetVisibility(show);
     this->GetSlider()->Render();
-  }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -363,9 +379,9 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
   int numOfElements = this->Elements.size();
 
   if (numOfElements < 1)
-  {
+    {
     return;
-  }
+    }
   double ratioPerElement = 100. / double(numOfElements - 1);
   int targetElement = int(ratio / ratioPerElement);
 
@@ -380,16 +396,16 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
 
   this->GetElement(targetElement)->GetBounds(b1);
   if (ratio == 0 || targetElement == numOfElements - 1)
-  {
+    {
     b[0] = b1[0];
     b[1] = b1[1];
     b[2] = b1[2];
     b[3] = b1[3];
     b[4] = b1[4];
     b[5] = b1[5];
-  }
+    }
   else
-  {
+    {
     this->GetElement(targetElement + 1)->GetBounds(b2);
     b[0] = b1[0] * (1 - subPathRatio) + b2[0] * subPathRatio;
     b[1] = b1[1] * (1 - subPathRatio) + b2[1] * subPathRatio;
@@ -397,7 +413,7 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
     b[3] = b1[3] * (1 - subPathRatio) + b2[3] * subPathRatio;
     b[4] = b1[4] * (1 - subPathRatio) + b2[4] * subPathRatio;
     b[5] = b1[5] * (1 - subPathRatio) + b2[5] * subPathRatio;
-  }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -425,37 +441,42 @@ void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
 {
   Superclass::SetCurrentRenderer(renderer);
   if (renderer)
-  {
-    this->GetSlider()->SetInteractor(renderer->GetRenderWindow()->GetInteractor());
+    {
+    this->GetSlider()->SetInteractor(
+          renderer->GetRenderWindow()->GetInteractor());
+
     this->GetSlider()->SetCurrentRenderer(renderer); //to check
     this->GetSlider()->GetRepresentation()->SetRenderer(renderer);
 
-    reinterpret_cast<vtkSliderInteractionCallback*>(
+    vtkSliderInteractionCallback::SafeDownCast(
       this->SliderInteractionCallback)->Renderer = renderer;
 
-    reinterpret_cast<vtkSliderStartInteractionCallback*>(
+    vtkSliderStartInteractionCallback::SafeDownCast(
       this->SliderStartInteractionCallback)->Renderer = renderer;
 
-    reinterpret_cast<vtkButtonCallbackGroup*>(
+    vtkButtonCallbackGroup::SafeDownCast(
       this->ButtonCallback)->Renderer = renderer;
 
     this->GetSlider()->EnabledOn();
-  }
+    }
   else
-  {
+    {
     GetSlider()->SetInteractor(NULL);
     GetSlider()->SetCurrentRenderer(NULL);
     GetSlider()->GetRepresentation()->SetRenderer(NULL);
-    reinterpret_cast<vtkSliderInteractionCallback*>(SliderInteractionCallback)->Renderer = NULL;
-    reinterpret_cast<vtkSliderStartInteractionCallback*>(SliderStartInteractionCallback)->Renderer = NULL;
-    reinterpret_cast<vtkButtonCallbackGroup*>(ButtonCallback)->Renderer = NULL;
+    vtkSliderInteractionCallback::SafeDownCast(
+          SliderInteractionCallback)->Renderer = NULL;
+    vtkSliderStartInteractionCallback::SafeDownCast(
+          SliderStartInteractionCallback)->Renderer = NULL;
+    vtkButtonCallbackGroup::SafeDownCast(
+          ButtonCallback)->Renderer = NULL;
     GetSlider()->EnabledOff();
-  }
+    }
   for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
     buttonsIt != Elements.end(); ++buttonsIt)
-  {
+    {
     (*buttonsIt)->SetCurrentRenderer(renderer);
-  }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -477,7 +498,8 @@ void msvVTKButtonsGroup::CalculatePosition()
   bds[4] = 0;
   bds[5] = 0;
 
-  vtkTexturedButtonRepresentation2D *rep = vtkTexturedButtonRepresentation2D::SafeDownCast(this->GetButton()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep = vtkTexturedButtonRepresentation2D::SafeDownCast(
+        this->GetButton()->GetRepresentation());
   rep->PlaceWidget(bds);
   rep->Modified();
   this->GetButton()->SetRepresentation(rep);
