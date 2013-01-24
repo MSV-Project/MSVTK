@@ -423,7 +423,7 @@ vtkCommand *msvVTKButtonsGroup::GetSliderStartInteractionCallback() const
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
 {
-  msvVTKButtonsInterface::SetCurrentRenderer(renderer);
+  Superclass::SetCurrentRenderer(renderer);
   if(renderer)
   {
     this->GetSlider()->SetInteractor(renderer->GetRenderWindow()->GetInteractor());
@@ -461,7 +461,7 @@ void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
 //----------------------------------------------------------------------
 void msvVTKButtonsGroup::Update()
 {
-  msvVTKButtonsInterface::Update();
+  Superclass::Update();
   this->CalculatePosition();
 }
 

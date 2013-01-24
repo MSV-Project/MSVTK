@@ -63,6 +63,8 @@ public:
   // Instantiate the class.
   static msvVTKButtonsGroup *New();
 
+  vtkTypeMacro(msvVTKButtonsGroup,msvVTKButtonsInterface);
+
   // Description:
   // Add a buttons to the buttons' vector
   void AddElement(msvVTKButtonsInterface* buttons);

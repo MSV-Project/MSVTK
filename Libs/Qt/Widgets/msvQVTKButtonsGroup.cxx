@@ -53,18 +53,23 @@ public:
   msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& object);
   virtual ~msvQVTKButtonsGroupPrivate();
 
-  inline vtkSliderWidget* slider(){return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->GetSlider();};
-  inline void setCurrentRenderer(vtkRenderer* renderer){return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->SetCurrentRenderer(renderer);};
-  inline void setShowButton(bool show){return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->SetShowButton(show);};
-  inline void setShowLabel(bool show){return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->SetShowLabel(show);};
-  void update(){static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->Update();};
+  inline vtkSliderWidget* slider(){
+    return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->GetSlider();};
+
+  inline void setCurrentRenderer(vtkRenderer* renderer){
+    return static_cast<msvVTKButtonsGroup*>(
+          this->vtkButtons())->SetCurrentRenderer(renderer);};
+
+  inline void update(){
+    static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->Update();};
+
+  inline int numberOfElements(){return Elements.size();};
 
   msvQVTKButtonsInterface* getElement(int index);
-  inline int numberOfElements(){return Elements.size();};
   void addElement(msvQVTKButtonsInterface* buttons);
   void removeElement(msvQVTKButtonsInterface* buttons);
   virtual msvVTKButtonsInterface* vtkButtons();
-  void setIconFileName(QString iconFilename);
+  void setImage(QImage image);
 };
 
 //------------------------------------------------------------------------------
@@ -76,13 +81,13 @@ msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& obje
 }
 
 //------------------------------------------------------------------------------
-/*virtual*/ msvVTKButtonsInterface* msvQVTKButtonsGroupPrivate::vtkButtons()
+msvVTKButtonsInterface* msvQVTKButtonsGroupPrivate::vtkButtons()
 {
-    if(!this->VtkButtonsGroup)
-    {
-        this->VtkButtonsGroup = msvVTKButtonsGroup::New();
-    }
-    return this->VtkButtonsGroup;
+  if (!this->VtkButtonsGroup)
+  {
+    this->VtkButtonsGroup = msvVTKButtonsGroup::New();
+  }
+  return this->VtkButtonsGroup;
 }
 
 //------------------------------------------------------------------------------
@@ -96,22 +101,23 @@ void msvQVTKButtonsGroupPrivate::addElement(msvQVTKButtonsInterface* buttons)
 {
   // add elements on both vectors
   Q_Q(msvQVTKButtonsGroup);
-  static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->AddElement(buttons->vtkButtonsInterface());
+  static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->AddElement(
+        buttons->vtkButtonsInterface());
   int i = 0;
   double b[6];
   buttons->bounds(b);
   double dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
   q->connect(buttons, SIGNAL(show(bool)), q, SLOT(show(bool)));
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+  for (QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
     buttonsIt != Elements.end(); buttonsIt++)
   {
-    if(*buttonsIt == buttons)
+    if (*buttonsIt == buttons)
     {
       return;
     }
     (*buttonsIt)->bounds(b);
     double cur_dimension = (b[1]-b[0])*(b[3]-b[2])*(b[5]-b[4]);
-    if(dimension > cur_dimension)
+    if (dimension > cur_dimension)
     {
       Elements.insert(i,buttons);
       return;
@@ -126,23 +132,24 @@ void msvQVTKButtonsGroupPrivate::removeElement(msvQVTKButtonsInterface* buttons)
 {
   // remove elements on both vectors
   int index = 0;
-  for(QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+  for (QVector<msvQVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
     buttonsIt != Elements.end(); buttonsIt++)
   {
-    if(*buttonsIt == buttons)
+    if (*buttonsIt == buttons)
     {
       Elements.remove(index);
       return;
     }
     index++;
   }
-  return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->RemoveElement(buttons->vtkButtonsInterface());
+  return static_cast<msvVTKButtonsGroup*>(
+        this->vtkButtons())->RemoveElement(buttons->vtkButtonsInterface());
 }
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsInterface* msvQVTKButtonsGroupPrivate::getElement(int index)
 {
-  if(index > Elements.size() - 1)
+  if (index > Elements.size() - 1)
   {
     return NULL;
   }
@@ -150,14 +157,13 @@ msvQVTKButtonsInterface* msvQVTKButtonsGroupPrivate::getElement(int index)
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsGroupPrivate::setIconFileName(QString iconfilename)
+void msvQVTKButtonsGroupPrivate::setImage(QImage image)
 {
-  QImage image;
-  image.load(iconfilename);
   vtkQImageToImageSource *imageToVTK = vtkQImageToImageSource::New();
   imageToVTK->SetQImage(&image);
   imageToVTK->Update();
-  return static_cast<msvVTKButtonsGroup*>(this->vtkButtons())->SetImage(imageToVTK->GetOutput());
+  return static_cast<msvVTKButtonsGroup*>(
+        this->vtkButtons())->SetImage(imageToVTK->GetOutput());
   imageToVTK->Delete();
 }
 
@@ -176,7 +182,7 @@ msvQVTKButtonsGroup::~msvQVTKButtonsGroup()
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::setCurrentRenderer(vtkRenderer *renderer) {
-  msvQVTKButtonsInterface::setCurrentRenderer(renderer);
+  //msvQVTKButtonsInterface::setCurrentRenderer(renderer);
   Q_D(msvQVTKButtonsGroup);
   d->setCurrentRenderer(renderer);
 }
@@ -224,7 +230,7 @@ msvQVTKButtons* msvQVTKButtonsGroup::createButtons()
 void msvQVTKButtonsGroup::update()
 {
   Q_D(msvQVTKButtonsGroup);
-  msvQVTKButtonsInterface::update();
+  //msvQVTKButtonsInterface::update();
   d->update();
 }
 
@@ -238,33 +244,9 @@ vtkSliderWidget* msvQVTKButtonsGroup::slider()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsGroup::show(bool val)
 {
-  if(val)
+  if (val)
   {
-    setShowButton(val);
+    msvQVTKButtonsInterface::setShowButton(val);
     this->update();
   }
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsGroup::setShowButton(bool show)
-{
-  Q_D(msvQVTKButtonsGroup);
-  msvQVTKButtonsInterface::setShowButton(show);
-  d->setShowButton(show);
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsGroup::setShowLabel(bool show)
-{
-  Q_D(msvQVTKButtonsGroup);
-  msvQVTKButtonsInterface::setShowLabel(show);
-  d->setShowLabel(show);
-}
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsGroup::setIconFileName(QString iconFileName)
-{
-  Q_D(msvQVTKButtonsGroup);
-  msvQVTKButtonsInterface::setIconFileName(iconFileName);
-  d->setIconFileName(iconFileName);
 }

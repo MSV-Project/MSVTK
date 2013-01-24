@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsManager_H
-#define msvQVTKButtonsManager_H
+#ifndef __msvQVTKButtonsManager_h
+#define __msvQVTKButtonsManager_h
 
 // MSVTK includes
 #include "msvQVTKButtons.h"
@@ -69,8 +69,4 @@ private:
   Q_DISABLE_COPY(msvQVTKButtonsManager);
 };
 
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-#endif // msvQVTKButtonsManager_H
+#endif // __msvQVTKButtonsManager_h
