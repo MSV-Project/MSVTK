@@ -137,7 +137,7 @@ msvVTKButtons::~msvVTKButtons()
 //----------------------------------------------------------------------
 void msvVTKButtons::SetBounds(double b[6])
 {
-  msvVTKButtonsInterface::SetBounds(b);
+  Superclass::SetBounds(b);
   reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->SetBounds(b);
   //reinterpret_cast<vtkRWICallback*>(RWICallback)->SetBounds(b);
   //this->Update();
@@ -146,7 +146,7 @@ void msvVTKButtons::SetBounds(double b[6])
 //----------------------------------------------------------------------
 void msvVTKButtons::SetCurrentRenderer(vtkRenderer *renderer)
 {
-  msvVTKButtonsInterface::SetCurrentRenderer(renderer);
+  Superclass::SetCurrentRenderer(renderer);
   if(renderer)
   {
     //renderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,RWICallback);
@@ -220,7 +220,7 @@ vtkImageData* msvVTKButtons::GetPreview(int width, int height)
 //------------------------------------------------------------------------------
 void msvVTKButtons::Update()
 {
-  msvVTKButtonsInterface::Update();
+  Superclass::Update();
   this->CalculatePosition();
   if(ButtonCallback)
   {

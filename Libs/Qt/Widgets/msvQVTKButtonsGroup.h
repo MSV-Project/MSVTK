@@ -75,7 +75,7 @@ public:
   void setShowLabel(bool show);
 
   /// set the icon path
-  void setIconFileName(QString iconFileName);
+  void setImage(QImage image);
 
   /// add vtk button to Renderer
   void setCurrentRenderer(vtkRenderer *renderer);

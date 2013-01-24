@@ -59,7 +59,8 @@ public:
     {
       //show tooltip (not if previous state was selecting)
       ToolButton->setShowTooltip(true);
-      ToolButton->vtkButtonsInterface()->SetPreviousOpacity(ToolButton->vtkButtonsInterface()->GetOpacity());
+      ToolButton->vtkButtonsInterface()->SetPreviousOpacity(
+            ToolButton->vtkButtonsInterface()->GetOpacity());
       ToolButton->vtkButtonsInterface()->SetOpacity(1);
     }
     else if ( highlightState == vtkButtonRepresentation::HighlightNormal )
@@ -94,17 +95,36 @@ public:
   virtual ~msvQVTKButtonsPrivate();
 
   // Getter and setter
-  void setData(vtkDataSet* data){static_cast<msvVTKButtons*>(this->vtkButtons())->SetData(data);};
-  vtkDataSet* data(){return static_cast<msvVTKButtons*>(this->vtkButtons())->GetData();};
-  void setFlyTo(bool flyTo){static_cast<msvVTKButtons*>(this->vtkButtons())->SetFlyTo(flyTo);};
-  bool flyTo(){return static_cast<msvVTKButtons*>(this->vtkButtons())->GetFlyTo();};
-  void setOnCenter(bool onCenter){static_cast<msvVTKButtons*>(this->vtkButtons())->SetOnCenter(onCenter);};
-  bool onCenter(){return static_cast<msvVTKButtons*>(this->vtkButtons())->GetOnCenter();};
-  void setCurrentRenderer(vtkRenderer *renderer){static_cast<msvVTKButtons*>(this->vtkButtons())->SetCurrentRenderer(renderer);}
-  void setBounds(double b[6]){static_cast<msvVTKButtons*>(this->vtkButtons())->SetBounds(b);}
-  void update(){static_cast<msvVTKButtons*>(this->vtkButtons())->Update();};
+  inline void setData(vtkDataSet* data){
+    static_cast<msvVTKButtons*>(this->vtkButtons())->SetData(data);};
+
+  inline vtkDataSet* data(){
+    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetData();};
+
+  inline void setFlyTo(bool flyTo){
+    static_cast<msvVTKButtons*>(this->vtkButtons())->SetFlyTo(flyTo);};
+
+  inline bool flyTo(){
+    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetFlyTo();};
+
+  void setOnCenter(bool onCenter){
+    static_cast<msvVTKButtons*>(this->vtkButtons())->SetOnCenter(onCenter);};
+
+  inline bool onCenter(){
+    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetOnCenter();};
+
+  inline void setCurrentRenderer(vtkRenderer *renderer){
+    static_cast<msvVTKButtons*>(this->vtkButtons())->SetCurrentRenderer(renderer);}
+
+  inline void setBounds(double b[6]){
+    static_cast<msvVTKButtons*>(this->vtkButtons())->SetBounds(b);};
+
+  inline void update(){static_cast<msvVTKButtons*>(this->vtkButtons())->Update();};
+
+  inline vtkImageData* preview(int width,int height){
+    return static_cast<msvVTKButtons*>(this->vtkButtons())->GetPreview(width,height);};
+
   virtual msvVTKButtonsInterface* vtkButtons();
-  vtkImageData* preview(int width,int height){return static_cast<msvVTKButtons*>(this->vtkButtons())->GetPreview(width,height);};
 };
 
 //------------------------------------------------------------------------------
@@ -117,13 +137,16 @@ msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object)
   this->HighlightCallback)->ToolButton = q;
 
   q->setVTKButtonsInterface(this->vtkButtons());
-  static_cast<msvVTKButtons*>(this->vtkButtons())->GetButton()->GetRepresentation()->AddObserver(vtkCommand::HighlightEvent,this->HighlightCallback);
+
+  static_cast<msvVTKButtons*>(
+        this->vtkButtons())->GetButton()->GetRepresentation()->AddObserver(
+        vtkCommand::HighlightEvent,this->HighlightCallback);
 }
 
 //------------------------------------------------------------------------------
 /*virtual*/ msvVTKButtonsInterface* msvQVTKButtonsPrivate::vtkButtons()
 {
-  if(!this->VtkButton)
+  if (!this->VtkButton)
   {
     this->VtkButton = msvVTKButtons::New();
   }
@@ -153,7 +176,7 @@ msvQVTKButtons::~msvQVTKButtons()
 void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer)
 {
   Q_D(msvQVTKButtons);
-  msvQVTKButtonsInterface::setCurrentRenderer(renderer);
+  //msvQVTKButtonsInterface::setCurrentRenderer(renderer);
   d->setCurrentRenderer(renderer);
 }
 
@@ -161,7 +184,7 @@ void msvQVTKButtons::setCurrentRenderer(vtkRenderer *renderer)
 void msvQVTKButtons::setBounds(double b[6])
 {
   Q_D(msvQVTKButtons);
-  msvQVTKButtonsInterface::setBounds(b);
+  //msvQVTKButtonsInterface::setBounds(b);
   d->setBounds(b);
 }
 
@@ -169,7 +192,7 @@ void msvQVTKButtons::setBounds(double b[6])
 void msvQVTKButtons::update()
 {
   Q_D(msvQVTKButtons);
-  msvQVTKButtonsInterface::update();
+  //msvQVTKButtonsInterface::update();
   d->update();
 }
 
@@ -185,28 +208,28 @@ void msvQVTKButtons::setFlyTo(bool active)
 QImage msvQVTKButtons::getPreview(int width, int height)
 {
   Q_D(msvQVTKButtons);
-  if(d->data())
+  if (d->data())
   {
     double bounds[6];
     d->data()->GetBounds(bounds);
 
     vtkImageData* vtkImage=d->preview(width,height);
-    if(!vtkImage)
+    if (!vtkImage)
         return QImage();
     vtkUnsignedCharArray* scalars =
       vtkUnsignedCharArray::SafeDownCast(
         vtkImage->GetPointData()->GetScalars());
 
-    if(!width || !height || !scalars)
+    if (!width || !height || !scalars)
         return QImage();
     QImage qImage(width, height, QImage::Format_ARGB32);
     vtkIdType tupleIndex=0;
     int qImageBitIndex=0;
     QRgb* qImageBits = (QRgb*)qImage.bits();
     unsigned char* scalarTuples = scalars->GetPointer(0);
-    for(int j=0; j<height; j++)
+    for (int j=0; j<height; j++)
     {
-      for(int i=0; i<width; i++)
+      for (int i=0; i<width; i++)
       {
         unsigned char* tuple = scalarTuples+(tupleIndex++*3);
         QRgb color = qRgba(tuple[0], tuple[1], tuple[2], 255);
