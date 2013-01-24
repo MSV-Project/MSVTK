@@ -64,22 +64,24 @@ public:
     return new vtkButtonCallback;
   }
 
+  vtkTypeMacro(vtkButtonCallback,vtkCommand);
+
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
     ToolButton->SetPreviousOpacity(0);
     msvVTKAnimate* animateCamera = new msvVTKAnimate();
     if (FlyTo)
-    {
+      {
       animateCamera->Execute(Renderer, Bounds, 100);
-    }
+      }
     else
-    {
+      {
       Renderer->ResetCamera(Bounds);
-    }
+      }
     if (animateCamera)
-    {
+      {
       delete animateCamera;
-    }
+      }
     //selection
   }
 
@@ -115,12 +117,11 @@ msvVTKButtons::msvVTKButtons() : msvVTKButtonsInterface()
   this->OnCenter=false;
 
   this->ButtonCallback = vtkButtonCallback::New();
-  reinterpret_cast<vtkButtonCallback*>(this->ButtonCallback)->ToolButton = this;
+  vtkButtonCallback::SafeDownCast(
+        this->ButtonCallback)->ToolButton = this;
 
-  //this->RWICallback = vtkRWICallback::New();
-  //reinterpret_cast<vtkRWICallback*>(this->RWICallback)->ToolButton = this;
-
-  this->GetButton()->AddObserver(vtkCommand::StateChangedEvent,this->ButtonCallback);
+  this->GetButton()->AddObserver(
+        vtkCommand::StateChangedEvent,this->ButtonCallback);
 
   this->OnCorner = false;
   this->CornerIndex = -1;
@@ -138,9 +139,7 @@ msvVTKButtons::~msvVTKButtons()
 void msvVTKButtons::SetBounds(double b[6])
 {
   Superclass::SetBounds(b);
-  reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->SetBounds(b);
-  //reinterpret_cast<vtkRWICallback*>(RWICallback)->SetBounds(b);
-  //this->Update();
+  vtkButtonCallback::SafeDownCast(ButtonCallback)->SetBounds(b);
 }
 
 //----------------------------------------------------------------------
@@ -148,23 +147,21 @@ void msvVTKButtons::SetCurrentRenderer(vtkRenderer *renderer)
 {
   Superclass::SetCurrentRenderer(renderer);
   if (renderer)
-  {
-    //renderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,RWICallback);
-    //reinterpret_cast<vtkRWICallback*>(RWICallback)->Renderer = renderer;
-    reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer = renderer;
-  }
+    {
+    vtkButtonCallback::SafeDownCast(
+          ButtonCallback)->Renderer = renderer;
+    }
   else
-  {
-    //reinterpret_cast<vtkRWICallback*>(RWICallback)->Renderer = NULL;
-    reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer = NULL;
-  }
+    {
+    vtkButtonCallback::SafeDownCast(ButtonCallback)->Renderer = NULL;
+    }
 }
 
 //----------------------------------------------------------------------
 vtkImageData* msvVTKButtons::GetPreview(int width, int height)
 {
   if (Data)
-  {
+    {
     double bounds[6];
     Data->GetBounds(bounds);
 
@@ -213,7 +210,7 @@ vtkImageData* msvVTKButtons::GetPreview(int width, int height)
     //this->GetWindow()->Delete();
 
     return vtkImage;
-  }
+    }
   return NULL;
 }
 
@@ -223,13 +220,13 @@ void msvVTKButtons::Update()
   Superclass::Update();
   this->CalculatePosition();
   if (ButtonCallback)
-  {
-    reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->FlyTo = FlyTo;
-    if (reinterpret_cast<vtkButtonCallback*>(ButtonCallback)->Renderer)
     {
+    vtkButtonCallback::SafeDownCast(ButtonCallback)->FlyTo = FlyTo;
+    if (vtkButtonCallback::SafeDownCast(ButtonCallback)->Renderer)
+      {
       Renderer->GetRenderWindow()->Render();
+      }
     }
-  }
 }
 
 //------------------------------------------------------------------------------
@@ -244,7 +241,8 @@ void msvVTKButtons::CalculatePosition()
   bds[3] = 16;
   bds[4] = 0.0;
   bds[5] = 0.0;
-  vtkTexturedButtonRepresentation2D *rep = vtkTexturedButtonRepresentation2D::SafeDownCast(this->GetButton()->GetRepresentation());
+  vtkTexturedButtonRepresentation2D *rep = vtkTexturedButtonRepresentation2D::SafeDownCast(
+        this->GetButton()->GetRepresentation());
   rep->SetPlaceFactor(1.);
   rep->PlaceWidget(bds);
   rep->Modified();
@@ -258,9 +256,9 @@ void msvVTKButtons::CalculatePosition()
 vtkRenderWindow* msvVTKButtons::GetWindow()
 {
   if (Window == NULL)
-  {
+    {
     Window = vtkRenderWindow::New();
-  }
+    }
   return Window;
 }
 
@@ -268,24 +266,24 @@ vtkRenderWindow* msvVTKButtons::GetWindow()
 void msvVTKButtons::DeleteWindow()
 {
   if (this->Window)
-  {
+    {
     this->Window->Delete();
     this->Window = NULL;
-  }
+    }
 }
 
 //------------------------------------------------------------------------------
 void msvVTKButtons::GetDisplayPosition(double pos[2])
 {
   if (!this->GetOnCorner())
-  {
+    {
     this->GetRealDisplayPosition(pos);
-  }
+    }
   else
-  {
+    {
     pos[0] = 96;
     pos[1] = (24 * (CornerIndex - 1)) + CornerIndex;
-  }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -296,18 +294,18 @@ void msvVTKButtons::GetRealDisplayPosition(double pos[2])
   double coord[3];
   this->GetBounds(bounds);
   if (this->OnCenter)
-  {
+    {
     coord[0] = (bounds[1] + bounds[0])*.5;
     coord[1] = (bounds[3] + bounds[2])*.5;
     coord[2] = (bounds[5] + bounds[4])*.5;
-  }
+    }
   else
-  {
-  //on the corner of the bounding box of the VME.
-  coord[0] = bounds[0];
-  coord[1] = bounds[2];
-  coord[2] = bounds[4];
-  }
+    {
+    //on the corner of the bounding box of the VME.
+    coord[0] = bounds[0];
+    coord[1] = bounds[2];
+    coord[2] = bounds[4];
+    }
 
   vtkCoordinate* anchor = vtkCoordinate::New();
   anchor->SetCoordinateSystemToWorld();
@@ -317,9 +315,9 @@ void msvVTKButtons::GetRealDisplayPosition(double pos[2])
   pos[0] = static_cast<double>(p[0]);
   pos[1] = static_cast<double>(p[1]) + this->YOffset;
   if (pos[0]<0 || pos[1]<0)
-  {
+    {
     pos[0] = 0;
     pos[1] = 0;
-  }
+    }
   anchor->Delete();
 }

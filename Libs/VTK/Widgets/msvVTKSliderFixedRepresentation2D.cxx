@@ -71,16 +71,17 @@ msvVTKSliderFixedRepresentation2D::~msvVTKSliderFixedRepresentation2D()
 //----------------------------------------------------------------------
 void msvVTKSliderFixedRepresentation2D::BuildRepresentation()
 {
-  if ( this->GetMTime() > this->BuildTime || (this->Renderer && this->Renderer->GetVTKWindow() &&
-    this->Renderer->GetVTKWindow()->GetMTime() > this->BuildTime) )
-  {
+  if ( this->GetMTime() > this->BuildTime ||
+       (this->Renderer && this->Renderer->GetVTKWindow() &&
+        this->Renderer->GetVTKWindow()->GetMTime() > this->BuildTime) )
+    {
     int *size = this->Renderer->GetSize();
     if (0 == size[0] || 0 == size[1])
-    {
+      {
       // Renderer has no size yet: wait until the next
       // BuildRepresentation...
       return;
-    }
+      }
 
     double t = (this->Value-this->MinimumValue) / (this->MaximumValue-this->MinimumValue);
 
@@ -143,11 +144,11 @@ void msvVTKSliderFixedRepresentation2D::BuildRepresentation()
       (this->TubeWidth > this->EndCapWidth ? this->TubeWidth : this->EndCapWidth) );
 
     if ( ! this->ShowSliderLabel )
-    {
+      {
       this->LabelActor->VisibilityOff();
-    }
+      }
     else
-    {
+      {
       this->LabelActor->VisibilityOn();
       int labelSize[2];
       char label[256];
@@ -159,7 +160,7 @@ void msvVTKSliderFixedRepresentation2D::BuildRepresentation()
       textSize[1] = static_cast<double>(labelSize[1])/static_cast<double>(400);
       double radius = maxY/2.0 + textSize[1]*cos(theta) + textSize[0]*sin(theta);
       this->Points->SetPoint(16, (x[2]+x[3])/2.0, radius, 0.0); //label
-    }
+      }
 
     this->TitleProperty->SetFontSize(static_cast<int>(10));
     this->TitleMapper->GetSize(this->Renderer, titleSize);
@@ -188,5 +189,5 @@ void msvVTKSliderFixedRepresentation2D::BuildRepresentation()
     this->TitleActor->SetPosition(p17[0],p17[1]+12);
 
     this->BuildTime.Modified();
-  }
+    }
 }

@@ -47,6 +47,8 @@ class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface
   Q_OBJECT
 
 public:
+  typedef msvQVTKButtonsInterface Superclass;
+
   /// Object constructor.
   msvQVTKButtonsGroup(QObject *parent = 0);
 

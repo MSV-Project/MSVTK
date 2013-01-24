@@ -38,8 +38,8 @@
 // .SECTION See Also
 //
 
-#ifndef msvVTKButtonsManager_H
-#define msvVTKButtonsManager_H
+#ifndef __msvVTKButtonsManager_h
+#define __msvVTKButtonsManager_h
 
 #include "vtkObject.h"
 
@@ -104,4 +104,4 @@ private:
   vtkCameraCallback* CameraCallback;
 };
 
-#endif // msvVTKButtonsManager_H
+#endif // __msvVTKButtonsManager_h

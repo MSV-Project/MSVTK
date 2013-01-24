@@ -246,7 +246,7 @@ void msvQVTKButtonsGroup::show(bool val)
 {
   if (val)
   {
-    msvQVTKButtonsInterface::setShowButton(val);
+    Superclass::setShowButton(val);
     this->update();
   }
 }
