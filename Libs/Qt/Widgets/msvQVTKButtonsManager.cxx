@@ -19,7 +19,7 @@
 ==============================================================================*/
 
 // MSVTK includes
-#include <msvVTKButtonsManager.h>
+#include "msvVTKButtonsManager.h"
 #include "msvQVTKButtonsInterface.h"
 #include "msvQVTKButtonsManager.h"
 
