@@ -53,8 +53,6 @@ class  msvVTKButtonsManager : public vtkObject
 {
 public:
   // Description:
-  // Object constructor
-  msvVTKButtonsManager();
 
   // Description:
   // Object destructor
@@ -102,6 +100,9 @@ private:
 
   // Callback for camera modified event
   vtkCameraCallback* CameraCallback;
+
+  // Object constructor
+  msvVTKButtonsManager();
 };
 
 #endif // __msvVTKButtonsManager_h

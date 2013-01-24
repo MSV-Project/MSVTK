@@ -19,6 +19,7 @@
 ==============================================================================*/
 
 // MSVTK includes
+#include <msvVTKButtonsManager.h>
 #include "msvQVTKButtonsInterface.h"
 #include "msvQVTKButtonsManager.h"
 
@@ -127,3 +128,9 @@ void msvQVTKButtonsManager::setShowLabel(bool show)
   Q_D(msvQVTKButtonsManager);
   d->setElementProperty("showLabel",show);
 }
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsManager::setRenderer(vtkRenderer* renderer)
+{
+  msvVTKButtonsManager::GetInstance()->SetRenderer(renderer);
+};

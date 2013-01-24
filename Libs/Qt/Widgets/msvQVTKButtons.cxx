@@ -99,19 +99,19 @@ public:
     msvVTKButtons::SafeDownCast(this->vtkButtons())->SetData(data);};
 
   inline vtkDataSet* data(){
-    msvVTKButtons::SafeDownCast(this->vtkButtons())->GetData();};
+    return msvVTKButtons::SafeDownCast(this->vtkButtons())->GetData();};
 
   inline void setFlyTo(bool flyTo){
     msvVTKButtons::SafeDownCast(this->vtkButtons())->SetFlyTo(flyTo);};
 
   inline bool flyTo(){
-    msvVTKButtons::SafeDownCast(this->vtkButtons())->GetFlyTo();};
+    return msvVTKButtons::SafeDownCast(this->vtkButtons())->GetFlyTo();};
 
   void setOnCenter(bool onCenter){
     msvVTKButtons::SafeDownCast(this->vtkButtons())->SetOnCenter(onCenter);};
 
   inline bool onCenter(){
-    msvVTKButtons::SafeDownCast(this->vtkButtons())->GetOnCenter();};
+    return msvVTKButtons::SafeDownCast(this->vtkButtons())->GetOnCenter();};
 
   inline void setCurrentRenderer(vtkRenderer *renderer){
     static_cast<msvVTKButtons*>(
@@ -123,7 +123,7 @@ public:
   inline void update(){static_cast<msvVTKButtons*>(this->vtkButtons())->Update();};
 
   inline vtkImageData* preview(int width,int height){
-    msvVTKButtons::SafeDownCast(
+    return msvVTKButtons::SafeDownCast(
           this->vtkButtons())->GetPreview(width,height);};
 
   virtual msvVTKButtonsInterface* vtkButtons();
