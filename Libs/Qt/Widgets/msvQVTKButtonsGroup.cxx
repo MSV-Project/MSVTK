@@ -54,7 +54,7 @@ public:
   virtual ~msvQVTKButtonsGroupPrivate();
 
   inline vtkSliderWidget* slider(){
-    msvVTKButtonsGroup::SafeDownCast(this->vtkButtons())->GetSlider();};
+    return msvVTKButtonsGroup::SafeDownCast(this->vtkButtons())->GetSlider();};
 
   inline void setCurrentRenderer(vtkRenderer* renderer){
     return msvVTKButtonsGroup::SafeDownCast(
