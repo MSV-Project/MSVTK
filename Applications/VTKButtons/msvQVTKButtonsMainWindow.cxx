@@ -34,6 +34,7 @@
 #include "msvVTKDataFileSeriesReader.h"
 #include "ui_msvQVTKButtonsMainWindow.h"
 #include "msvQVTKButtonsAboutDialog.h"
+#include "msvQVTKButtonsManager.h"
 
 // VTK includes
 #include "vtkAlgorithmOutput.h"
@@ -121,6 +122,8 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
   this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
   this->threeDRenderer->SetBackground2(0.2, 0.4, 0.8);
   this->threeDRenderer->SetGradientBackground(true);
+
+  msvQVTKButtonsManager::instance()->setRenderer(this->threeDRenderer);
 
   this->axes = vtkSmartPointer<vtkAxesActor>::New();
   this->orientationMarker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
@@ -333,7 +336,7 @@ void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent)
 {
-  msvQVTKButtons *toolButton = new msvQVTKButtons();
+  msvQVTKButtons *toolButton = msvQVTKButtonsManager::instance()->createButtons();
   buttons.append(toolButton);
   QString name("TestData");
   toolButton->setShowButton(true);
@@ -348,6 +351,7 @@ void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent)
   QObject::connect(toolButton, SIGNAL(showTooltip(QString)),
                    parent, SLOT(showTooltip(QString)));
   toolButton->setCurrentRenderer(this->threeDRenderer);
+  toolButton->update();
 }
 
 //------------------------------------------------------------------------------

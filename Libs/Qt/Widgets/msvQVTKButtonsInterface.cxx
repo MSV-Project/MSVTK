@@ -46,7 +46,7 @@ public:
     return QString(this->vtkButtonsInterface()->GetLabelText());};
 
   inline void setTooltip(QString tooltip){
-    this->vtkButtonsInterface()->SetTooltip(tooltip.toStdString().c_str());};
+    this->vtkButtonsInterface()->SetTooltip(tooltip.toAscii());};
 
   inline QString tooltip(){return QString(
           this->vtkButtonsInterface()->GetTooltip());};
