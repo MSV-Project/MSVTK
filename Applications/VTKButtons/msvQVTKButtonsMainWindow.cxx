@@ -418,10 +418,13 @@ void msvQVTKButtonsMainWindow::openData()
 
   QString fileName = QFileDialog::getOpenFileName(
     this, tr("Open Data"), QDir::homePath(), tr("VTK Files (*.vtk)"));
-  d->clear();             // Clean Up data and scene
-  d->importVTKData(fileName);  // Load data
-  d->addVTKButton(this);
-  d->update();            // Update the Ui and the View
+  if(!fileName.isEmpty())
+  {
+    d->clear();             // Clean Up data and scene
+    d->importVTKData(fileName);  // Load data
+    d->addVTKButton(this);
+    d->update();            // Update the Ui and the View
+  }
 }
 
 //------------------------------------------------------------------------------
