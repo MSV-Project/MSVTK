@@ -53,7 +53,7 @@ vtkStandardNewMacro(msvVTKButtonsInterface);
 msvVTKButtonsInterface::msvVTKButtonsInterface()
 {
   this->LabelText=NULL;
-  this->Tooltip="";
+  this->Tooltip=NULL;
   this->ShowButton=true;
   this->ShowLabel=true;
   this->ButtonWidget=NULL;
@@ -69,6 +69,7 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
   this->BalloonLayout = vtkBalloonRepresentation::ImageLeft;
   this->Renderer = NULL;
   this->Opacity=1;
+  this->PreviousOpacity=1;
 }
 
 //----------------------------------------------------------------------
