@@ -26,8 +26,6 @@
 
 // MSV includes
 #include "msvQFFSMainWindow.h"
-#include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
 #include "msvVTKImageDataFileSeriesReader.h"
 #include "ui_msvQFFSMainWindow.h"
 #include "msvQFFSAboutDialog.h"
@@ -57,6 +55,7 @@
 #include <vtkPlotBar.h>
 #include <vtkPlotLine.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataReader.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
@@ -105,7 +104,6 @@ protected:
   vtkSmartPointer<vtkRenderer>                          threeDRenderer;
   vtkSmartPointer<vtkAxesActor>                         axes;
   vtkSmartPointer<vtkOrientationMarkerWidget>           orientationMarker;
-  vtkSmartPointer<msvVTKPolyDataFileSeriesReader>       boundaryReader;
   vtkSmartPointer<vtkPolyDataReader>                    polyDataReader;
   vtkSmartPointer<vtkPolyDataMapper>                    amrLagrangianMapper;
   vtkSmartPointer<vtkActor>                             amrLagrangianActor;
@@ -294,7 +292,7 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
   this->fluidSimulator->SetDataLevel(4);
   this->fluidSimulator->SetCoarsestGridSpacing(4);
   this->fluidSimulator->Init(data);
-  this->fluidSimulator->SetDataSet();
+//   this->fluidSimulator->SetDataSet();
   // Render
   double extent[6];
   this->amrLagrangianSurfaceMapper->GetBounds(extent);

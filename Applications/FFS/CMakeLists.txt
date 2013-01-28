@@ -4,10 +4,6 @@ project(msv${KIT})
 
 # Find IBTK and add config and use files
 # --------------------------------------------------------------------------
-set(IBAMR_DIR $ENV{HOME}/projects/IBAMR/build_debug)
-include(${IBAMR_DIR}/IBAMRConfig.cmake)
-
-include(${IBAMR_USE_FILE})
 include_directories(${IBAMR_INCLUDE_DIRS})
 
 # Sources

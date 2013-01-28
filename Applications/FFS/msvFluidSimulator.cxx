@@ -784,6 +784,8 @@ void msvFluidSimulator::Init(vtkPolyData *polydata)
 
   this->Internal->SetBCDatabase();
   this->Internal->InitializeBoundaryConditions();
+
+  this->SetDataSet();
 }
 
 // -----------------------------------------------------------------------------
