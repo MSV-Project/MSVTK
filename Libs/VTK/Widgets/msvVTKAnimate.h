@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,50 +17,36 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    msvVTKAnimate.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-
-#ifndef msvVTKAnimate_H
-#define msvVTKAnimate_H
+#ifndef __msvVTKAnimate_h
+#define __msvVTKAnimate_h
 
 // MSVTK includes
-#include "msvVTKWidgetsExport.h"
 #include "msvVTKButtonsAction.h"
 
 // forward references
 class vtkRenderer;
 
-/**
-Class name: msvQVTKAnimate
-This is an utility class to animate VTKCamera.
-*/
-
+// .NAME msvQVTKAnimate - a utility class to animate VTKCamera.
+// .SECTION Description
+//
 class MSV_VTK_WIDGETS_EXPORT msvVTKAnimate : public msvVTKButtonsAction
 {
 
 public:
-  /// Object constructor.
+  // Description:
+  // Object constructor.
   msvVTKAnimate();
 
-  /// Animate the camera to zoom on the passed bounding box.
-  void Execute(vtkRenderer *renderer, double bounds[6],
-    int numberOfSteps = 120);
-
-  /// Object destructor.
+  // Description:
+  // Object destructor.
   virtual ~msvVTKAnimate();
+
+  // Description:
+  // Animate the camera to zoom on the passed bounding box.
+  virtual void Execute(vtkRenderer *renderer, double bounds[6],
+                       int numberOfSteps = 120);
 
 };
 
-#endif // msvVTKAnimate_H
+#endif // __msvVTKAnimate_h

@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsInterface_H
-#define msvQVTKButtonsInterface_H
+#ifndef __msvQVTKButtonsInterface_h
+#define __msvQVTKButtonsInterface_h
 
 // Qt includes
 #include <QImage>
@@ -45,12 +45,11 @@ class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsInterface : public QObject {
   Q_OBJECT
   Q_PROPERTY(QString label READ label WRITE setLabel);
   Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip);
-  Q_PROPERTY(QString iconFileName READ iconFileName WRITE setIconFileName);
+  //Q_PROPERTY(QString image READ image WRITE setImage);
   Q_PROPERTY(bool showButton READ showButton WRITE setShowButton);
   Q_PROPERTY(bool showLabel READ showLabel WRITE setShowLabel);
 
 public:
-
   /// Object constructor
   msvQVTKButtonsInterface(QObject *parent = 0);
 
@@ -64,10 +63,10 @@ public:
   void setShowLabel(bool show);
 
   /// set the icon path
-  void setIconFileName(QString iconFileName);
+  void setImage(QImage image);
 
   /// Get the icon path
-  QString iconFileName();
+  //QString image();
 
   /// Return showLabel flag
   bool showLabel();
@@ -91,13 +90,13 @@ public:
   vtkButtonWidget *button();
 
   /// add vtk button to Renderer
-  void setCurrentRenderer(vtkRenderer *renderer);
+  virtual void setCurrentRenderer(vtkRenderer *renderer)=0;
 
   /// set the show/hide signal
   void setShowTooltip(bool value);
 
   /// update graphic objects
-  void update();
+  virtual void update() = 0;
 
   /// get element bounds
   void bounds(double b[6]);
@@ -106,10 +105,10 @@ public:
   void setBounds(double b[6]);
 
   /// get vtk buttons interface widget
-  msvVTKButtonsInterface* getVTKButtonsInterface();
+  msvVTKButtonsInterface* vtkButtonsInterface();
 
   /// set the associated vtk buttons
-  void setVTKButtons(msvVTKButtonsInterface* buttons);
+  void setVTKButtonsInterface(msvVTKButtonsInterface* buttons);
 
 signals:
 
@@ -123,18 +122,12 @@ signals:
   void show(bool show);
 
 protected:
-
   QScopedPointer<msvQVTKButtonsInterfacePrivate> d_ptr;
-  vtkCommand *m_ButtonCallback; ///< Callback called by picking on vtkButton
-  vtkCommand *m_HighlightCallback; ///< Callback called by hovering over the button.
-
-  //virtual void calculatePosition() = 0;
 
 private:
-
   Q_DECLARE_PRIVATE(msvQVTKButtonsInterface);
   Q_DISABLE_COPY(msvQVTKButtonsInterface);
 };
 
 
-#endif // msvQVTKButtonsInterface_H
+#endif // __msvQVTKButtonsInterface_h
