@@ -100,10 +100,9 @@ public:
   // Returns the number of levels.
   size_t GetNumberOfLevels();
   
-  static vtkInformationDoubleVectorKey* DATA_DIMENSIONALITY();
   static vtkInformationIdTypeKey* CLUSTER_IDX();
-  static vtkInformationIntegerVectorKey* CLUSTER_BUTTONS_RANGE();
-  static vtkInformationIntegerVectorKey* DATASET_BUTTONS_RANGE();
+  static vtkInformationIdTypeKey* DATASET_BUTTONS_OFFSET();
+  static vtkInformationIntegerVectorKey* CLUSTER_BUTTONS_OFFSET();
 
   virtual void UpdateWidgets();
   virtual void Clear();

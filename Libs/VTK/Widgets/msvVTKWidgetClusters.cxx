@@ -486,12 +486,9 @@ void msvVTKWidgetClusters::vtkInternal::GetDisplayCoordinates(vtkPoints* from,
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(msvVTKWidgetClusters);
 vtkInformationKeyMacro(msvVTKWidgetClusters, CLUSTER_IDX, IdType);
-vtkInformationKeyRestrictedMacro(msvVTKWidgetClusters, CLUSTER_BUTTONS_RANGE,
+vtkInformationKeyMacro(msvVTKWidgetClusters, DATASET_BUTTONS_OFFSET, IdType);
+vtkInformationKeyRestrictedMacro(msvVTKWidgetClusters, CLUSTER_BUTTONS_OFFSET,
   IntegerVector, 2);
-vtkInformationKeyRestrictedMacro(msvVTKWidgetClusters, DATASET_BUTTONS_RANGE,
-  IntegerVector, 2);
-vtkInformationKeyRestrictedMacro(msvVTKWidgetClusters, DATA_DIMENSIONALITY,
-  DoubleVector, 6);
 
 //------------------------------------------------------------------------------
 vtkCxxSetObjectMacro(msvVTKWidgetClusters,ColorLookUpTable,vtkLookupTable);
@@ -517,19 +514,9 @@ void msvVTKWidgetClusters::SetDataSet(size_t level, size_t idx,
     vtkInformation* info = levelDS->GetMetaData(idx);
     if (info)
       {
-      double *bounds = points->GetBounds();
-      info->Set(DATA_DIMENSIONALITY(),
-        bounds[0], bounds[1], bounds[2],
-        bounds[3], bounds[4], bounds[5]);
       info->Set(CLUSTER_IDX(),clusterIdx);
-
-      int range[2] = {0};
-      range[0] = this->Internal->ButtonList.size();
-      range[1] = this->Internal->ButtonList.size() +
-                 points->GetNumberOfPoints();
-
-      info->Set(DATASET_BUTTONS_RANGE(), range, 2);
-
+      vtkIdType offset = this->Internal->ButtonList.size();
+      info->Set(DATASET_BUTTONS_OFFSET(), offset);
       }
     this->Internal->SetButtons(points,this->Internal->ButtonList);
     }
@@ -616,11 +603,11 @@ void msvVTKWidgetClusters::SetRenderer(vtkRenderer* renderer)
 //------------------------------------------------------------------------------
 void msvVTKWidgetClusters::UpdateWidgets()
 {
+  this->Clear();
   if(!this->ClusteringEnabled)
     {
     return;
     }
-  this->Clear();
 
   size_t numLevels = this->GetNumberOfLevels();
   for(size_t levelIdx = 0; levelIdx < numLevels; ++levelIdx)
@@ -636,10 +623,10 @@ void msvVTKWidgetClusters::UpdateWidgets()
           = vtkUnstructuredGrid::SafeDownCast(levelDS->GetPiece(dataSetIdx));
         // Recompute clusters for each dataset
         vtkPoints *points     = ds->GetPoints();
-        vtkIdType  clusterIdx = this->Internal->ComputeClusters(points);
+        size_t clusterIdx = this->Internal->ComputeClusters(points);
 
         // Get the cluster structure and assign a button to each cluster
-        vtkInternal::IndexMapType& indexMap = this->Internal->IndexMaps.back();
+        vtkInternal::IndexMapType& indexMap = this->Internal->IndexMaps[clusterIdx];
 
         vtkNew<vtkPoints> clusterPositions;
         this->Internal->GetClustersPositions(points,indexMap,
@@ -647,13 +634,11 @@ void msvVTKWidgetClusters::UpdateWidgets()
         vtkInformation* info = levelDS->GetMetaData(dataSetIdx);
         if(info)
           {
-
           int range[2] = {0};
           range[0] = this->Internal->ClusterButtons.size();
-          range[1] = this->Internal->ClusterButtons.size() +
-                     clusterPositions->GetNumberOfPoints();
+          range[1] = clusterPositions->GetNumberOfPoints();
           info->Set(CLUSTER_IDX(),clusterIdx);
-          info->Set(CLUSTER_BUTTONS_RANGE(),range,2);
+          info->Set(CLUSTER_BUTTONS_OFFSET(),range,2);
           }
         this->Internal->SetButtons(
           clusterPositions.GetPointer(), this->Internal->ClusterButtons);
@@ -765,11 +750,11 @@ void msvVTKWidgetClusters::ShowClusterButtons(size_t level)
       vtkInformation* info = levelDS->GetMetaData(dataSetIdx);
       if(info)
         {
-        int buttonRange[2];
-        info->Get(CLUSTER_BUTTONS_RANGE(),buttonRange);
-        for(int i = buttonRange[0]; i < buttonRange[1]; ++i)
+        int offset[2];
+        info->Get(CLUSTER_BUTTONS_OFFSET(),offset);
+        for(int i = 0; i < offset[1]; ++i)
           {
-          this->Internal->ClusterButtons[i]->Show();
+          this->Internal->ClusterButtons[offset[0]+i]->Show();
           }
         }
       }
@@ -794,11 +779,11 @@ void msvVTKWidgetClusters::HideClusterButtons(size_t level)
       vtkInformation* info = levelDS->GetMetaData(dataSetIdx);
       if(info)
         {
-        int buttonRange[2];
-        info->Get(CLUSTER_BUTTONS_RANGE(),buttonRange);
-        for(int i = buttonRange[0]; i < buttonRange[1]; ++i)
+        int offset[2];
+        info->Get(CLUSTER_BUTTONS_OFFSET(),offset);
+        for(int i = 0; i < offset[1]; ++i)
           {
-          this->Internal->ClusterButtons[i]->Hide();
+          this->Internal->ClusterButtons[offset[0]+i]->Hide();
           }
         }
       }
@@ -820,12 +805,12 @@ void msvVTKWidgetClusters::ShowButtons(size_t level)
     size_t numDataSets = this->GetNumberOfDataSets(level);
     for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
       {
+      size_t numButtons = vtkUnstructuredGrid::SafeDownCast(levelDS->GetPiece(dataSetIdx))->GetPoints()->GetNumberOfPoints();
       vtkInformation* info = levelDS->GetMetaData(dataSetIdx);
       if(info)
         {
-        int buttonRange[2];
-        info->Get(DATASET_BUTTONS_RANGE(),buttonRange);
-        for(int i = buttonRange[0]; i < buttonRange[1]; ++i)
+        vtkIdType offset = info->Get(DATASET_BUTTONS_OFFSET());
+        for(size_t i = offset, end = offset+numButtons; i < end; ++i)
           {
           this->Internal->ButtonList[i]->Show();
           }
@@ -845,12 +830,12 @@ void msvVTKWidgetClusters::HideButtons(size_t level)
     size_t numDataSets = this->GetNumberOfDataSets(level);
     for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
       {
+      size_t numButtons = vtkUnstructuredGrid::SafeDownCast(levelDS->GetPiece(dataSetIdx))->GetPoints()->GetNumberOfPoints();
       vtkInformation* info = levelDS->GetMetaData(dataSetIdx);
       if(info)
         {
-        int buttonRange[2];
-        info->Get(DATASET_BUTTONS_RANGE(),buttonRange);
-        for(int i = buttonRange[0]; i < buttonRange[1]; ++i)
+        vtkIdType offset = info->Get(DATASET_BUTTONS_OFFSET());
+        for(size_t i = offset, end = offset+numButtons; i < end; ++i)
           {
           this->Internal->ButtonList[i]->Hide();
           }

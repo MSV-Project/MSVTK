@@ -255,6 +255,7 @@ void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
     {
     this->ButtonsManager->ClusteringEnabledOff();
     this->ButtonsManager->ShowButtons();
+    this->ButtonsManager->HideClusterButtons(1);
     }
   this->update();
 }
