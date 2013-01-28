@@ -30,6 +30,7 @@
 #include "msvGridViewerExport.h"
 
 // VTK includes
+#include "vtkActor.h"
 #include "vtkAlgorithm.h"
 #include "vtkAxesActor.h"
 #include "vtkMapper.h"
@@ -38,6 +39,9 @@
 #include "vtkSmartPointer.h"
 
 class vtkDataReader;
+class vtkDataObjectToTable;
+
+typedef std::map<std::string,vtkSmartPointer<vtkActor> > vtkActorsMap;
 
 class MSV_GridViewer_EXPORT msvGridViewerPipeline
 {
@@ -53,6 +57,8 @@ public:
     { return this->endMapper; }
   void addToRenderWindow(vtkRenderWindow *renderWindow);
   void updateTime(double);
+  vtkActorsMap *getActorsMap();
+  vtkDataObjectToTable *getDataTable();
 
 private:
   vtkDataReader *createDataReader(std::string &readerName);
@@ -68,6 +74,8 @@ private:
   vtkSmartPointer<vtkAxesActor> axes;
   vtkSmartPointer<vtkOrientationMarkerWidget> orientationMarker;
   vtkSmartPointer<vtkMapper> endMapper;
+  vtkSmartPointer<vtkDataObjectToTable> dataTable;
+  vtkActorsMap actorsMap;
 };
 
 #endif
