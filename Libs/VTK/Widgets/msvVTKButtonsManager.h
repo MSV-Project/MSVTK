@@ -20,7 +20,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    msvVTKSliderFixedRepresentation2D.h
+  Module:    msvVTKButtonsManager.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -31,64 +31,77 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME msvVTKSliderFixedRepresentation2D -
+// .NAME msvVTKButtonsManager -
 // .SECTION Description
-//
+// Manager class to manage groups of msvVTKButtons and msvVTKButtonsGroup
 
 // .SECTION See Also
 //
 
-// The current class has been overridden...
+#ifndef __msvVTKButtonsManager_h
+#define __msvVTKButtonsManager_h
 
-#ifndef __msvVTKSliderFixedRepresentation2D_h
-#define __msvVTKSliderFixedRepresentation2D_h
+#include "vtkObject.h"
 
-#include "vtkSliderRepresentation2D.h"
+// MSVTK includes
+#include "msvVTKButtons.h"
+#include "msvVTKButtonsGroup.h"
 
-// VTK_WIDGET includes
-#include "msvVTKWidgetsExport.h"
+class vtkCameraCallback;
 
-class MSV_VTK_WIDGETS_EXPORT msvVTKSliderFixedRepresentation2D : public vtkSliderRepresentation2D
+class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsManager : public vtkObject
 {
 public:
   // Description:
-  // Instantiate the class.
-  static msvVTKSliderFixedRepresentation2D *New();
-
-  // Description:
-  // Standard methods for instances of the class.
-  vtkTypeMacro(msvVTKSliderFixedRepresentation2D,vtkSliderRepresentation2D);
-
-  // Description:
-  // Builds representation
-  void BuildRepresentation();
-
-  // Description:
-  // Set Scale factor for the representation
-  vtkSetVectorMacro(Scale,double,2);
-
-  // Description:
-  // Set translation coordinates
-  vtkSetVectorMacro(Translate,double,2);
-
-protected:
-  // Description:
   // Object constructor
-  msvVTKSliderFixedRepresentation2D();
+  msvVTKButtonsManager();
 
   // Description:
   // Object destructor
-  ~msvVTKSliderFixedRepresentation2D();
+  ~msvVTKButtonsManager();
 
-  // Scale factor
-  double Scale[2];
+  // Description:
+  // Get the singleton instance of the manager
+  static msvVTKButtonsManager* GetInstance();
 
-  // Translation coordinates
-  double Translate[2];
+  // Description:
+  // Create a group
+  msvVTKButtonsGroup *CreateGroup();
+
+  // Description:
+  // Create a button
+  msvVTKButtons *CreateButtons();
+
+  // Description:
+  // Set show button property for children elements
+  void SetShowButton(bool show);
+
+  // Description:
+  // Set show label property for children elements
+  void SetShowLabel(bool show);
+
+  // Description:
+  // Add an element
+  void AddElement(msvVTKButtonsInterface *element);
+
+  // Description:
+  // Get an element
+  msvVTKButtonsInterface * GetElement(int index);
+
+  // Description:
+  // Get the number of elements
+  inline int GetNumberOfElements(){return Elements.size();};
+
+  // Description:
+  // Set the renderer
+  void SetRenderer(vtkRenderer* renderer);
 
 private:
-  msvVTKSliderFixedRepresentation2D(const msvVTKSliderFixedRepresentation2D&);  //Not implemented
-  void operator=(const msvVTKSliderFixedRepresentation2D&);                     //Not implemented
+  // Vector of elements
+  std::vector<msvVTKButtonsInterface*> Elements;
+
+  // Callback for camera modified event
+  vtkCameraCallback* CameraCallback;
 };
 
-#endif
+#endif // __msvVTKButtonsManager_h

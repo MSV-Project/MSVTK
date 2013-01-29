@@ -48,13 +48,14 @@ endif()
 # Sources
 # --------------------------------------------------------------------------
 set(msvVTKWidgets_SRCS
+  msvVTKAnimate.cxx
+  msvVTKButtons.cxx
+  msvVTKButtonsAction.cxx
+  msvVTKButtonsGroup.cxx
+  msvVTKButtonsInterface.cxx
+  msvVTKButtonsManager.cxx
   msvVTKProp3DButtonRepresentation.cxx
   msvVTKSliderFixedRepresentation2D.cxx
-  msvVTKButtonsInterface.cxx
-  msvVTKButtons.cxx
-  msvVTKButtonsGroup.cxx
-  msvVTKAnimate.cxx
-  msvVTKButtonsAction.cxx
   )
 
 # Abstract/pure virtual classes

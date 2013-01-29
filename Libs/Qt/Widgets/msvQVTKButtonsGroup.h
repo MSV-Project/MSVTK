@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsGroup_H
-#define msvQVTKButtonsGroup_H
+#ifndef __msvQVTKButtonsGroup_h
+#define __msvQVTKButtonsGroup_h
 
 // Qt includes
 #include <QVariant>
@@ -32,8 +32,6 @@
 class vtkRenderer;
 class msvQVTKButtons;
 class vtkSliderWidget;
-class vtkSliderCallback;
-class vtkSliderCallback2;
 class vtkCommand;
 
 // Pimpl
@@ -49,6 +47,8 @@ class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface
   Q_OBJECT
 
 public:
+  typedef msvQVTKButtonsInterface Superclass;
+
   /// Object constructor.
   msvQVTKButtonsGroup(QObject *parent = 0);
 
@@ -77,7 +77,7 @@ public:
   void setShowLabel(bool show);
 
   /// set the icon path
-  void setIconFileName(QString iconFileName);
+  void setImage(QImage image);
 
   /// add vtk button to Renderer
   void setCurrentRenderer(vtkRenderer *renderer);
@@ -102,14 +102,9 @@ protected:
   /// Calculate element position
   void calculatePosition();
 
-//   QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
-//   vtkSliderWidget* m_Slider; //< Slider widget
-  vtkSliderCallback* m_SliderCallback; //< Slider callback function
-  vtkSliderCallback2* m_SliderCallback2; //< Slider callback function
-
 private:
   Q_DECLARE_PRIVATE(msvQVTKButtonsGroup);
   Q_DISABLE_COPY(msvQVTKButtonsGroup);
 };
 
-#endif // msvQVTKButtonsGroup_H
+#endif // __msvQVTKButtonsGroup_h

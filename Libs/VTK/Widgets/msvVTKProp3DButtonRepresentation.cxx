@@ -165,7 +165,7 @@ void msvVTKProp3DButtonRepresentation::PlaceWidget(double bds[6])
     return;
     }
 
-  for (int i=0; i<6; i++)
+  for (int i=0; i<6; ++i)
     {
     this->InitialBounds[i] = bounds[i];
     }

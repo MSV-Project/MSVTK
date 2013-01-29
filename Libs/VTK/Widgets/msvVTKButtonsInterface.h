@@ -55,6 +55,7 @@ class vtkRenderer;
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsInterface : public vtkObject
 {
 public:
+  // Description:
   // Instantiate the class.
   static msvVTKButtonsInterface *New();
 
@@ -64,11 +65,11 @@ public:
 
   // Description:
   // Allow to show/hide button
-  vtkSetMacro(ShowButton,bool);
+  void SetShowButton(bool show);
   vtkGetMacro(ShowButton,bool);
 
   // Description:
-  /// Allow to show/hide label
+  // Allow to show/hide label
   vtkSetMacro(ShowLabel,bool);
   vtkGetMacro(ShowLabel,bool);
 
@@ -79,14 +80,13 @@ public:
 
   // Description:
   // Specify the button's label
-  void SetLabel(const char* label);
-  //vtkSetMacro(Label,const char*);
-  const char* GetLabel(){return LabelText;}
+  vtkSetStringMacro(LabelText);
+  vtkGetStringMacro(LabelText);
 
   // Description:
   // Specify the tooltip text
-  vtkSetMacro(Tooltip,const char*);
-  vtkGetMacro(Tooltip,const char*);
+  vtkSetStringMacro(Tooltip);
+  vtkGetStringMacro(Tooltip);
 
   // Description:
   // Represents the element bounds
@@ -94,21 +94,43 @@ public:
   vtkSetVectorMacro(Bounds,double,6)
 
   // Description:
-  // Retrieve button pointer.
+  // Get the opacity value (in 0 1 range)
+  vtkGetMacro(Opacity, double);
+
+  // Description:
+  // Set the previous opacity
+  vtkSetMacro(PreviousOpacity,double);
+
+  // Description:
+  // Retrieve button widget pointer
   vtkButtonWidget *GetButton();
 
   // Description:
-  // add vtk button to Renderer
+  // Add vtk button to Renderer
   void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Description:
   // update graphic objects
   void Update();
 
+  // Description:
+  // Get the current renderer
+  inline vtkRenderer* GetRenderer(){return Renderer;};
+
+  // Description:
+  // Set the opacity value (in 0 1 range)
+  void SetOpacity(double opacity);
+
+  // Description:
+  // Restore the previous opacity
+  void RestorePreviousOpacity();
+
 protected:
+  // Description:
   // Object constructor
   msvVTKButtonsInterface();
 
+  // Description:
   // Object destructor.
   virtual ~msvVTKButtonsInterface();
 
@@ -122,7 +144,7 @@ protected:
   char * LabelText;
 
   // Tooltip associated to the button
-  const char * Tooltip;
+  char * Tooltip;
 
   // Flag to show/hide button
   bool ShowButton;
@@ -138,6 +160,18 @@ protected:
 
   // Bounds of the data related to the buttonWin
   double Bounds[6];
+
+  // Layout of the button's balloon
+  int BalloonLayout;
+
+  // Current renderer
+  vtkRenderer* Renderer;
+
+  // Button opacity
+  double Opacity;
+
+  // Previous button opacity
+  double PreviousOpacity;
 
 private:
   msvVTKButtonsInterface(const msvVTKButtonsInterface&);  //Not implemented

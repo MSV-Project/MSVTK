@@ -59,56 +59,79 @@ class msvVTKButtons;
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsGroup : public msvVTKButtonsInterface
 {
 public:
+  // Description:
   // Instantiate the class.
   static msvVTKButtonsGroup *New();
 
+  vtkTypeMacro(msvVTKButtonsGroup,msvVTKButtonsInterface);
+
+  // Description:
   // Add a buttons to the buttons' vector
   void AddElement(msvVTKButtonsInterface* buttons);
 
+  // Description:
   // Remove a buttons to the buttons' vector
   void RemoveElement(msvVTKButtonsInterface* buttons);
 
+  // Description:
   // Get the specified element
   msvVTKButtonsInterface* GetElement(unsigned int index);
 
+  // Description:
   // Create a new element
   msvVTKButtonsGroup* CreateGroup();
 
+  // Description:
   // Create a new element
   msvVTKButtons* CreateButtons();
 
+  // Description:
   // Allow to show/hide button
-  void SetShowButton(bool show);
+  void SetShowButtons(bool show);
 
+  // Description:
   // Allow to show/hide label
   void SetShowLabel(bool show);
 
-  // set the icon path
-  void SetImages(vtkImageData *image);
+  // Description:
+  // set the elements image
+  void SetImageToElements(vtkImageData *image);
 
+  // Description:
   // Get the slider widget
   vtkSliderWidget* GetSlider();
 
+  // Description:
   // Show/hide the slider widget
   void ShowSlider(bool show);
 
+  // Description:
   // Get the position on the path at the specified ratio
-  void GetCameraPoistionOnPath(double ratio, double b[6]);
+  void GetCameraPositionOnPath(double ratio, double b[6]);
 
+  // Description:
   // Set the position on the path at the specified ratio
-  void SetCameraPoistionOnPath(double ratio);
+  void SetCameraPositionOnPath(double ratio);
 
+  // Description:
   // Get the interaction callback for slicer
   vtkCommand *GetSliderInteractionCallback() const;
 
+  // Description:
   // Get the start interaction callback for slicer
   vtkCommand *GetSliderStartInteractionCallback() const;
 
+  // Description:
   // Set the current renderer
   void SetCurrentRenderer(vtkRenderer *renderer);
 
+  // Description:
   // Perform update
   void Update();
+
+  // Description:
+  // Calculate position (center or corner)
+  void CalculatePosition();
 
 protected:
   // Object constructor
@@ -116,12 +139,6 @@ protected:
 
   // Object destructor.
   virtual ~msvVTKButtonsGroup();
-
-  // Calculate position (center or corner)
-  void CalculatePosition();
-
-  // Set the specified property
-  ///---> void SetElementProperty(QString name, QVariant value);
 
   // Slider callback function
   vtkSliderInteractionCallback* SliderInteractionCallback;
@@ -136,6 +153,7 @@ protected:
   vtkSliderWidget* SliderWidget;
 
 private:
+  // Description:
   // Create element template function
   template <class T>
   T *CreateElement();
