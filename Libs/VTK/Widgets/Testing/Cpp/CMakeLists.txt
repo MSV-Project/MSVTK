@@ -4,7 +4,7 @@ set(KIT_TEST_SRCS
   msvVTKProp3DButtonRepresentationTest1.cxx
   )
 
-create_test_sourcelist(Tests ${KIT}CxxTests.cxx
+create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
   ${KIT_TEST_SRCS}
   )
 
@@ -13,8 +13,8 @@ create_test_sourcelist(Tests ${KIT}CxxTests.cxx
 
 set(LIBRARY_NAME msv${KIT})
 
-add_executable(${KIT}CxxTests ${Tests})
-target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
+add_executable(msv${KIT}CxxTests ${Tests})
+target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
 
 #
 # Add Tests

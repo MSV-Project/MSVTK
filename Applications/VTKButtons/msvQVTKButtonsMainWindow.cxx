@@ -34,6 +34,7 @@
 #include "msvVTKDataFileSeriesReader.h"
 #include "ui_msvQVTKButtonsMainWindow.h"
 #include "msvQVTKButtonsAboutDialog.h"
+#include "msvQVTKButtonsManager.h"
 
 // VTK includes
 #include "vtkAlgorithmOutput.h"
@@ -121,6 +122,8 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
   this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
   this->threeDRenderer->SetBackground2(0.2, 0.4, 0.8);
   this->threeDRenderer->SetGradientBackground(true);
+
+  msvQVTKButtonsManager::instance()->setRenderer(this->threeDRenderer);
 
   this->axes = vtkSmartPointer<vtkAxesActor>::New();
   this->orientationMarker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
@@ -247,129 +250,149 @@ void msvQVTKButtonsMainWindowPrivate::updateView()
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 {
-    //import VTK Data
-    polyDataReader->SetFileName(filePath.toAscii().data());
-    polyDataReader->Update();
-    
-    int type = polyDataReader->ReadOutputType();
-    
-    if(type == 0) {
-        // render data into the scene
-        this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
-        this->threeDRenderer->AddActor(this->surfaceActor);
-        this->threeDRenderer->ResetCamera();
-    } else {
-        qWarning() << "Current Data is not a polydata";
+  //import VTK Data
+  polyDataReader->SetFileName(filePath.toAscii().data());
+  polyDataReader->Update();
+
+  int type = polyDataReader->ReadOutputType();
+
+  if (type == 0)
+    {
+    // render data into the scene
+    this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
+    this->threeDRenderer->AddActor(this->surfaceActor);
+    this->threeDRenderer->ResetCamera();
+    }
+  else
+    {
+    qWarning() << "Current Data is not a polydata";
     }
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
 {
-    double *bounds = polyDataReader->GetOutput()->GetBounds();
-    
-    QString text("<table border=\"0\"");
+  double *bounds = polyDataReader->GetOutput()->GetBounds();
+
+  QString text("<table border=\"0\"");
+  text.append("<tr>");
+  text.append("<td>");
+  QImage preview = b->getPreview(180,180);
+  QByteArray ba;
+  QBuffer buffer(&ba);
+  buffer.open(QIODevice::WriteOnly);
+  preview.save(&buffer, "PNG");
+
+  text.append(QString("<img src=\"data:image/png;base64,%1\">").arg(QString(buffer.data().toBase64())));
+  text.append("</td>");
+
+  text.append("<td>");
+  text.append("<b>Data type</b>: ");
+  text.append("vtkPolyData");
+  text.append("<br>");
+
+  QString matrixString("1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"); //identity matrix
+  QStringList list = matrixString.split(" ");
+  int numElement = list.count();
+  int i = 0;
+
+  text.append("<b>Pose Matrix</b>:");
+  text.append("<table border=\"0.2\">");
+  for ( ; i < numElement; ++i )
+    {
     text.append("<tr>");
-    text.append("<td>");
-    QImage preview = b->getPreview(180,180);
-    QByteArray ba;
-    QBuffer buffer(&ba);
-    buffer.open(QIODevice::WriteOnly);
-    preview.save(&buffer, "PNG");
-
-    text.append(QString("<img src=\"data:image/png;base64,%1\">").arg(QString(buffer.data().toBase64())));
-    text.append("</td>");
-
-    text.append("<td>");
-    text.append("<b>Data type</b>: ");
-    text.append("vtkPolyData");
-    text.append("<br>");
-    
-    QString matrixString("1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"); //identity matrix
-    QStringList list = matrixString.split(" ");
-    int numElement = list.count();
-    int i = 0;
-    
-    text.append("<b>Pose Matrix</b>:");
-    text.append("<table border=\"0.2\">");
-    for ( ; i < numElement; i++ ) {
-        text.append("<tr>");
-        text.append("<td>" + list[i] +"</td>");
-        i++;
-        text.append("<td>" + list[i] +"</td>");
-        i++;
-        text.append("<td>" + list[i] +"</td>");
-        i++;
-        text.append("<td>" + list[i] +"</td>");
-        text.append("</tr>");
+    text.append("<td>" + list[i] +"</td>");
+    i++;
+    text.append("<td>" + list[i] +"</td>");
+    i++;
+    text.append("<td>" + list[i] +"</td>");
+    i++;
+    text.append("<td>" + list[i] +"</td>");
+    text.append("</tr>");
     }
-    text.append("</table>");
-    text.append("<b>Bounds: (min - max)</b>:");
-    text.append("<table border=\"0.2\">");
-    text.append("<tr>");
-    text.append("<td>" + QString::number(bounds[0]) +"</td>");
-    text.append("<td>" + QString::number(bounds[1]) +"</td>");
-    text.append("</tr>");
-    text.append("<tr>");
-    text.append("<td>" + QString::number(bounds[2]) +"</td>");
-    text.append("<td>" + QString::number(bounds[3]) +"</td>");
-    text.append("</tr>");
-    text.append("<tr>");
-    text.append("<td>" + QString::number(bounds[4]) +"</td>");
-    text.append("<td>" + QString::number(bounds[5]) +"</td>");
-    text.append("</tr>");
-    text.append("</table>");
-    text.append("</td>");
-    text.append("</tr>");
-    text.append("</table>");
+  text.append("</table>");
+  text.append("<b>Bounds: (min - max)</b>:");
+  text.append("<table border=\"0.2\">");
+  text.append("<tr>");
+  text.append("<td>" + QString::number(bounds[0]) +"</td>");
+  text.append("<td>" + QString::number(bounds[1]) +"</td>");
+  text.append("</tr>");
+  text.append("<tr>");
+  text.append("<td>" + QString::number(bounds[2]) +"</td>");
+  text.append("<td>" + QString::number(bounds[3]) +"</td>");
+  text.append("</tr>");
+  text.append("<tr>");
+  text.append("<td>" + QString::number(bounds[4]) +"</td>");
+  text.append("<td>" + QString::number(bounds[5]) +"</td>");
+  text.append("</tr>");
+  text.append("</table>");
+  text.append("</td>");
+  text.append("</tr>");
+  text.append("</table>");
 
-    b->setToolTip(text);
+  b->setToolTip(text);
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent) {
-    msvQVTKButtons *toolButton = new msvQVTKButtons();
-    buttons.append(toolButton);
-    QString name("TestData");
-    toolButton->setShowButton(true);
-    QString iconFileName(":/Images/buttonIcon.png");
-    toolButton->setIconFileName(iconFileName);
-    toolButton->setLabel(name);
-    toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
-    toolButton->setData(polyDataReader->GetOutput());
-    setToolTip(toolButton);
-    QObject::connect(toolButton, SIGNAL(showTooltip(QString)), parent, SLOT(showTooltip(QString)));
-    toolButton->setCurrentRenderer(this->threeDRenderer);
+void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent)
+{
+  msvQVTKButtons *toolButton = msvQVTKButtonsManager::instance()->createButtons();
+  buttons.append(toolButton);
+  QString name("TestData");
+  toolButton->setShowButton(true);
+  QString iconFileName(":/Images/buttonIcon.png");
+  QImage image;
+  image.load(iconFileName);
+  toolButton->setImage(image);
+  toolButton->setLabel(name);
+  toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
+  toolButton->setData(polyDataReader->GetOutput());
+  this->setToolTip(toolButton);
+  QObject::connect(toolButton, SIGNAL(showTooltip(QString)),
+                   parent, SLOT(showTooltip(QString)));
+  toolButton->setCurrentRenderer(this->threeDRenderer);
+  toolButton->update();
 }
 
-void msvQVTKButtonsMainWindowPrivate::showButtons(bool value) {
-    Q_FOREACH(msvQVTKButtons *button, buttons) {
-        button->setShowButton(value);
-        button->update();
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindowPrivate::showButtons(bool value)
+{
+  Q_FOREACH(msvQVTKButtons *button, buttons)
+    {
+    button->setShowButton(value);
+    button->update();
     }
 }
 
-void msvQVTKButtonsMainWindowPrivate::showLabels(bool value) {
-    Q_FOREACH(msvQVTKButtons *button, buttons) {
-        button->setShowLabel(value);
-        button->update();
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindowPrivate::showLabels(bool value)
+{
+  Q_FOREACH(msvQVTKButtons *button, buttons)
+    {
+    button->setShowLabel(value);
+    button->update();
     }
 }
 
-void msvQVTKButtonsMainWindowPrivate::setFlyTo(bool value) {
-    Q_FOREACH(msvQVTKButtons *button, buttons) {
-        button->setFlyTo(value);
-        button->update();
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindowPrivate::setFlyTo(bool value)
+{
+  Q_FOREACH(msvQVTKButtons *button, buttons)
+    {
+    button->setFlyTo(value);
+    button->update();
     }
 }
 
-void msvQVTKButtonsMainWindowPrivate::setOnCenter(bool value) {
-    Q_FOREACH(msvQVTKButtons *button, buttons) {
-        button->setOnCenter(value);
-        button->update();
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindowPrivate::setOnCenter(bool value)
+{
+  Q_FOREACH(msvQVTKButtons *button, buttons)
+    {
+    button->setOnCenter(value);
+    button->update();
     }
 }
-
 
 //------------------------------------------------------------------------------
 // msvQVTKButtonsMainWindow methods
@@ -393,12 +416,15 @@ void msvQVTKButtonsMainWindow::openData()
 {
   Q_D(msvQVTKButtonsMainWindow);
 
-  QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Data"), QDir::homePath(), tr("VTK Files (*.vtk)"));
-  d->clear();             // Clean Up data and scene
-  d->importVTKData(fileName);  // Load data
-  d->addVTKButton(this);
-  d->update();            // Update the Ui and the View
+  QString fileName = QFileDialog::getOpenFileName(
+    this, tr("Open Data"), QDir::homePath(), tr("VTK Files (*.vtk)"));
+  if(!fileName.isEmpty())
+  {
+    d->clear();             // Clean Up data and scene
+    d->importVTKData(fileName);  // Load data
+    d->addVTKButton(this);
+    d->update();            // Update the Ui and the View
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -452,43 +478,44 @@ void msvQVTKButtonsMainWindow::onVTKButtonsSelectionChanged()
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindow::onCurrentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)
+void msvQVTKButtonsMainWindow
+::onCurrentItemChanged(QListWidgetItem * current, QListWidgetItem * previous)
 {
   Q_UNUSED(current)
   Q_UNUSED(previous);
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindow::on_checkBoxShowButtons_stateChanged(int state) {
-    Q_D(msvQVTKButtonsMainWindow);
-    
-    d->showButtons(state);
+void msvQVTKButtonsMainWindow::on_checkBoxShowButtons_stateChanged(int state)
+{
+  Q_D(msvQVTKButtonsMainWindow);
+  d->showButtons(state);
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindow::on_checkBoxShowLabels_stateChanged(int state) {
-    Q_D(msvQVTKButtonsMainWindow);
-    
-    d->showLabels(state);
+void msvQVTKButtonsMainWindow::on_checkBoxShowLabels_stateChanged(int state)
+{
+  Q_D(msvQVTKButtonsMainWindow);
+  d->showLabels(state);
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindow::on_checkBoxFlyTo_stateChanged(int state) {
-    Q_D(msvQVTKButtonsMainWindow);
-    
-    d->setFlyTo(state);
-}
-
-
-//------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindow::on_comboBoxPosition_currentIndexChanged(int index) {
-    Q_D(msvQVTKButtonsMainWindow);
-    
-    d->setOnCenter(index == 1);
+void msvQVTKButtonsMainWindow::on_checkBoxFlyTo_stateChanged(int state)
+{
+  Q_D(msvQVTKButtonsMainWindow);
+  d->setFlyTo(state);
 }
 
 //------------------------------------------------------------------------------
-void msvQVTKButtonsMainWindow::showTooltip(QString text) {
-    //show tooltip near the current mouse position
-    QToolTip::showText(QCursor::pos(), text);
+void msvQVTKButtonsMainWindow::on_comboBoxPosition_currentIndexChanged(int index)
+{
+  Q_D(msvQVTKButtonsMainWindow);
+  d->setOnCenter(index == 1);
+}
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsMainWindow::showTooltip(QString text)
+{
+  //show tooltip near the current mouse position
+  QToolTip::showText(QCursor::pos(), text);
 }

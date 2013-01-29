@@ -34,6 +34,7 @@
 
 #include "vtkBalloonRepresentation.h"
 #include "vtkButtonWidget.h"
+#include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
@@ -51,10 +52,8 @@ vtkStandardNewMacro(msvVTKButtonsInterface);
 //----------------------------------------------------------------------
 msvVTKButtonsInterface::msvVTKButtonsInterface()
 {
-//  this->ButtonCallback=NULL;
-//  this->HighlightCallback=NULL;
   this->LabelText=NULL;
-  this->Tooltip="";
+  this->Tooltip=NULL;
   this->ShowButton=true;
   this->ShowLabel=true;
   this->ButtonWidget=NULL;
@@ -66,112 +65,134 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
   rep->SetNumberOfStates(1);
   GetButton()->SetRepresentation(rep);
   rep->Delete();
-//  if(ButtonCallback)
-//    this->GetButton()->AddObserver(vtkCommand::StateChangedEvent,ButtonCallback);
-//  if(HighlightCallback)
-//  {
-//    this->GetButton()->GetRepresentation()->AddObserver(
-//      vtkCommand::HighlightEvent,HighlightCallback);
-//  }
+
+  this->BalloonLayout = vtkBalloonRepresentation::ImageLeft;
+  this->Renderer = NULL;
+  this->Opacity=1;
+  this->PreviousOpacity=1;
 }
 
 //----------------------------------------------------------------------
 msvVTKButtonsInterface::~msvVTKButtonsInterface()
 {
-  if(NULL!=this->LabelText)
-  {
+  if (NULL!=this->LabelText)
+    {
     delete[] this->LabelText;
     this->LabelText = NULL;
-  }
+    }
 }
 
 //----------------------------------------------------------------------
 vtkButtonWidget *msvVTKButtonsInterface::GetButton()
 {
-  if(this->ButtonWidget == NULL)
-  {
+  if (this->ButtonWidget == NULL)
+    {
     this->ButtonWidget = vtkButtonWidget::New();
-  }
+    }
   return this->ButtonWidget;
 }
 
 //----------------------------------------------------------------------
 void msvVTKButtonsInterface::SetCurrentRenderer(vtkRenderer* renderer)
 {
-  if(renderer)
-  {
+  Renderer = renderer;
+  if (renderer)
+    {
     this->GetButton()->SetInteractor(
       renderer->GetRenderWindow()->GetInteractor());
     this->GetButton()->SetCurrentRenderer(renderer); //to check
     this->GetButton()->EnabledOn();
-  }
+    }
   else
-  {
+    {
     this->GetButton()->SetInteractor(NULL);
     this->GetButton()->SetCurrentRenderer(NULL); //to check
     this->GetButton()->EnabledOff();
-  }
-}
-
-void msvVTKButtonsInterface::SetLabel(const char* label)
-{
-  if(NULL!=this->LabelText)
-  {
-    delete[] this->LabelText;
-    this->LabelText = NULL;
-  }
-  this->LabelText = new char[strlen(label)+1];
-  strcpy(this->LabelText,label);
+    }
 }
 
 //----------------------------------------------------------------------
 void msvVTKButtonsInterface::Update()
 {
   vtkTexturedButtonRepresentation2D *rep =
-    reinterpret_cast<vtkTexturedButtonRepresentation2D*>(
+    vtkTexturedButtonRepresentation2D::SafeDownCast(
     this->GetButton()->GetRepresentation());
 
   if (this->GetShowLabel())
-  {
+    {
     //Add a label to the button and change its text property
-    rep->GetBalloon()->SetBalloonText(this->GetLabel());
+    rep->GetBalloon()->SetBalloonText(this->GetLabelText());
     vtkTextProperty *textProp = rep->GetBalloon()->GetTextProperty();
     rep->GetBalloon()->SetPadding(2);
     textProp->SetFontSize(13);
+    textProp->SetFontFamilyToArial();
     textProp->BoldOff();
-    //textProp->SetColor(0.9,0.9,0.9);
+    textProp->ShadowOn();
+    textProp->SetColor(1,1,1);
 
     //Set label position
-    rep->GetBalloon()->SetBalloonLayoutToImageLeft();
+    rep->GetBalloon()->SetBalloonLayout(BalloonLayout);
+    //This method allows to set the label's backgroun
+    rep->GetBalloon()->GetFrameProperty()->SetColor(.5,.5,.5);
 
-    //This method allows to set the label's background opacity
-    rep->GetBalloon()->GetFrameProperty()->SetOpacity(0.65);
-  }
+    rep->GetBalloon()->GetTextProperty()->SetOpacity(0.3 + Opacity * 0.7);
+    rep->GetBalloon()->GetFrameProperty()->SetOpacity(.2 + Opacity * 0.3);
+    rep->GetProperty()->SetOpacity(0.3 + Opacity * 0.7);
+    rep->Modified();
+    }
   else
-  {
+    {
     rep->GetBalloon()->SetBalloonText("");
-  }
+    }
 
-  if(this->GetShowButton())
-  {
+  if (this->GetShowButton())
+    {
     this->GetButton()->GetRepresentation()->SetVisibility(true);
     this->GetButton()->EnabledOn();
-  }
+    }
   else
-  {
+    {
     this->GetButton()->GetRepresentation()->SetVisibility(false);
     this->GetButton()->EnabledOff();
-  }
+    }
 }
 
+//----------------------------------------------------------------------
 void msvVTKButtonsInterface::SetImage(vtkImageData* image)
 {
   Image = image;
   vtkTexturedButtonRepresentation2D *rep =
-    static_cast<vtkTexturedButtonRepresentation2D *>(
+    vtkTexturedButtonRepresentation2D::SafeDownCast(
     this->GetButton()->GetRepresentation());
   rep->SetButtonTexture(0,Image);
   int size[2]; size[0] = 16; size[1] = 16;
   rep->GetBalloon()->SetImageSize(size);
+  //this->Update();
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsInterface::SetOpacity(double opacity)
+{
+  if (opacity > 1) opacity=1;
+  if (opacity < 0) opacity=0;
+
+  Opacity = opacity;
+
   this->Update();
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsInterface::RestorePreviousOpacity()
+{
+  this->SetOpacity(PreviousOpacity);
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsInterface::SetShowButton(bool show)
+{
+  this->ShowButton = show;
+  if (this->Renderer)
+    {
+    this->Renderer->GetActiveCamera()->Modified();
+    }
 }
