@@ -290,7 +290,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   set(MSVTK_C_FLAGS "${cflags} ${MSVTK_C_FLAGS}")
-  set(MSVTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MSVTK_CXX_FLAGS}")
+#   set(MSVTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MSVTK_CXX_FLAGS}")
+  set(MSVTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wstrict-null-sentinel -Wsign-promo ${MSVTK_CXX_FLAGS}")
 endif()
 
 if(MSVC)
@@ -350,12 +351,15 @@ option(MSVTK_USE_KWSTYLE     "Enable sourcecode-based style tests." OFF)
 # Will contain a list of sub-directory without option ON or OFF
 #
 set(MSVTK_PLUGINS_SUBDIRS )
+
 set(MSVTK_APPLICATIONS_SUBDIRS )
 
-option(MSVTK_APP_ECG "ECG application to demonstrate vtkButtons" ON)
+option(MSVTK_APP_ECG "ECG application to demonstrate vtkPipeline architecture and vtkButtons" ON)
 option(MSVTK_APP_VTKButtons "vtkButtons application to demonstrate vtkButtons" ON)
+option(MSVTK_APP_FFS "FFS application to demonstrate fluid flow simulation capabilities in msvtk" ON)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS FFS)
 
 set(MSVTK_MAIN_PROJECT_APPLICATION_NAME ECG)
 
@@ -370,7 +374,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Superbuild script
 #
-
 if(MSVTK_SUPERBUILD)
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/CMake/SuperBuild")
   return()
@@ -393,6 +396,12 @@ include(${VTK_USE_FILE})
 #-----------------------------------------------------------------------------
 find_package(CTK REQUIRED)
 include(${CTK_USE_FILE})
+
+#-----------------------------------------------------------------------------
+# IBAMR
+#-----------------------------------------------------------------------------
+find_package(IBAMR REQUIRED)
+include(${IBAMR_USE_FILE})
 
 #-----------------------------------------------------------------------------
 # MSVTK_SUPERBUILD_BINARY_DIR
@@ -454,7 +463,7 @@ endforeach()
 foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
   if(MSVTK_APP_${app})
     add_subdirectory(Applications/${app})
-  endif()
+  endif()            
 endforeach()
 
 #-----------------------------------------------------------------------------
@@ -473,7 +482,6 @@ endif()
 # Documentation
 #
 add_subdirectory( Utilities/Documentation )
-
 
 #-----------------------------------------------------------------------------
 # The commands in this directory are intended to be executed as

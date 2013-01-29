@@ -19,7 +19,7 @@
 ###########################################################################
 
 #
-# VTK
+# IBAMR
 #
 
 # Make sure this file is included only once
@@ -30,29 +30,24 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED VTK_DIR AND NOT EXISTS ${VTK_DIR})
-  message(FATAL_ERROR "VTK_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED IBAMR_DIR AND NOT EXISTS ${IBAMR_DIR})
+  message(FATAL_ERROR "IBAMR_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-#set(VTK_enabling_variable VTK_LIBRARIES)
+#set(IBAMR_enabling_variable IBAMR_LIBRARIES)
 
 set(additional_vtk_cmakevars )
 if(MINGW)
   list(APPEND additional_vtk_cmakevars -DCMAKE_USE_PTHREADS:BOOL=OFF)
 endif()
 
-set(VTK_DEPENDENCIES "")
-# Include dependent projects if any
-msvMacroCheckExternalProjectDependency(VTK)
-set(proj VTK)
-if(NOT DEFINED VTK_DIR)
+set(IBAMR_DEPENDENCIES "")
 
-  #set(revision_tag "v5.8.0")
-  #set(revision_tag fea2d622cf01dfd22f727330dbace97d4af892db)
-  set(revision_tag 0044aa72799d75a12a21daf575f83b15d038d120)
-  if(${proj}_REVISION_TAG)
-    set(revision_tag ${${proj}_REVISION_TAG})
-  endif()
+# Include dependent projects if any
+msvMacroCheckExternalProjectDependency(IBAMR)
+set(proj IBAMR)
+
+if(NOT DEFINED IBAMR_DIR)
 
   # Set CMake OSX variable to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
@@ -69,8 +64,8 @@ if(NOT DEFINED VTK_DIR)
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
-    GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/VTK.git
-    GIT_TAG ${revision_tag}
+    GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/IBAMR.git
+    GIT_TAG "msvtk"
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
@@ -82,33 +77,19 @@ if(NOT DEFINED VTK_DIR)
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       -DBUILD_TESTING:BOOL=OFF
       ${additional_vtk_cmakevars}
-      -DVTK_WRAP_TCL:BOOL=OFF
-      -DVTK_USE_TK:BOOL=OFF
-      -DVTK_WRAP_PYTHON:BOOL=${MSVTK_LIB_Scripting/Python/Core_PYTHONQT_USE_VTK}
-      -DVTK_WRAP_JAVA:BOOL=OFF
       -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-      -DVTK_USE_GUISUPPORT:BOOL=ON
-      -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
-      -DVTK_USE_QT:BOOL=ON
-      -DVTK_LEGACY_REMOVE:BOOL=ON
-      -DHDF5_BUILD_HL_LIB:BOOL=ON
-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
       -DLIBRARY_OUTPUT_PATH:STRING=${MSVTK_BINARY_DIR}/MSVTK-build/bin
       -DEXECUTABLE_OUTPUT_PATH:STRING=${MSVTK_BINARY_DIR}/MSVTK-build/bin
-      
+      -DBUILD_TESTING:BOO:=OFF
     DEPENDS
-      ${VTK_DEPENDENCIES}
+      ${IBAMR_DEPENDENCIES}
     )
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
-
-  # Since the link directories associated with VTK is used, it makes sens to
-  # update MSVTK_EXTERNAL_LIBRARY_DIRS with its associated library output directory
-  list(APPEND MSVTK_EXTERNAL_LIBRARY_DIRS ${VTK_DIR}/bin)
-
+  
 else()
   msvMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 endif()
 
-list(APPEND MSVTK_SUPERBUILD_EP_ARGS -DVTK_DIR:PATH=${VTK_DIR})
+list(APPEND MSVTK_SUPERBUILD_EP_ARGS -DIBAMR_DIR:PATH=${IBAMR_DIR})
 
 

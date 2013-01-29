@@ -18,7 +18,7 @@
 #
 ###########################################################################
 
-set(MSVTK_DEPENDENCIES VTK CTK)
+set(MSVTK_DEPENDENCIES VTK CTK IBAMR)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
