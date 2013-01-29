@@ -158,20 +158,6 @@ void msvVTKEmbeddedProbeFilter::InitializeForProbing(vtkDataSet* input,
       }
     }
   tempCellData->Delete();
-
-  // BUG FIX: JB.
-  // Output gets setup from input, but when output is imagedata, scalartype
-  // depends on source scalartype not input scalartype
-  if (output->IsA("vtkImageData"))
-    {
-    vtkImageData *out = static_cast<vtkImageData *>(output);
-    vtkDataArray *s = outPD->GetScalars();
-    if (s)
-      {
-      out->SetScalarType(s->GetDataType());
-      out->SetNumberOfScalarComponents(s->GetNumberOfComponents());
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
