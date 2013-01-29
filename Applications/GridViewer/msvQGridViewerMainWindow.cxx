@@ -78,8 +78,6 @@ msvQGridViewerMainWindowPrivate::~msvQGridViewerMainWindowPrivate()
 //------------------------------------------------------------------------------
 void msvQGridViewerMainWindowPrivate::clear()
 {
-  Q_Q(msvQGridViewerMainWindow);
-
   this->timePlayerWidget->play(false);            // stop the player widget
   this->gridPipeline.clear();
   this->timePlayerWidget->setFilter(0);
@@ -150,7 +148,6 @@ void msvQGridViewerMainWindowPrivate::updateTime(double time)
 //------------------------------------------------------------------------------
 void msvQGridViewerMainWindowPrivate::readGridData(const QString& gridFileName)
 {
-  Q_Q(msvQGridViewerMainWindow);
   QFileInfo fileInfo(gridFileName);
   QDir::setCurrent(fileInfo.absolutePath());
   std::string tmp = gridFileName.toStdString();

@@ -57,9 +57,9 @@ public:
 private:
   vtkDataReader *createDataReader(std::string &readerName);
   int checkOption(const char *token, std::string &name,
-    std::vector<std::string> &options, int &i, int minArgs);
+    std::vector<std::string> &options, unsigned int &i, unsigned int minArgs);
   vtkAlgorithm *checkAlgorithmOption(const char *token, std::string &name,
-    std::vector<std::string> &options, int &i, vtkNameMap &objects);
+    std::vector<std::string> &options, unsigned int &i, vtkNameMap &objects);
   int readCommand(std::istream &gridFile,
     std::string &command, std::vector<std::string> &options);
 
