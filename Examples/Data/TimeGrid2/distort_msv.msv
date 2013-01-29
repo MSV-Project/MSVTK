@@ -1,0 +1,24 @@
+#vtkUnstructuredGridReader(block FILE block2.vtk)
+msvVTKDataFileSeriesReader(block
+  READER vtkUnstructuredGridReader TIMERANGE 0.0 5.0 FILES
+  block0.vtk block1.vtk block2.vtk block3.vtk block4.vtk block5.vtk)
+vtkPolyDataReader(msvText FILE msv.vtk)
+# show text in its original coordinate location
+vtkPolyDataMapper(msvTextMapper INPUT msvText)
+vtkActor("Original MSV Text" MAPPER msvTextMapper COLOR 0.5 0.96 0.5 VISIBILITY 0)
+
+# show text in embedded location
+msvVTKEmbeddedProbeFilter(msvEmbeddedText INPUT msvText SOURCE block
+  CELLIDARRAYNAME cellId
+  PARAMETRICCOORDINATEARRAYNAME pcoord)
+vtkFieldDataToAttributeDataFilter(msvEmbeddedTextScalar INPUT msvEmbeddedText INPUTPOINTDATA OUTPUTPOINTDATA SCALAR "testval")
+vtkPolyDataMapper(msvEmbeddedTextMapper INPUT msvEmbeddedTextScalar SCALARVISIBILITYON)
+vtkActor("Embedded MSV Text" MAPPER msvEmbeddedTextMapper COLOR 0.89 0.36 0.37 VISIBILITY 1)
+
+# show semi-transparent host box
+vtkExtractEdges(blockEdges INPUT block)
+vtkPolyDataMapper(blockEdgesMapper INPUT blockEdges)
+vtkActor("Block Edges" MAPPER blockEdgesMapper COLOR 0 0 0 VISIBILITY 1)
+vtkDataSetSurfaceFilter(blockSurfaces INPUT block)
+vtkPolyDataMapper(blockSurfaceMapper INPUT blockSurfaces)
+vtkActor("Block Surfaces" MAPPER blockSurfaceMapper COLOR 0.89 0.89 0.37 OPACITY 0.3 VISIBILITY 1)

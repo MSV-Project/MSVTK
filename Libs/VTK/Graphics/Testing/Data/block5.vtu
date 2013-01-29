@@ -1,0 +1,43 @@
+# vtk DataFile Version 2.0
+Unstructured grid consisting of 2 connected hexahedral elements
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 12 double
+-0.125	0.5	-0.560660172
+-0.125	-0.560660172	0.5
+-0.125	1.560660172	0.5
+-0.125	0.5	1.560660172
+1	0	0
+1	0	1
+1	1	0
+1	1	1
+2.125	-0.560660172	0.5
+2.125	0.5	1.560660172
+2.125	0.5	-0.560660172
+2.125	1.560660172	0.5
+CELLS 2 18
+8 1 5 4 0 3 7 6 2
+8 5 9 8 4 7 11 10 6
+CELL_TYPES 2
+12
+12
+POINT_DATA 12
+FIELD fieldarrays 1
+PointTestVal 1 12 double
+ 0.5
+ 0.6
+ 0.7
+ 0.8
+ 0.9
+ 1.0
+ 0.9
+ 0.8
+ 0.7
+ 0.6
+ 0.5
+ 0.4
+CELL_DATA 2
+FIELD fieldarrays 1
+CellTestVal 1 2 double
+ 5
+ 17
