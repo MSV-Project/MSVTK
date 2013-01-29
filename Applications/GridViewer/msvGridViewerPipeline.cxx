@@ -214,7 +214,8 @@ vtkDataReader *msvGridViewerPipeline::createDataReader(std::string &readerName)
 
 //------------------------------------------------------------------------------
 int msvGridViewerPipeline::checkOption(const char *token,
-  std::string &name, std::vector<std::string> &options, int &i, int minArgs)
+  std::string &name, std::vector<std::string> &options,
+  unsigned int &i, unsigned int minArgs)
 {
   if (!token)
     return 0;
@@ -224,7 +225,7 @@ int msvGridViewerPipeline::checkOption(const char *token,
   if (i + minArgs > options.size())
     {
     cerr << "'" << name << "' is missing " << token << " argument.\n";
-    i = static_cast<int>(options.size());
+    i = static_cast<unsigned int>(options.size());
     return 0;
     }
   return 1;
@@ -232,7 +233,7 @@ int msvGridViewerPipeline::checkOption(const char *token,
 
 //------------------------------------------------------------------------------
 vtkAlgorithm *msvGridViewerPipeline::checkAlgorithmOption(const char *token,
-  std::string &name, std::vector<std::string> &options, int &i,
+  std::string &name, std::vector<std::string> &options, unsigned int &i,
   vtkNameMap &objects)
 {
   if (!this->checkOption(token, name, options, i, /*minArgs*/1))
@@ -241,14 +242,14 @@ vtkAlgorithm *msvGridViewerPipeline::checkAlgorithmOption(const char *token,
   if (!inputObject)
     {
     cerr << "'" << name << token << " argument '" << options[i] << "' not found.\n";
-    i = static_cast<int>(options.size());
+    i = static_cast<unsigned int>(options.size());
     return 0;
     }
   vtkAlgorithm *inputAlgorithm = vtkAlgorithm::SafeDownCast(inputObject);
   if (!inputAlgorithm)
     {
     cerr << "'" << name << token << " argument '" << options[i] << "' must be a vtkAlgorithm.\n";
-    i = static_cast<int>(options.size());
+    i = static_cast<unsigned int>(options.size());
     return 0;
     }
   ++i;
@@ -288,7 +289,7 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
       return 0;
       }
     vtkSmartPointer<vtkObject> object;
-    int optionIndex = 1;
+    unsigned int optionIndex = 1;
     vtkDataReader *tmpDataReader;
 
     if (0 != (tmpDataReader = this->createDataReader(command)))
