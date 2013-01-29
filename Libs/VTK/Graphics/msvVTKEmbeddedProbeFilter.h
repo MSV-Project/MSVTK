@@ -27,14 +27,21 @@
 // structure is passed through the filter, and if the Input is a vtkPointSet,
 // point coordinates in the output are probed from the Source. All field arrays
 // from the Input are passed through by reference before probing.
-// Arguments specify Input point data fields giving cell index and parametric
-// coordinates at which fields from the Source are sampled. Both point data and
-// cell data fields from the Source are sampled, but where the same-named field
-// array exists in both, only the point data is sampled. Sampled fields replace
-// point data fields of the same name in the output.
+// Arguments specify Input point data fields giving cell index (an array of
+// vtkidtype) and parametric coordinates (numeric type) at which fields from the
+// Source are sampled. Both point data and cell data fields from the Source are
+// sampled, but where the same-named field array exists in both, only the point
+// data is sampled. Sampled fields replace point data fields of the same name in
+// the output.
 //
-// This filter allows a dataset to inherit fields and point coordinates from a
-// host dataset, simulating topological embedding.
+// The main difference between this filter and vtkProbeFilter is that it probes
+// fields at prescribed parametric coordinates in the Source dataset, whereas
+// vtkProbeFilter finds them from Input point coordinates, which is expensive.
+// It also updates point coordinates if the Input dataset is a vtkPointSet.
+// It is used in situations where a dataset has a fixed topological embedding in
+// another dataset, allowing fields to be sampled from the Source without adding
+// storage on the Input dataset. This is particularly beneficial when Source
+// fields are time-varying.
 
 #ifndef __msvVTKEmbeddedProbeFilter_h
 #define __msvVTKEmbeddedProbeFilter_h
@@ -66,7 +73,7 @@ public:
 
   // Description:
   // Specify the name of the field in the Input point data which gives the
-  // cell index to probe at for each point. Field must be scalar integer-valued.
+  // cell index to probe at for each point. Field array must be of vtkIdType.
   // If the field array length is less than the number of points, the last value
   // is used for all remaining points. If this field is unspecified, the first
   // cell in the source dataset is used.
