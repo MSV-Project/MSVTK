@@ -23,7 +23,7 @@
 #include "vtkCell.h"
 #include "vtkDoubleArray.h"
 #include "vtkImageData.h"
-#include "vtkIntArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -198,9 +198,8 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
   vtkPointData *sourcePD = source->GetPointData();
   vtkCellData *sourceCD = source->GetCellData();
   vtkPointData *outputPD = output->GetPointData();
-  const int sourceMaxCells = source->GetNumberOfCells();
 
-  vtkIntArray *cellIdArray = 0;
+  vtkIdTypeArray *cellIdArray = 0;
   int cellIdArrayNumberOfTuples = 0;
   if (this->CellIdArrayName)
     {
@@ -212,10 +211,10 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
       }
     const int cellIdArrayNumberOfComponents =
       cellIdDataArray->GetNumberOfComponents();
-    cellIdArray = vtkIntArray::SafeDownCast(cellIdDataArray);
+    cellIdArray = vtkIdTypeArray::SafeDownCast(cellIdDataArray);
     if ((cellIdArrayNumberOfComponents != 1) || (!cellIdArray))
       {
-      vtkErrorMacro(<<"Cell Id array is not scalar integer.");
+      vtkErrorMacro(<<"Cell Id array is not scalar vtkIdType.");
       return 0;
       }
     cellIdArrayNumberOfTuples = cellIdArray->GetNumberOfTuples();
@@ -287,7 +286,6 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
       return 0;
       }
     pcoordArray->GetTuple(ptId, pcoords);
-    const int cellNumberOfPoints = cell->GetNumberOfPoints();
 
     if (points)
       {

@@ -25,7 +25,7 @@ LINES 3 19
 5 11 12 13 14 15
 POINT_DATA 16
 FIELD fieldarrays 2
-cellId 1 16 int
+cellId 1 16 vtkidtype
 0 0 0 0 0 0 0 1 0 0 1 1 1 1 1 1
 pcoord 3 16 double
  0.2 0.5 0.1
