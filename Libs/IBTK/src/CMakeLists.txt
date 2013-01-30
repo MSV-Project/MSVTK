@@ -1,5 +1,5 @@
-project(msvVTKWidgets)
-set(KIT VTK_WIDGETS)
+project(msvIBTK)
+set(KIT IBTK_SRC)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.2)
@@ -15,9 +15,6 @@ if(POLICY CMP0017)
   cmake_policy(SET CMP0017 OLD)
 endif()
 
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
-
 if(NOT DEFINED BUILD_SHARED_LIBS)
   option(BUILD_SHARED_LIBS "Build with shared libraries." ON)
 endif()
@@ -26,8 +23,8 @@ endif()
 # Include dirs
 # --------------------------------------------------------------------------
 set(include_dirs
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/utilities
+  ${CMAKE_CURRENT_BINARY_DIR}/utilities
   )
 include_directories(${include_dirs})
 
@@ -47,38 +44,23 @@ endif()
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(msvVTKWidgets_SRCS
-  msvVTKAnimate.cxx
-  msvVTKButtons.cxx
-  msvVTKButtonsAction.cxx
-  msvVTKButtonsGroup.cxx
-  msvVTKButtonsInterface.cxx
-  msvVTKButtonsManager.cxx
-  msvVTKProp3DButtonRepresentation.cxx
-  msvVTKSliderFixedRepresentation2D.cxx
-  msvVTKWidgetClusters.cxx
+set(msvIBTK_SRCS
+  utilities/msvAppInitializer.C
   )
-
-# Abstract/pure virtual classes
-
-#set_source_files_properties(
-#  ABSTRACT
-#  )
-
-# Helper classes
 
 # --------------------------------------------------------------------------
 # Build library
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
+set(srcs ${msvIBTK_SRCS})
 
-set(srcs ${msvVTKWidgets_SRCS})
-add_library(${lib_name} ${srcs})
-
-set(libs
-    ${VTK_LIBRARIES}
+add_library(${lib_name} ${srcs}
   )
-target_link_libraries(${lib_name} ${libs})
+set_target_properties(${lib_name} PROPERTIES COMPILE_DEFINITIONS NDIM=3)
+
+target_link_libraries(${lib_name}
+  ${IBTK_LIBRARIES}
+  )
 
 # Apply user-defined properties to the library target.
 if(MSVTK_LIBRARY_PROPERTIES)
@@ -128,11 +110,11 @@ install(TARGETS ${lib_name}
 # Testing (requires some of the examples)
 # --------------------------------------------------------------------------
 if(BUILD_TESTING)
-  add_subdirectory(Testing)
+#   add_subdirectory(Testing)
 endif()
 
 # --------------------------------------------------------------------------
 # Set INCLUDE_DIRS variable
 # --------------------------------------------------------------------------
-set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/utilities ${CMAKE_CURRENT_BINARY_DIR}/utilities
   CACHE INTERNAL "${PROJECT_NAME} include dirs" FORCE)

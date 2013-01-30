@@ -1,5 +1,5 @@
-project(msvVTKWidgets)
-set(KIT VTK_WIDGETS)
+project(msvVTKFiltering)
+set(KIT VTK_FILTERING)
 
 #-----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.2)
@@ -47,16 +47,8 @@ endif()
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
-set(msvVTKWidgets_SRCS
-  msvVTKAnimate.cxx
-  msvVTKButtons.cxx
-  msvVTKButtonsAction.cxx
-  msvVTKButtonsGroup.cxx
-  msvVTKButtonsInterface.cxx
-  msvVTKButtonsManager.cxx
-  msvVTKProp3DButtonRepresentation.cxx
-  msvVTKSliderFixedRepresentation2D.cxx
-  msvVTKWidgetClusters.cxx
+set(msvVTKFiltering_SRCS
+  msvVTKBoundaryEdgeSources.cxx
   )
 
 # Abstract/pure virtual classes
@@ -72,7 +64,7 @@ set(msvVTKWidgets_SRCS
 # --------------------------------------------------------------------------
 set(lib_name ${PROJECT_NAME})
 
-set(srcs ${msvVTKWidgets_SRCS})
+set(srcs ${msvVTKFiltering_SRCS})
 add_library(${lib_name} ${srcs})
 
 set(libs

@@ -1,4 +1,4 @@
-project(msvVTKLibs)
+project(msvIBTKLibs)
 
 # --------------------------------------------------------------------------
 #                      ----] W A R N I N G [----
@@ -10,15 +10,13 @@ set(dirs
   )
 
 list(APPEND dirs
-  Filtering  Graphics
-  Parallel
-  Widgets
+  src
   )
 
 #-----------------------------------------------------------------------------
 # Loop over list of directories
 #-----------------------------------------------------------------------------
 foreach(dir ${dirs})
-  message(STATUS "Configuring library: msvVTK${dir}")
+  message(STATUS "Configuring library: msvIBTK${dir}")
   add_subdirectory(${dir})
 endforeach()
