@@ -18,12 +18,11 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtons_H
-#define msvQVTKButtons_H
+#ifndef __msvQVTKButtons_h
+#define __msvQVTKButtons_h
 
 // MSVTK includes
 #include "msvQVTKButtonsInterface.h"
-#include "msvQtWidgetsExport.h"
 
 //forward declarations
 class vtkRenderer;
@@ -50,7 +49,11 @@ public Q_SLOTS:
   /// Allow to execute and update the pipeline when something change.
   /*virtual*/ void update();
 
+  /// Allow to set button position on center or on corner
+  void setOnCenter(bool onCenter);
+
 public:
+  typedef msvQVTKButtonsInterface Superclass;
   /// Object constructor.
   msvQVTKButtons(QObject *parent = 0);
 
@@ -75,9 +78,6 @@ public:
   /// Return FlyTo flag
   bool flyTo();
 
-  /// Allow to set button position on center or on corner
-  void setOnCenter(bool onCenter);
-
   /// Return OnCenter flag
   bool onCenter();
 
@@ -92,4 +92,4 @@ private:
   Q_DISABLE_COPY(msvQVTKButtons);
 };
 
-#endif // msvQVTKButtons_H
+#endif // __msvQVTKButtons_h

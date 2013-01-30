@@ -1,8 +1,8 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+  Copyright (c) SCS s.r.l. (B3C)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,20 +17,6 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    msvVTKAnimate.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 
 // VTK includes
 #include <vtkCamera.h>
@@ -88,31 +74,32 @@ void msvVTKAnimate::Execute(vtkRenderer *renderer, double bounds[6],
   radius = (radius==0)?(1.0):(radius);
   radius = sqrt(radius)*0.5;
 
-  double angle=vtkMath::RadiansFromDegrees(camera->GetViewAngle());
-  double parallelScale=radius;
+  double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
+  double parallelScale = radius;
 
   renderer->ComputeAspect();
   double aspect[2];
   renderer->GetAspect(aspect);
 
-  if(aspect[0]>=1.0)
-  {
+  if (aspect[0] >= 1.0)
+    {
     // horizontal window, deal with vertical angle|scale
-    if(camera->GetUseHorizontalViewAngle())
-    {
+    if (camera->GetUseHorizontalViewAngle())
+      {
       angle=2.0*atan(tan(angle*0.5)/aspect[0]);
+      }
     }
-  } else
-  {
-    // vertical window, deal with horizontal angle|scale
-    if(!camera->GetUseHorizontalViewAngle())
+  else
     {
-      angle=2.0*atan(tan(angle*0.5)*aspect[0]);
+    // vertical window, deal with horizontal angle|scale
+    if (!camera->GetUseHorizontalViewAngle())
+      {
+      angle = 2.0*atan(tan(angle*0.5)*aspect[0]);
+      }
+    parallelScale = parallelScale/aspect[0];
     }
-    parallelScale=parallelScale/aspect[0];
-  }
 
-  distance =radius/sin(angle*0.5);
+  distance = radius/sin(angle*0.5);
 
   fly1[0] = center[0];
   fly1[1] = center[1];
@@ -131,26 +118,26 @@ void msvVTKAnimate::Execute(vtkRenderer *renderer, double bounds[6],
     && fabs(fly0[2]-fly1[2]) < 0.0000001 && fabs(fly0[3]-fly1[3]) < 0.0000001
     && fabs(fly0[4]-fly1[4]) < 0.0000001 && fabs(fly0[5]-fly1[5]) < 0.0000001
     && fabs(fly0[6]-fly1[6]) < 0.0000001)
-  {
-          return;
-  }
+    {
+    return;
+    }
 
-  for (int i = 0; i <= numSteps; i++)
-  {
+  for (int i = 0; i <= numSteps; ++i)
+    {
     double t  = ( i * 1.0 ) / numSteps;
     double t2 = 0.5 + 0.5 * sin( t*pi - pi/2 );
 
-    for(int j = 0; j < 7 ; j ++ )
-    {
+    for (int j = 0; j < 7 ; ++j)
+      {
       fly[j] = (1-t2) * fly0[j] + t2 * fly1[j];
-    }
+      }
     camera->SetFocalPoint(fly[0],fly[1],fly[2]);
     camera->SetPosition(fly[3],fly[4],fly[5]);
     camera->SetParallelScale(fly[6]);
 
     renderer->ResetCameraClippingRange();
     renderer->GetRenderWindow()->Render();
-  }
+    }
 }
 
 //------------------------------------------------------------------------------
