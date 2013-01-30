@@ -12,10 +12,14 @@ set(dirs
 list(APPEND dirs
   VTK
   Qt
-  IBTK
-  IBAMR
   )
 
+if(ENABLE_IBAMR)
+  list(APPEND dirs 
+    IBTK 
+    IBAMR
+    )
+endif()  
 #-----------------------------------------------------------------------------
 # Loop over list of directories
 #-----------------------------------------------------------------------------
