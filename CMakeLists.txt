@@ -351,17 +351,21 @@ option(MSVTK_USE_KWSTYLE     "Enable sourcecode-based style tests." OFF)
 # Will contain a list of sub-directory without option ON or OFF
 #
 set(MSVTK_PLUGINS_SUBDIRS )
-
 set(MSVTK_APPLICATIONS_SUBDIRS )
 
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkPipeline architecture and vtkButtons" ON)
 option(MSVTK_APP_VTKButtons "vtkButtons application to demonstrate vtkButtons" ON)
-option(MSVTK_APP_FFS "FFS application to demonstrate fluid flow simulation capabilities in msvtk" ON)
 option(MSVTK_APP_ButtonClusters "vtkButtons application to demonstrate vtkButtons clustering" ON)
+
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
-list(APPEND MSVTK_APPLICATIONS_SUBDIRS FFS)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ButtonClusters)
+
+option(MSVTK_APP_FFS "FFS application to demonstrate fluid flow simulation capabilities in msvtk" OFF)
+if(MSVTK_APP_FFS)
+  list(APPEND MSVTK_APPLICATIONS_SUBDIRS FFS)
+  set(ENABLE_IBAMR ON)
+endif()
 
 set(MSVTK_MAIN_PROJECT_APPLICATION_NAME ECG)
 
@@ -402,8 +406,10 @@ include(${CTK_USE_FILE})
 #-----------------------------------------------------------------------------
 # IBAMR
 #-----------------------------------------------------------------------------
-find_package(IBAMR REQUIRED)
-include(${IBAMR_USE_FILE})
+if(ENABLE_IBAMR)
+  find_package(IBAMR REQUIRED)
+  include(${IBAMR_USE_FILE})
+endif()  
 
 #-----------------------------------------------------------------------------
 # MSVTK_SUPERBUILD_BINARY_DIR
