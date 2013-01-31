@@ -41,9 +41,9 @@
 #INCLUDE(MSVTKFunctionGeneratePluginUseFile)
 
 # Construct version numbers for MSVTKConfigVersion.cmake.
-SET(_MSVTK_VERSION_MAJOR ${MSVTK_MAJOR_VERSION})
-SET(_MSVTK_VERSION_MINOR ${MSVTK_MINOR_VERSION})
-SET(_MSVTK_VERSION_PATCH ${MSVTK_BUILD_VERSION})
+SET(_MSVTK_VERSION_MAJOR ${MSVTK_VERSION_MAJOR})
+SET(_MSVTK_VERSION_MINOR ${MSVTK_VERSION_MINOR})
+SET(_MSVTK_VERSION_PATCH ${MSVTK_VERSION_PATCH})
 # We use odd minor numbers for development versions.
 # Use a date for the development patch level.
 # IF("${_MSVTK_VERSION_MINOR}" MATCHES "[13579]$")
