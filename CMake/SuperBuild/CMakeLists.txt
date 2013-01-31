@@ -19,6 +19,9 @@
 ###########################################################################
 
 set(MSVTK_DEPENDENCIES VTK CTK)
+if(ENABLE_IBAMR)
+  list(APPEND MSVTK_DEPENDENCIES IBAMR)
+endif()  
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -194,6 +197,7 @@ ExternalProject_Add(${proj}
     -DMSVTK_C_FLAGS:STRING=${MSVTK_C_FLAGS}
     -DMSVTK_EXTERNAL_LIBRARY_DIRS:STRING=${MSVTK_EXTERNAL_LIBRARY_DIRS}
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+    -DENABLE_IBAMR:BOOL=${ENABLE_IBAMR}
     -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
     ${MSVTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}

@@ -9,6 +9,9 @@ A brief table of contents of the contents of this directory follows.
 Beginners should start with the examples found in the Tutorial subdirectory.
 The topics listed here have corresponding subdirectories in MSVTK/Examples.
 
+Embedding - Classes and modules addressing embedding of datasets using
+       msvVTKEmbeddedProbeFilter.
+
 Time - Classes and modules addressed to manage time varying data issues such
        as timePlayer, pipeline management etc.
 

@@ -2,6 +2,7 @@ set(KIT VTKWidgets)
 
 set(KIT_TEST_SRCS
   msvVTKProp3DButtonRepresentationTest1.cxx
+  msvVTKWidgetClustersTest1.cxx
   )
 
 create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
@@ -19,5 +20,6 @@ target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
 #
 # Add Tests
 #
+SIMPLE_TEST( msvVTKProp3DButtonRepresentationTest1 )
+SIMPLE_TEST( msvVTKButtonManagerTest1 )
 
-simple_test( msvVTKProp3DButtonRepresentationTest1 )
