@@ -32,7 +32,17 @@ endif()
 
 #-----------------------------------------------------------------------------
 project(MSVTK)
+set(kit ${PROJECT_NAME})
 #-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Update CMake module path
+# Note: FindXXX.cmake script specific to utility should be copied into Utilities/CMake
+#
+set(CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/CMake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/CMake"
+  ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------
 # Library mode: SHARED (default) or STATIC
@@ -86,23 +96,53 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Prerequisites
+#-----------------------------------------------------------------------------
+find_package(Git)
+if(NOT GIT_FOUND)
+  message(FATAL_ERROR "error: Install Git and try to re-configure")
+endif()
+
+#-----------------------------------------------------------------------------
 # MSVTK version number.  An even minor number corresponds to releases.
 #
-set(MSVTK_VERSION_MAJOR 0)
-set(MSVTK_VERSION_MINOR 1)
-set(MSVTK_VERSION_PATCH 0)
-set(MSVTK_VERSION
-    "${MSVTK_VERSION_MAJOR}.${MSVTK_VERSION_MINOR}.${MSVTK_VERSION_PATCH}")
+set(${kit}_VERSION_MAJOR 0)
+set(${kit}_VERSION_MINOR 1)
+set(${kit}_VERSION_PATCH 0)
+# Releases define a tweak level
+#set(${kit}_VERSION_TWEAK 0)
+#set(${kit}_VERSION_RC 1)
+
+include(ExtractRepositoryInfo)
+extract_repository_info(VAR_PREFIX ${kit}) # Used to configure ${kit}VersionConfigure.h.in
+
+if (${kit}_WC_LAST_CHANGED_DATE)
+  string(REGEX REPLACE ".*([0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]).*" "\\1"
+    ${kit}_BUILDDATE "${${kit}_WC_LAST_CHANGED_DATE}")
+  set(${kit}_VERSION_UID "${(${kit}_BUILDDATE}")
+else()
+  set(${kit}_VERSION_UID "${${kit}_WC_REVISION}")
+endif()
+
+set(${kit}_VERSION "${${kit}_VERSION_MAJOR}.${${kit}_VERSION_MINOR}")
+set(${kit}_VERSION_FULL "${${kit}_VERSION}.${${kit}_VERSION_PATCH}")
+if(${kit}_VERSION_RC)
+  set(${kit}_VERSION_FULL "${${kit}_VERSION_FULL}-rc${${kit}_VERSION_RC}")
+endif()
+if(NOT DEFINED ${kit}_VERSION_TWEAK)
+  set(${kit}_VERSION_FULL "${${kit}_VERSION_FULL}-${${kit}_VERSION_UID}")
+endif()
+
 
 # TODO Rename MSVTK_VERSION into MSVTK_VERSION_STR  -  MSVTK_VERSION should be hexadecimal one
 
 # Append the library version information to the library target
 # properties.  A parent project may set its own properties and/or may
 # block this.
-if(NOT MSVTK_NO_LIBRARY_VERSION)
-  set(MSVTK_LIBRARY_PROPERTIES ${MSVTK_LIBRARY_PROPERTIES}
-    VERSION "${MSVTK_VERSION}"
-    SOVERSION "${MSVTK_MAJOR_VERSION}.${MSVTK_MINOR_VERSION}"
+if(NOT ${kit}_NO_LIBRARY_VERSION)
+  set(${kit}_LIBRARY_PROPERTIES ${${kit}_LIBRARY_PROPERTIES}
+    VERSION "${${kit}_VERSION_FULL}"
+    SOVERSION "${${kit}_VERSION}"
     )
 endif()
 
@@ -122,15 +162,6 @@ endif()
 if(NOT MSVTK_INSTALL_DOC_DIR)
   set(MSVTK_INSTALL_DOC_DIR "doc")
 endif()
-
-#-----------------------------------------------------------------------------
-# Update CMake module path
-# Note: FindXXX.cmake script specific to utility should be copied into Utilities/CMake
-#
-set(CMAKE_MODULE_PATH
-  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/CMake"
-  "${CMAKE_CURRENT_SOURCE_DIR}/CMake"
-  ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------
 # Clear MSVTK_BASE_INCLUDE_DIRS, MSVTK_BASE_LIBRARIES and MSVTK_WRAPPED_LIBRARIES_PYTHONQT
@@ -368,14 +399,6 @@ if(MSVTK_APP_FFS)
 endif()
 
 set(MSVTK_MAIN_PROJECT_APPLICATION_NAME ECG)
-
-#-----------------------------------------------------------------------------
-# Prerequisites
-#-----------------------------------------------------------------------------
-find_package(Git)
-if(NOT GIT_FOUND)
-  message(FATAL_ERROR "error: Install Git and try to re-configure")
-endif()
 
 #-----------------------------------------------------------------------------
 # Superbuild script
