@@ -31,7 +31,6 @@
 #include "vtkActorCollection.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkDataObjectReader.h"
-#include "vtkDataObjectToTable.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkExtractEdges.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
@@ -471,33 +470,6 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
           cerr << "'" << name << "' requires only INPUT <algorithm> option.\n";
         }
       }
-    else if (command == "vtkDataObjectToTable")
-      {
-      vtkNew<vtkDataObjectToTable> dataTable;
-      object = dataTable.GetPointer();
-      vtkAlgorithm *inputAlgorithm = 0;
-      while (optionIndex < options.size())
-        {
-        vtkAlgorithm *inputAlgorithm = 0;
-        if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
-          {
-          dataTable->SetInputConnection(inputAlgorithm->GetOutputPort());
-          }
-        else if (this->checkOption("POINT_DATA", name, options, optionIndex, /*minArgs*/0))
-          {
-          dataTable->SetFieldType(vtkDataObjectToTable::POINT_DATA);
-          }
-        else
-          {
-          if (optionIndex < options.size())
-            {
-            cerr << "'" << name << "' has unrecognised token '" << options[optionIndex] << "'\n";
-            return 0;
-            }
-          }
-        }
-      this->dataTable = dataTable.GetPointer();
-      }
     else if (command == "vtkExtractEdges")
       {
       vtkNew<vtkExtractEdges> edges;
@@ -675,11 +647,6 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
 vtkActorsMap *msvGridViewerPipeline::getActorsMap()
 {
 	return &(this->actorsMap);
-}
-
-vtkDataObjectToTable *msvGridViewerPipeline::getDataTable()
-{
-  return dataTable;
 }
 
 void msvGridViewerPipeline::addToRenderWindow(vtkRenderWindow *renderWindow)
