@@ -21,9 +21,13 @@
 #ifndef __msvVTKBoundaryEdgeSources_h
 #define __msvVTKBoundaryEdgeSources_h
 
+// VTK_FILTERING includes
+#include "msvVTKFilteringExport.h"
+
+// VTK includes
 #include "vtkPolyDataAlgorithm.h"
 
-class VTK_FILTERING_EXPORT msvVTKBoundaryEdgeSources : public
+class MSV_VTK_FILTERING_EXPORT msvVTKBoundaryEdgeSources : public
                            vtkPolyDataAlgorithm
 {
 public:
