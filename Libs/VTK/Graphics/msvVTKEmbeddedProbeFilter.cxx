@@ -238,8 +238,7 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
     return 0;
     }
 
-  std::vector<double> basisWeights(source->GetMaxCellSize());
-  double *weights = basisWeights.data();
+  double *weights = new double[source->GetMaxCellSize()];
   double pcoords[3] = { 0.0, 0.0, 0.0 };
   vtkIdType cellId = 0;
   vtkCell *cell = 0;
@@ -252,6 +251,7 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
     {
     points = pointSet->GetPoints();
     }
+  int result = 1;
   for (vtkIdType ptId = 0; ptId < numPts; ++ptId)
     {
     if (ptId < cellIdArrayNumberOfTuples)
@@ -269,7 +269,8 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
     if (!cell)
       {
       vtkErrorMacro(<<"No cell found with ID "<<cellId);
-      return 0;
+      result = 0;
+      break;
       }
     pcoordArray->GetTuple(ptId, pcoords);
 
@@ -297,8 +298,9 @@ int msvVTKEmbeddedProbeFilter::PerformProbe(vtkDataSet *input,
         }
       }
     }
+  delete[] weights;
 
-  return 1;
+  return result;
 }
 
 //----------------------------------------------------------------------------
