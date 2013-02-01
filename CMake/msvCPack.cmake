@@ -95,16 +95,12 @@ set(CPACK_NSIS_MODIFY_PATH OFF)
 
 set(CPACK_PACKAGE_EXECUTABLES)
 
-if (MSVTK_APP_ECG)
-  get_target_property(ECG_EXECUTABLE_NAME ECG OUTPUT_NAME)
-  list(APPEND CPACK_PACKAGE_EXECUTABLES "${ECG_EXECUTABLE_NAME}" "ECG")
-endif()
-
-if (MSVTK_APP_VTKButtons)
-  get_target_property(VTKButtons_EXECUTABLE_NAME VTKButtons OUTPUT_NAME)
-  list(APPEND CPACK_PACKAGE_EXECUTABLES "${VTKButtons_EXECUTABLE_NAME}" "VTKButtons")
-endif()
-
+foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
+  if(MSVTK_APP_${app})
+    get_target_property(${app}_EXECUTABLE_NAME ${app} OUTPUT_NAME)
+    list(APPEND CPACK_PACKAGE_EXECUTABLES "${${app}_EXECUTABLE_NAME}" "${app}")
+  endif()
+endforeach()
 # -------------------------------------------------------------------------
 # File extensions
 # -------------------------------------------------------------------------
