@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSV BUTTON CLUSTERS
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 

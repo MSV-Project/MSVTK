@@ -1,6 +1,6 @@
 ###########################################################################
 #
-#  Library:   MSVTK
+#  Library: MSVTK
 #
 #  Copyright (c) Kitware Inc.
 #
