@@ -39,7 +39,6 @@
 #include "vtkSmartPointer.h"
 
 class vtkDataReader;
-class vtkDataObjectToTable;
 
 typedef std::map<std::string,vtkSmartPointer<vtkActor> > vtkActorsMap;
 
@@ -58,7 +57,6 @@ public:
   void addToRenderWindow(vtkRenderWindow *renderWindow);
   void updateTime(double);
   vtkActorsMap *getActorsMap();
-  vtkDataObjectToTable *getDataTable();
 
 private:
   vtkDataReader *createDataReader(std::string &readerName);
@@ -74,7 +72,6 @@ private:
   vtkSmartPointer<vtkAxesActor> axes;
   vtkSmartPointer<vtkOrientationMarkerWidget> orientationMarker;
   vtkSmartPointer<vtkMapper> endMapper;
-  vtkSmartPointer<vtkDataObjectToTable> dataTable;
   vtkActorsMap actorsMap;
 };
 
