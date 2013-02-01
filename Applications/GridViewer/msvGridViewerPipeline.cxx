@@ -77,6 +77,7 @@ msvGridViewerPipeline::~msvGridViewerPipeline()
 //------------------------------------------------------------------------------
 void msvGridViewerPipeline::clear()
 {
+  this->actorsMap.clear();
   this->threeDRenderer->RemoveAllViewProps();
   this->endMapper = 0;
 }
