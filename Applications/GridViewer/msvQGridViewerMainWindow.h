@@ -31,6 +31,7 @@
 #include "msvGridViewerExport.h"
 
 class msvQGridViewerMainWindowPrivate;
+class QListWidgetItem;
 
 class MSV_GridViewer_EXPORT msvQGridViewerMainWindow : public QMainWindow
 {
@@ -46,6 +47,7 @@ public slots:
   void closeData();
   void aboutApplication();
   void updateView();
+  void onActorsListItemChanged(QListWidgetItem * item);
 
 protected slots:
   void onCurrentTimeChanged(double);
