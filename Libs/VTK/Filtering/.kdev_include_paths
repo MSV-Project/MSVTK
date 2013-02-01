@@ -1,0 +1,20 @@
+RESOLVE: SOURCE=/home/rortiz/projects/MSVTK/build_debug/VTK/Common BUILD=
+/home/rortiz/Projects/MSVTK/build/IBAMR-build/ibtk/SuperBuild/include/
+/home/rortiz/Projects/MSVTK/build/IBAMR-build/ibtk/SuperBuild/include/samrai/
+/home/rortiz/Projects/MSVTK/build/VTK/Common/
+/home/rortiz/Projects/MSVTK/build/VTK/Filtering/
+/home/rortiz/Projects/MSVTK/build/VTK/GenericFiltering/
+/home/rortiz/Projects/MSVTK/build/VTK/Graphics/
+/home/rortiz/Projects/MSVTK/build/VTK/GUISupport/Qt/
+/home/rortiz/Projects/MSVTK/build/VTK/Imaging/
+/home/rortiz/Projects/MSVTK/build/VTK/IO/
+/home/rortiz/Projects/MSVTK/build/VTK/Parallel/
+/home/rortiz/Projects/MSVTK/build/VTK/Rendering/
+/home/rortiz/Projects/MSVTK/build/VTK/Utilities/
+/home/rortiz/Projects/MSVTK/build/VTK/VolumeRendering/
+/home/rortiz/Projects/MSVTK/build/VTK/Widgets/
+/home/rortiz/Projects/MSVTK/build/IBAMR-build/ibtk/include/
+/home/rortiz/Projects/MSVTK/build/IBAMR/include/
+/home/rortiz/Projects/MSVTK/build/IBAMR/ibtk/include/
+/home/rortiz/Projects/MSVTK/build/IBAMR-build/ibtk/SuperBuild/PETSC/include
+/home/rortiz/Projects/MSVTK/build/IBAMR-build/ibtk/SuperBuild/PETSC/build/include/

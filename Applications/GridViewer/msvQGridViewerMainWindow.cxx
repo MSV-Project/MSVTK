@@ -103,7 +103,7 @@ public:
   msvQGridViewerMainWindowPrivate(msvQGridViewerMainWindow& object);
   ~msvQGridViewerMainWindowPrivate();
 
-  void addActorListItem(std::string name);
+  void addActorListItem(std::string actorName);
   void addSignal(vtkDataObjectToTable* signal);
   virtual void setup(QMainWindow*);
   virtual void setupUi(QMainWindow*);
@@ -154,13 +154,16 @@ msvQGridViewerMainWindowPrivate::~msvQGridViewerMainWindowPrivate()
   this->clear();
 }
 
-void msvQGridViewerMainWindowPrivate::addActorListItem(const std::string name)
+void msvQGridViewerMainWindowPrivate::addActorListItem(const std::string actorName)
 {
   QListWidgetItem* actorItem = new QListWidgetItem;
   actorItem->setSizeHint(QSize(100, 25));
   //actorItem->setFlags(Qt::ItemIsUserCheckable & Qt::ItemIsEnabled & Qt::ItemIsSelectable);
-  actorItem->setCheckState(Qt::Checked);
-  actorItem->setText(QString::fromStdString(name));
+  vtkActorsMap *actorsMap = this->gridPipeline.getActorsMap();
+	vtkActor *actor = (*actorsMap)[actorName];
+  const int visible = actor->GetVisibility();
+  actorItem->setCheckState(visible ? Qt::Checked : Qt::Unchecked);
+  actorItem->setText(QString::fromStdString(actorName));
   this->actorsListWidget->addItem(actorItem);
 }
 
@@ -181,6 +184,7 @@ void msvQGridViewerMainWindowPrivate::addSignal(vtkDataObjectToTable* signal)
 void msvQGridViewerMainWindowPrivate::clear()
 {
   this->timePlayerWidget->play(false);            // stop the player widget
+  this->actorsListWidget->clear();
   this->gridPipeline.clear();
   this->timePlayerWidget->setFilter(0);
   this->timePlayerWidget->updateFromFilter();     // update the player widget
@@ -432,5 +436,4 @@ void msvQGridViewerMainWindow::onActorsListItemChanged(QListWidgetItem * item)
 	  Q_D(msvQGridViewerMainWindow);
 	  // update 3D view
 	  d->updateActorVisibility(item);
-
 }
