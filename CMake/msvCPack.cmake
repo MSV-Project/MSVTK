@@ -85,7 +85,9 @@ SET(CPACK_PACKAGE_VERSION "${MSVTK_VERSION}")
 set(CPACK_SYSTEM_NAME "${MSVTK_OS}-${MSVTK_ARCHITECTURE}")
 
 if(APPLE)
-#  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/Resources/Slicer.icns")
+  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/msvLogo.icns")
+else()
+  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/msvLogo.png")
 endif()
 
 # MSVTK does require setting the windows path
