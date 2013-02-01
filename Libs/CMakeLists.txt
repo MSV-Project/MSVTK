@@ -14,6 +14,12 @@ list(APPEND dirs
   Qt
   )
 
+if(ENABLE_IBAMR)
+  list(APPEND dirs 
+    IBTK 
+    IBAMR
+    )
+endif()  
 #-----------------------------------------------------------------------------
 # Loop over list of directories
 #-----------------------------------------------------------------------------
