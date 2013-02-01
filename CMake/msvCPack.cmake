@@ -21,11 +21,7 @@
 set(CPACK_INSTALL_CMAKE_PROJECTS)
 #set(CMAKE_INSTALL_DEBUG_LIBRARIES true)
 
-# Install CTK Apps and Plugins (PythonQt modules, QtDesigner plugins ...)
-if(NOT "${CTK_DIR}" STREQUAL "" AND EXISTS "${CTK_DIR}/CTK-build/CMakeCache.txt")
-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CTK_DIR}/CTK-build;CTK;RuntimeApplications;/")
-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CTK_DIR}/CTK-build;CTK;RuntimePlugins;/")
-endif()
+include(${MSVTK_CMAKE_DIR}/msvInstallCMakeProjects.cmake)
 
 if(NOT APPLE)
   include(${MSVTK_CMAKE_DIR}/msvInstallQt.cmake)
@@ -36,7 +32,6 @@ if(NOT APPLE)
   #  include(${MSVTK_CMAKE_DIR}/SlicerBlockInstallQtTesting.cmake)
   #endif()
   include(InstallRequiredSystemLibraries)
-  include(${MSVTK_CMAKE_DIR}/msvInstallCMakeProjects.cmake)
 else()
 
   # Generate qt.conf
