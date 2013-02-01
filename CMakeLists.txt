@@ -388,9 +388,11 @@ option(MSVTK_APP_ECG "ECG application to demonstrate vtkPipeline architecture an
 option(MSVTK_APP_VTKButtons "vtkButtons application to demonstrate vtkButtons" ON)
 option(MSVTK_APP_ButtonClusters "vtkButtons application to demonstrate vtkButtons clustering" ON)
 
+option(MSVTK_APP_GridViewer "GridViewer application to demonstrate time variation and embedding" ON)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ButtonClusters)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS GridViewer)
 
 option(MSVTK_APP_FFS "FFS application to demonstrate fluid flow simulation capabilities in msvtk" OFF)
 if(MSVTK_APP_FFS)

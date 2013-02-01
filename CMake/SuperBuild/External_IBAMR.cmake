@@ -59,13 +59,13 @@ if(NOT DEFINED IBAMR_DIR)
   endif()
 
 #     message(STATUS "Adding project:${proj}")
-
+  set(IBAMR_TAG "b1c423a69b51942ae2dc70eadf206645da2ab765")
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build
     PREFIX ${proj}${ep_suffix}
     GIT_REPOSITORY ${git_protocol}://github.com/MSV-Project/IBAMR.git
-    GIT_TAG "msvtk"
+    GIT_TAG ${IBAMR_TAG}
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
