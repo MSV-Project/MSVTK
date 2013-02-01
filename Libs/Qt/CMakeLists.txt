@@ -25,10 +25,7 @@ project(msvQtLibs)
 # --------------------------------------------------------------------------
 # Order of project directory matters. Project should be topologically ordered
 # --------------------------------------------------------------------------
-set(dirs
-# FileWatcher
-  )
-
+set(dirs)
 list(APPEND dirs
   Widgets
   )
