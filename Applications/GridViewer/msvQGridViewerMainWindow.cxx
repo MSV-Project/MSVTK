@@ -119,6 +119,8 @@ void msvQGridViewerMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   q->connect(this->actionOpen, SIGNAL(triggered()), q, SLOT(openData()));
   q->connect(this->actionClose, SIGNAL(triggered()), q, SLOT(closeData()));
   q->connect(this->actionExit, SIGNAL(triggered()), q, SLOT(close()));
+  q->connect(this->actionResetCamera, SIGNAL(triggered()), q, SLOT(resetCamera()));
+  q->connect(this->actionAutorangeScalar, SIGNAL(triggered()), q, SLOT(autorangeScalar()));
   q->connect(this->actionAboutGridViewerApplication, SIGNAL(triggered()), q,
              SLOT(aboutApplication()));
 
@@ -238,6 +240,24 @@ void msvQGridViewerMainWindow::closeData()
 }
 
 //------------------------------------------------------------------------------
+void msvQGridViewerMainWindow::resetCamera()
+{
+  Q_D(msvQGridViewerMainWindow);
+
+  d->gridPipeline.resetCamera();
+  d->update();
+}
+
+//------------------------------------------------------------------------------
+void msvQGridViewerMainWindow::autorangeScalar()
+{
+  Q_D(msvQGridViewerMainWindow);
+
+  d->gridPipeline.autorangeScalar();
+  d->update();
+}
+
+//------------------------------------------------------------------------------
 void msvQGridViewerMainWindow::aboutApplication()
 {
   msvQGridViewerAboutDialog about(this);
@@ -265,4 +285,5 @@ void msvQGridViewerMainWindow::onActorsListItemChanged(QListWidgetItem * item)
 	  Q_D(msvQGridViewerMainWindow);
 	  // update 3D view
 	  d->updateActorVisibility(item);
+    d->update();
 }

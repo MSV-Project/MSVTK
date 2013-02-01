@@ -45,6 +45,8 @@ public:
 public slots:
   void openData();
   void closeData();
+  void resetCamera();
+  void autorangeScalar();
   void aboutApplication();
   void updateView();
   void onActorsListItemChanged(QListWidgetItem * item);

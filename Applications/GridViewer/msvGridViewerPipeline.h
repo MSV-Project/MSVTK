@@ -55,6 +55,8 @@ public:
   vtkAlgorithm *getEndMapper()
     { return this->endMapper; }
   void addToRenderWindow(vtkRenderWindow *renderWindow);
+  void autorangeScalar();
+  void resetCamera();
   void updateTime(double);
   vtkActorsMap *getActorsMap();
 

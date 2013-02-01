@@ -637,10 +637,7 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
     }
   gridFile.close();
 
-  double extent[6];
-
-  this->endMapper->GetBounds(extent);
-  this->threeDRenderer->ResetCamera(extent);
+  this->threeDRenderer->ResetCamera();
   return 1;
 }
 
@@ -658,6 +655,36 @@ void msvGridViewerPipeline::addToRenderWindow(vtkRenderWindow *renderWindow)
     (this->threeDRenderer->GetRenderWindow()->GetInteractor());
   this->orientationMarker->SetEnabled(1);
   this->orientationMarker->InteractiveOn();
+}
+
+void msvGridViewerPipeline::autorangeScalar()
+{
+  vtkActorCollection *actors = this->threeDRenderer->GetActors();
+  if (actors)
+    {
+    actors->InitTraversal();
+    vtkActor *actor = 0;
+    while (0 != (actor = actors->GetNextActor()))
+      {
+      if (actor->GetVisibility())
+        {
+        vtkMapper *mapper = actor->GetMapper();
+        if (mapper)
+          {
+          vtkDataObject *dataObject = mapper->GetInputDataObject(0, 0);
+          vtkDataSet *dataSet = vtkDataSet::SafeDownCast(dataObject);
+          double range[2];
+          dataSet->GetScalarRange(range);
+          mapper->SetScalarRange(range);
+          }
+        }
+      }
+    }
+}
+
+void msvGridViewerPipeline::resetCamera()
+{
+  this->threeDRenderer->ResetCamera();
 }
 
 void msvGridViewerPipeline::updateTime(double time)
@@ -695,3 +722,4 @@ void msvGridViewerPipeline::updateTime(double time)
       }
     }
 }
+
