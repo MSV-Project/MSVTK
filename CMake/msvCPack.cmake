@@ -81,6 +81,8 @@ set(CPACK_SYSTEM_NAME "${MSVTK_OS}-${MSVTK_ARCHITECTURE}")
 
 if(APPLE)
   set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/msvLogo.icns")
+elseif(WIN32)
+  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}\\\\msvLogo.png")
 else()
   set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/msvLogo.png")
 endif()
