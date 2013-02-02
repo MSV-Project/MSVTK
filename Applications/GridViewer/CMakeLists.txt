@@ -131,7 +131,7 @@ set(dynamicHeaders
 # --------------------------------------------------------------------------
 # Install
 # --------------------------------------------------------------------------
-if(NOT APPLE)
+if(NOT PACKAGE_WITH_BUNDLE)
   set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR})
 else()
   set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ".")

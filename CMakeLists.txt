@@ -375,6 +375,11 @@ msvMacroSetupQt()
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 mark_as_advanced(DART_TESTING_TIMEOUT)
 
+set(PACKAGE_WITH_BUNDLE FALSE)
+if (APPLE)
+  #set(PACKAGE_WITH_BUNDLE TRUE)
+endif()
+
 # KWStyle
 option(MSVTK_USE_KWSTYLE     "Enable sourcecode-based style tests." OFF)
 #mark_as_advanced(MSVTK_USE_KWSTYLE)

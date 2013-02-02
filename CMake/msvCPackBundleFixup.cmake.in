@@ -123,7 +123,7 @@ function(fixup_bundle_with_plugins app)
   list(REMOVE_DUPLICATES libs_path)
 
   set(MSVTK_BUILD_DIR "@MSVTK_BINARY_DIR@")
-  set(MSVTK_SUPERBUILD_DIR "@MSVTK_SUPERBUILD_DIR@")
+  set(MSVTK_SUPERBUILD_DIR "@MSVTK_SUPERBUILD_BINARY_DIR@")
 
   gp_clear_log()
 

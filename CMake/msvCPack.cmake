@@ -23,7 +23,7 @@ set(CPACK_INSTALL_CMAKE_PROJECTS)
 
 include(${MSVTK_CMAKE_DIR}/msvInstallCMakeProjects.cmake)
 
-if(NOT APPLE)
+if(NOT PACKAGE_WITH_BUNDLE)
   include(${MSVTK_CMAKE_DIR}/msvInstallQt.cmake)
   #if(MSVTK_USE_PYTHONQT)
   #  include(${MSVTK_CMAKE_DIR}/msvInstallPythonQt.cmake)
@@ -76,7 +76,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${MSVTK_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_VERSION_MAJOR "${MSVTK_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${MSVTK_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${MSVTK_VERSION_PATCH}")
-SET(CPACK_PACKAGE_VERSION "${MSVTK_VERSION}")
+set(CPACK_PACKAGE_VERSION "${MSVTK_VERSION}")
 set(CPACK_SYSTEM_NAME "${MSVTK_OS}-${MSVTK_ARCHITECTURE}")
 
 if(APPLE)
@@ -87,8 +87,8 @@ endif()
 
 # MSVTK does require setting the windows path
 set(CPACK_NSIS_MODIFY_PATH OFF)
-
 set(CPACK_PACKAGE_EXECUTABLES)
+set(CMAKE_INSTALL_DO_STRIP TRUE)
 
 foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
   if(MSVTK_APP_${app})
@@ -137,9 +137,9 @@ set(CPACK_SOURCE_TZ   OFF CACHE BOOL "Enable to build TZ source packages" FORCE)
 # -------------------------------------------------------------------------
 # Enable generator
 # -------------------------------------------------------------------------
-if(UNIX)
+if(UNIX OR APPLE)
   set(CPACK_GENERATOR "TGZ")
-  if(APPLE)
+  if(PACKAGE_WITH_BUNDLE)
     set(CPACK_GENERATOR "DragNDrop")
   endif()
 elseif(WIN32)
