@@ -317,7 +317,6 @@ void msvQECGMainWindowPrivate::updateView()
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 {
-  Q_Q(msvQECGMainWindow);
   QDir dir(rootDirectory);
 
   if (dir.cd(QString("CartoSignals"))) {
@@ -423,8 +422,6 @@ bool msvQECGMainWindowPrivate::fileLessThan(const QString &s1, const QString &s2
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::addCartoSignal(vtkDelimitedTextReader* signal)
 {
-  Q_Q(msvQECGMainWindow);
-
   ctkVTKChartView* ecgView = new ctkVTKChartView;
   ecgView->setMinimumSize(QSize(100, 80));
   ecgView->setFocusPolicy(Qt::NoFocus);
