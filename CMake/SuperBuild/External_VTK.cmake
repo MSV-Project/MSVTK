@@ -79,6 +79,8 @@ if(NOT DEFINED VTK_DIR)
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+      -DVTK_INSTALL_BIN_DIR:STRING=${MSVTK_INSTALL_BIN_DIR}
+      -DVTK_INSTALL_LIB_DIR:STRING=${MSVTK_INSTALL_BIN_DIR}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       -DBUILD_TESTING:BOOL=OFF
       ${additional_vtk_cmakevars}

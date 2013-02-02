@@ -134,7 +134,6 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Set superbuild boolean args
 #
-
 set(ctk_cmake_boolean_args
   BUILD_TESTING
   #BUILD_QTDESIGNER_PLUGINS
@@ -147,6 +146,9 @@ set(ctk_cmake_boolean_args
   #${ctk_applications_bool_vars}
   #${ctk_lib_options_list}
   )
+foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
+  list(APPEND ctk_cmake_boolean_args MSVTK_APP_${app})
+endforeach()
 
 set(ctk_superbuild_boolean_args)
 foreach(ctk_cmake_arg ${ctk_cmake_boolean_args})

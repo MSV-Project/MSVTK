@@ -1,13 +1,29 @@
+###########################################################################
+#
+#  Library: MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
 set(CPACK_INSTALL_CMAKE_PROJECTS)
 #set(CMAKE_INSTALL_DEBUG_LIBRARIES true)
 
-# Install CTK Apps and Plugins (PythonQt modules, QtDesigner plugins ...)
-if(NOT "${CTK_DIR}" STREQUAL "" AND EXISTS "${CTK_DIR}/CTK-build/CMakeCache.txt")
-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CTK_DIR}/CTK-build;CTK;RuntimeApplications;/")
-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CTK_DIR}/CTK-build;CTK;RuntimePlugins;/")
-endif()
+include(${MSVTK_CMAKE_DIR}/msvInstallCMakeProjects.cmake)
 
-if(NOT APPLE)
+if(NOT PACKAGE_WITH_BUNDLE)
   include(${MSVTK_CMAKE_DIR}/msvInstallQt.cmake)
   #if(MSVTK_USE_PYTHONQT)
   #  include(${MSVTK_CMAKE_DIR}/msvInstallPythonQt.cmake)
@@ -16,7 +32,6 @@ if(NOT APPLE)
   #  include(${MSVTK_CMAKE_DIR}/SlicerBlockInstallQtTesting.cmake)
   #endif()
   include(InstallRequiredSystemLibraries)
-  include(${MSVTK_CMAKE_DIR}/msvInstallCMakeProjects.cmake)
 else()
 
   # Generate qt.conf
@@ -61,28 +76,28 @@ set(CPACK_RESOURCE_FILE_LICENSE "${MSVTK_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_PACKAGE_VERSION_MAJOR "${MSVTK_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${MSVTK_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${MSVTK_VERSION_PATCH}")
-SET(CPACK_PACKAGE_VERSION "${MSVTK_VERSION}")
+set(CPACK_PACKAGE_VERSION "${MSVTK_VERSION_FULL}")
 set(CPACK_SYSTEM_NAME "${MSVTK_OS}-${MSVTK_ARCHITECTURE}")
 
 if(APPLE)
-#  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/Resources/Slicer.icns")
+  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/msvLogo.icns")
+elseif(WIN32)
+  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}\\\\msvLogo.png")
+else()
+  set(CPACK_PACKAGE_ICON "${MSVTK_SOURCE_DIR}/msvLogo.png")
 endif()
 
 # MSVTK does require setting the windows path
 set(CPACK_NSIS_MODIFY_PATH OFF)
-
 set(CPACK_PACKAGE_EXECUTABLES)
+set(CMAKE_INSTALL_DO_STRIP TRUE)
 
-if (MSVTK_APP_ECG)
-  get_target_property(ECG_EXECUTABLE_NAME ECG OUTPUT_NAME)
-  list(APPEND CPACK_PACKAGE_EXECUTABLES "${ECG_EXECUTABLE_NAME}" "ECG")
-endif()
-
-if (MSVTK_APP_VTKButtons)
-  get_target_property(VTKButtons_EXECUTABLE_NAME VTKButtons OUTPUT_NAME)
-  list(APPEND CPACK_PACKAGE_EXECUTABLES "${VTKButtons_EXECUTABLE_NAME}" "VTKButtons")
-endif()
-
+foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
+  if(MSVTK_APP_${app})
+    get_target_property(${app}_EXECUTABLE_NAME ${app} OUTPUT_NAME)
+    list(APPEND CPACK_PACKAGE_EXECUTABLES "${${app}_EXECUTABLE_NAME}" "${app}")
+  endif()
+endforeach()
 # -------------------------------------------------------------------------
 # File extensions
 # -------------------------------------------------------------------------
@@ -124,9 +139,9 @@ set(CPACK_SOURCE_TZ   OFF CACHE BOOL "Enable to build TZ source packages" FORCE)
 # -------------------------------------------------------------------------
 # Enable generator
 # -------------------------------------------------------------------------
-if(UNIX)
+if(UNIX OR APPLE)
   set(CPACK_GENERATOR "TGZ")
-  if(APPLE)
+  if(PACKAGE_WITH_BUNDLE)
     set(CPACK_GENERATOR "DragNDrop")
   endif()
 elseif(WIN32)
