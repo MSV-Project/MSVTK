@@ -30,8 +30,8 @@
 
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
-#include "msvQTimePlayerWidget.h"
-#include "msvVTKDataFileSeriesReader.h"
+//#include "msvQTimePlayerWidget.h"
+//#include "msvVTKDataFileSeriesReader.h"
 #include "ui_msvQVTKButtonsMainWindow.h"
 #include "msvQVTKButtonsAboutDialog.h"
 #include "msvQVTKButtonsManager.h"
@@ -168,9 +168,9 @@ void msvQVTKButtonsMainWindowPrivate::clear()
 {
   //Q_Q(msvQVTKButtonsMainWindow);
 
-  this->timePlayerWidget->play(false);            // stop the player widget
+  //this->timePlayerWidget->play(false);            // stop the player widget
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
-  this->timePlayerWidget->updateFromFilter();     // update the player widget
+  //this->timePlayerWidget->updateFromFilter();     // update the player widget
 }
 
 //------------------------------------------------------------------------------
@@ -187,9 +187,9 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   this->Ui_msvQVTKButtonsMainWindow::setupUi(mainWindow);
 
-  this->vtkButtonsPanel->toggleViewAction()->setText("VTKButtons panel");
-  this->vtkButtonsPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
-  this->menuView->addAction(this->vtkButtonsPanel->toggleViewAction());
+  //this->vtkButtonsPanel->toggleViewAction()->setText("VTKButtons panel");
+  //this->vtkButtonsPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
+  //this->menuView->addAction(this->vtkButtonsPanel->toggleViewAction());
 
   this->vtkButtonsReviewPanel->toggleViewAction()->setText("VTKButtons review panel");
   this->vtkButtonsReviewPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+2"));
@@ -205,8 +205,8 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
              SLOT(aboutApplication()));
 
   // Playback Controller
-  q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
-             q, SLOT(onCurrentTimeChanged(double)));
+  //q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
+  //           q, SLOT(onCurrentTimeChanged(double)));
 
   // Customize QAction icons with standard pixmaps
   QIcon dirIcon = q->style()->standardIcon(QStyle::SP_DirIcon);

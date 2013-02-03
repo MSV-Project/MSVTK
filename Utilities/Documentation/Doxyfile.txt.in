@@ -62,14 +62,14 @@ PROJECT_BRIEF          = "MSVTK is a community effort to provide support multi s
 # exceed 55 pixels and the maximum width should not exceed 200 pixels.
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           = @MSVTK_SOURCE_DIR@/msvtkLogo.png
+PROJECT_LOGO           = @MSVTK_SOURCE_DIR@/msvLogo.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @MSVTK_BINARY_DIR@/Documentation
+OUTPUT_DIRECTORY       = @MSVTK_BINARY_DIR@/Utilities/Documentation
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -704,8 +704,7 @@ RECURSIVE              = YES
 
 EXCLUDE                = @MSVTK_BINARY_DIR@ \
                          @MSVTK_SOURCE_DIR@/Utilities \
-                         @MSVTK_SOURCE_DIR@/CMake/ctkDashboardDriverScript.cmake \
-                         @MSVTK_SOURCE_DIR@/CMake/ctkDashboardScript.TEMPLATE.cmake
+                         @MSVTK_SOURCE_DIR@/CMake/TEMPLATE.msvtkDashboardScript.cmake
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

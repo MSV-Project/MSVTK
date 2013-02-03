@@ -32,7 +32,17 @@ endif()
 
 #-----------------------------------------------------------------------------
 project(MSVTK)
+set(kit ${PROJECT_NAME})
 #-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Update CMake module path
+# Note: FindXXX.cmake script specific to utility should be copied into Utilities/CMake
+#
+set(CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/CMake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/CMake"
+  ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------
 # Library mode: SHARED (default) or STATIC
@@ -86,23 +96,53 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Prerequisites
+#-----------------------------------------------------------------------------
+find_package(Git)
+if(NOT GIT_FOUND)
+  message(FATAL_ERROR "error: Install Git and try to re-configure")
+endif()
+
+#-----------------------------------------------------------------------------
 # MSVTK version number.  An even minor number corresponds to releases.
 #
-set(MSVTK_VERSION_MAJOR 0)
-set(MSVTK_VERSION_MINOR 1)
-set(MSVTK_VERSION_PATCH 0)
-set(MSVTK_VERSION
-    "${MSVTK_VERSION_MAJOR}.${MSVTK_VERSION_MINOR}.${MSVTK_VERSION_PATCH}")
+set(${kit}_VERSION_MAJOR 1)
+set(${kit}_VERSION_MINOR 0)
+set(${kit}_VERSION_PATCH 0)
+# Releases define a tweak level
+#set(${kit}_VERSION_TWEAK 0)
+#set(${kit}_VERSION_RC 1)
+
+include(ExtractRepositoryInfo)
+extract_repository_info(VAR_PREFIX ${kit}) # Used to configure ${kit}VersionConfigure.h.in
+
+if (${kit}_WC_LAST_CHANGED_DATE)
+  string(REGEX REPLACE ".*([0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]).*" "\\1"
+    ${kit}_BUILDDATE "${${kit}_WC_LAST_CHANGED_DATE}")
+  set(${kit}_VERSION_UID "${(${kit}_BUILDDATE}")
+else()
+  set(${kit}_VERSION_UID "${${kit}_WC_REVISION}")
+endif()
+
+set(${kit}_VERSION "${${kit}_VERSION_MAJOR}.${${kit}_VERSION_MINOR}")
+set(${kit}_VERSION_FULL "${${kit}_VERSION}.${${kit}_VERSION_PATCH}")
+if(${kit}_VERSION_RC)
+  set(${kit}_VERSION_FULL "${${kit}_VERSION_FULL}-rc${${kit}_VERSION_RC}")
+endif()
+if(NOT DEFINED ${kit}_VERSION_TWEAK)
+  set(${kit}_VERSION_FULL "${${kit}_VERSION_FULL}-${${kit}_VERSION_UID}")
+endif()
+
 
 # TODO Rename MSVTK_VERSION into MSVTK_VERSION_STR  -  MSVTK_VERSION should be hexadecimal one
 
 # Append the library version information to the library target
 # properties.  A parent project may set its own properties and/or may
 # block this.
-if(NOT MSVTK_NO_LIBRARY_VERSION)
-  set(MSVTK_LIBRARY_PROPERTIES ${MSVTK_LIBRARY_PROPERTIES}
-    VERSION "${MSVTK_VERSION}"
-    SOVERSION "${MSVTK_MAJOR_VERSION}.${MSVTK_MINOR_VERSION}"
+if(NOT ${kit}_NO_LIBRARY_VERSION)
+  set(${kit}_LIBRARY_PROPERTIES ${${kit}_LIBRARY_PROPERTIES}
+    VERSION "${${kit}_VERSION_FULL}"
+    SOVERSION "${${kit}_VERSION}"
     )
 endif()
 
@@ -114,23 +154,15 @@ if(NOT MSVTK_INSTALL_BIN_DIR)
   set(MSVTK_INSTALL_BIN_DIR "bin")
 endif()
 if(NOT MSVTK_INSTALL_LIB_DIR)
-  set(MSVTK_INSTALL_LIB_DIR "lib/MSVTK-${MSVTK_MAJOR_VERSION}.${MSVTK_MINOR_VERSION}")
+  #set(MSVTK_INSTALL_LIB_DIR "lib/MSVTK-${MSVTK_VERSION_MAJOR}.${MSVTK_VERSION_MINOR}")
+  set(MSVTK_INSTALL_LIB_DIR "bin")
 endif()
 if(NOT MSVTK_INSTALL_INCLUDE_DIR)
-  set(MSVTK_INSTALL_INCLUDE_DIR "include/MSVTK-${MSVTK_MAJOR_VERSION}.${MSVTK_MINOR_VERSION}")
+  set(MSVTK_INSTALL_INCLUDE_DIR "include/MSVTK-${MSVTK_VERSION_MAJOR}.${MSVTK_VERSION_MINOR}")
 endif()
 if(NOT MSVTK_INSTALL_DOC_DIR)
   set(MSVTK_INSTALL_DOC_DIR "doc")
 endif()
-
-#-----------------------------------------------------------------------------
-# Update CMake module path
-# Note: FindXXX.cmake script specific to utility should be copied into Utilities/CMake
-#
-set(CMAKE_MODULE_PATH
-  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/CMake"
-  "${CMAKE_CURRENT_SOURCE_DIR}/CMake"
-  ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------
 # Clear MSVTK_BASE_INCLUDE_DIRS, MSVTK_BASE_LIBRARIES and MSVTK_WRAPPED_LIBRARIES_PYTHONQT
@@ -343,6 +375,11 @@ msvMacroSetupQt()
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 mark_as_advanced(DART_TESTING_TIMEOUT)
 
+set(PACKAGE_WITH_BUNDLE FALSE)
+if (APPLE)
+  #set(PACKAGE_WITH_BUNDLE TRUE)
+endif()
+
 # KWStyle
 option(MSVTK_USE_KWSTYLE     "Enable sourcecode-based style tests." OFF)
 #mark_as_advanced(MSVTK_USE_KWSTYLE)
@@ -356,28 +393,20 @@ set(MSVTK_APPLICATIONS_SUBDIRS )
 option(MSVTK_APP_ECG "ECG application to demonstrate vtkPipeline architecture and vtkButtons" ON)
 option(MSVTK_APP_VTKButtons "vtkButtons application to demonstrate vtkButtons" ON)
 option(MSVTK_APP_ButtonClusters "vtkButtons application to demonstrate vtkButtons clustering" ON)
-
 option(MSVTK_APP_GridViewer "GridViewer application to demonstrate time variation and embedding" ON)
+option(MSVTK_APP_FFS "FFS application to demonstrate fluid flow simulation capabilities in msvtk" OFF)
+
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ECG)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS VTKButtons)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS ButtonClusters)
 list(APPEND MSVTK_APPLICATIONS_SUBDIRS GridViewer)
+list(APPEND MSVTK_APPLICATIONS_SUBDIRS FFS)
 
-option(MSVTK_APP_FFS "FFS application to demonstrate fluid flow simulation capabilities in msvtk" OFF)
 if(MSVTK_APP_FFS)
-  list(APPEND MSVTK_APPLICATIONS_SUBDIRS FFS)
   set(ENABLE_IBAMR ON)
 endif()
 
 set(MSVTK_MAIN_PROJECT_APPLICATION_NAME ECG)
-
-#-----------------------------------------------------------------------------
-# Prerequisites
-#-----------------------------------------------------------------------------
-find_package(Git)
-if(NOT GIT_FOUND)
-  message(FATAL_ERROR "error: Install Git and try to re-configure")
-endif()
 
 #-----------------------------------------------------------------------------
 # Superbuild script
@@ -473,7 +502,7 @@ endforeach()
 foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
   if(MSVTK_APP_${app})
     add_subdirectory(Applications/${app})
-  endif()            
+  endif()
 endforeach()
 
 #-----------------------------------------------------------------------------
