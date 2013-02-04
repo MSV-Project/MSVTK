@@ -187,5 +187,22 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBoxShowButtons</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>checkBoxShowLabels</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>613</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>613</x>
+     <y>83</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

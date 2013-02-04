@@ -143,10 +143,10 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
   this->SurfaceActor->GetProperty()->BackfaceCullingOn();
   this->SurfaceActor->SetMapper(this->SurfaceMapper);
 
-  ShowLabels = false;
-  ShowButtons = false;
-  FlyTo = false;
-  OnCenter = false;
+  ShowLabels = true;
+  ShowButtons = true;
+  FlyTo = true;
+  OnCenter = 0;
 }
 
 //------------------------------------------------------------------------------
