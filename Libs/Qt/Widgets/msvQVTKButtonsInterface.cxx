@@ -86,7 +86,7 @@ public:
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object)
-  : VtkButtonsInterface(NULL), q_ptr(&object)
+  :  q_ptr(&object), VtkButtonsInterface(NULL)
 {
 
 }
