@@ -51,6 +51,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    Q_UNUSED(caller);
     vtkTexturedButtonRepresentation2D *rep =
       reinterpret_cast<vtkTexturedButtonRepresentation2D*>(caller);
     int highlightState = rep->GetHighlightState();
@@ -165,7 +166,7 @@ msvQVTKButtonsPrivate::~msvQVTKButtonsPrivate()
 msvQVTKButtons::msvQVTKButtons(QObject *parent)
   : msvQVTKButtonsInterface(), d_ptr(new msvQVTKButtonsPrivate(*this))
 {
-
+  Q_UNUSED(parent);
 }
 
 //------------------------------------------------------------------------------

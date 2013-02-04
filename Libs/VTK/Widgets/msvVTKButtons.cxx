@@ -54,6 +54,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
     ToolButton->SetPreviousOpacity(0);
     msvVTKAnimate* animateCamera = new msvVTKAnimate();
     if (FlyTo)

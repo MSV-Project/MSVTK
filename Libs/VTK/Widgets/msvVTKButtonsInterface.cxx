@@ -45,8 +45,6 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
   this->ButtonWidget=NULL;
   this->Image=NULL;
 
-  // Bounds of the data related to the buttonWin
-  double Bounds[6];
   vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
   rep->SetNumberOfStates(1);
   GetButton()->SetRepresentation(rep);
