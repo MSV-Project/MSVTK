@@ -51,6 +51,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
     State = !State;
     // Show / Hide slider
     this->ToolButton->ShowSlider(State);
@@ -82,6 +83,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
 //    vtkTexturedButtonRepresentation2D *rep =
 //      vtkTexturedButtonRepresentation2D::SafeDownCast(caller);
 //    int highlightState = rep->GetHighlightState();
@@ -112,6 +114,7 @@ public:
 class vtkSliderInteractionCallback : public vtkCommand
 {
 public:
+
   static vtkSliderInteractionCallback *New()
   {
     return new vtkSliderInteractionCallback;
@@ -121,13 +124,15 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
     vtkSliderWidget *sliderWidget = vtkSliderWidget::SafeDownCast(caller);
     double ratio = vtkSliderRepresentation::SafeDownCast(
       sliderWidget->GetRepresentation())->GetValue();
     this->ToolButton->SetCameraPositionOnPath(ratio);
   }
 
-  vtkSliderInteractionCallback() : ToolButton(NULL), Renderer(0) {}
+  vtkSliderInteractionCallback() :  Renderer(0), ToolButton(NULL) {}
+
   vtkRenderer *Renderer;
   msvVTKButtonsGroup *ToolButton;
 };
@@ -155,7 +160,7 @@ public:
     animateCamera->Execute(this->Renderer, bounds, 20);
   }
 
-  vtkSliderStartInteractionCallback() : ToolButton(NULL), Renderer(0) {}
+  vtkSliderStartInteractionCallback() : Renderer(0), ToolButton(NULL) {}
   vtkRenderer *Renderer;
   msvVTKButtonsGroup *ToolButton;
 };
@@ -376,7 +381,6 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
   // (0-1 value)
 
   // calculate intermediate bounds
-  double resetBounds[6];
   double b1[6];
   double b2[6];
 

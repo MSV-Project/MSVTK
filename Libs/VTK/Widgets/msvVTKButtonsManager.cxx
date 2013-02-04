@@ -42,6 +42,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
     int onCornerCount = 0;
     if (Renderer && Renderer->GetActiveCamera())
       {
