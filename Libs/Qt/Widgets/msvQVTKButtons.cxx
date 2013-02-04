@@ -88,7 +88,7 @@ class msvQVTKButtonsPrivate
 protected:
 
   msvQVTKButtons* const q_ptr;
-  msvVTKButtons* VtkButton;
+  msvVTKButtons* VTKButton;
   vtkCommand* HighlightCallback;
 
 public:
@@ -132,7 +132,7 @@ public:
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object)
-  : VtkButton(NULL), q_ptr(&object)
+  : q_ptr(&object), VTKButton(NULL)
 {
   Q_Q(msvQVTKButtons);
   this->HighlightCallback = vtkButtonHighLightCallback::New();
@@ -149,11 +149,11 @@ msvQVTKButtonsPrivate::msvQVTKButtonsPrivate(msvQVTKButtons& object)
 //------------------------------------------------------------------------------
 /*virtual*/ msvVTKButtonsInterface* msvQVTKButtonsPrivate::vtkButtons()
 {
-  if (!this->VtkButton)
+  if (!this->VTKButton)
   {
-    this->VtkButton = msvVTKButtons::New();
+    this->VTKButton = msvVTKButtons::New();
   }
-  return this->VtkButton;
+  return this->VTKButton;
 }
 
 //------------------------------------------------------------------------------
