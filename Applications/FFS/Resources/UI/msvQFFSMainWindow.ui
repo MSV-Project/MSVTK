@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>FFS - Multi Scale Visualization Toolkit</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../msvQFFS.qrc">
+    <normaloff>:/Logo/icon.png</normaloff>:/Logo/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
     <property name="margin">
@@ -29,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>698</width>
-     <height>24</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -46,13 +50,7 @@
     </property>
     <addaction name="actionAboutFFSApplication"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -161,6 +159,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../msvQFFS.qrc"/>
+ </resources>
  <connections/>
 </ui>
