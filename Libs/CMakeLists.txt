@@ -35,7 +35,6 @@ list(APPEND dirs
 
 if(ENABLE_IBAMR)
   list(APPEND dirs 
-    IBTK 
     IBAMR
     )
 endif()  
