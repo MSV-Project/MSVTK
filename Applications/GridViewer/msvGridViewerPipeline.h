@@ -52,8 +52,7 @@ public:
 
   void clear();
   int readGridFile(const char *gridFileName);
-  vtkAlgorithm *getEndMapper()
-    { return this->endMapper; }
+  vtkAlgorithm *getTimeVaryingMapper();
   void addToRenderWindow(vtkRenderWindow *renderWindow);
   void autorangeScalar();
   void resetCamera();
@@ -73,7 +72,6 @@ private:
   vtkSmartPointer<vtkRenderer> threeDRenderer;
   vtkSmartPointer<vtkAxesActor> axes;
   vtkSmartPointer<vtkOrientationMarkerWidget> orientationMarker;
-  vtkSmartPointer<vtkMapper> endMapper;
   vtkActorsMap actorsMap;
 };
 

@@ -191,8 +191,8 @@ void msvQGridViewerMainWindowPrivate::readGridData(const QString& gridFileName)
   std::string tmp = gridFileName.toStdString();
   this->gridPipeline.readGridFile(tmp.c_str());
 
-  vtkAlgorithm *endMapper = this->gridPipeline.getEndMapper();
-  this->timePlayerWidget->setFilter(endMapper);
+  vtkAlgorithm *timeVaryingMapper = this->gridPipeline.getTimeVaryingMapper();
+  this->timePlayerWidget->setFilter(timeVaryingMapper);
   this->timePlayerWidget->updateFromFilter();
   this->updateActorsList();
 }

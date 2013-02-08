@@ -30,11 +30,14 @@
 #include "vtkActor.h"
 #include "vtkActorCollection.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkContourFilter.h"
+#include "vtkContourGrid.h"
 #include "vtkDataObjectReader.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkExtractEdges.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
-//#include "vtkMergeFilter.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMergeDataObjectFilter.h"
 #include "vtkNew.h"
 #include "vtkOrientationMarkerWidget.h"
@@ -48,7 +51,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGridReader.h"
 #include "vtkTemporalDataSetCache.h"
+#include "vtkTemporalInterpolator.h"
 #include "vtkUnstructuredGridReader.h"
+#include "vtkVertexGlyphFilter.h"
 
 //------------------------------------------------------------------------------
 // msvGridViewerPipeline methods
@@ -57,8 +62,8 @@ msvGridViewerPipeline::msvGridViewerPipeline()
 {
   // Renderer
   this->threeDRenderer = vtkSmartPointer<vtkRenderer>::New();
-  this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
-  this->threeDRenderer->SetBackground2(0.2, 0.4, 0.8);
+  this->threeDRenderer->SetBackground(0.1, 0.15, 0.3);
+  this->threeDRenderer->SetBackground2(0.2, 0.3, 0.5);
   this->threeDRenderer->SetGradientBackground(true);
 
   this->axes = vtkSmartPointer<vtkAxesActor>::New();
@@ -78,7 +83,6 @@ void msvGridViewerPipeline::clear()
 {
   this->actorsMap.clear();
   this->threeDRenderer->RemoveAllViewProps();
-  this->endMapper = 0;
 }
 
 int msvGridViewerPipeline::readCommand(std::istream &gridFile,
@@ -114,7 +118,7 @@ int msvGridViewerPipeline::readCommand(std::istream &gridFile,
   while (true)
     {
     c = gridFile.peek();
-    if (!isalpha(c))
+    if (!(isalpha(c) || isdigit(c)))
       {
       break;
       }
@@ -336,6 +340,12 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
           ++optionIndex;
           fileSeriesReader->SetOutputTimeRange(timeRange);
           }
+        else if (this->checkOption("METAFILE", name, options, optionIndex, /*minArgs*/1))
+          {
+          fileSeriesReader->SetMetaFileName(options[optionIndex].c_str());
+          fileSeriesReader->UseMetaFileOn();
+          ++optionIndex;
+          }
         else if (this->checkOption("FILES", name, options, optionIndex, /*minArgs*/1))
           {
           while (optionIndex < options.size())
@@ -415,7 +425,6 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
             }
           ++optionIndex;
           actor->SetMapper(mapper);
-          this->endMapper = mapper;
           }
         else if (this->checkOption("COLOR", name, options, optionIndex, /*minArgs*/3))
           {
@@ -456,6 +465,100 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
         this->actorsMap[options[0]] = actor.GetPointer();
       }
 
+    else if (command == "vtkContourFilter")
+      {
+      vtkNew<vtkContourFilter> contour;
+      object = contour.GetPointer();
+      contour->UseScalarTreeOn();
+      int numberOfValues = 0;
+      while (optionIndex < options.size())
+        {
+        vtkAlgorithm *inputAlgorithm = 0;
+        if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
+          {
+          contour->SetInputConnection(inputAlgorithm->GetOutputPort());
+          }
+        else if (this->checkOption("GENERATEVALUES", name, options, optionIndex, /*minArgs*/3))
+          {
+          int nValues = atoi(options[optionIndex].c_str());
+          ++optionIndex;
+          double minValue = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          double maxValue = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          contour->GenerateValues(nValues, minValue, maxValue);
+          numberOfValues += nValues;
+          }
+        else if (this->checkOption("VALUE", name, options, optionIndex, /*minArgs*/1))
+          {
+          double value;
+          value = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          contour->SetValue(numberOfValues, value);
+          ++numberOfValues;
+          }
+        else if (this->checkOption("COMPUTENORMALSON", name, options, optionIndex, /*minArgs*/0))
+          {
+          contour->ComputeNormalsOn();
+          }
+        else
+          {
+          if (optionIndex < options.size())
+            {
+            cerr << "'" << name << "' has unrecognised token '" << options[optionIndex] << "'\n";
+            return 0;
+            }
+          }
+        }
+      }
+
+    else if (command == "vtkContourGrid")
+      {
+      vtkNew<vtkContourGrid> contour;
+      object = contour.GetPointer();
+      contour->UseScalarTreeOn();
+      int numberOfValues = 0;
+      while (optionIndex < options.size())
+        {
+        vtkAlgorithm *inputAlgorithm = 0;
+        if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
+          {
+          contour->SetInputConnection(inputAlgorithm->GetOutputPort());
+          }
+        else if (this->checkOption("GENERATEVALUES", name, options, optionIndex, /*minArgs*/3))
+          {
+          int nValues = atoi(options[optionIndex].c_str());
+          ++optionIndex;
+          double minValue = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          double maxValue = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          contour->GenerateValues(nValues, minValue, maxValue);
+          numberOfValues += nValues;
+          }
+        else if (this->checkOption("VALUE", name, options, optionIndex, /*minArgs*/1))
+          {
+          double value;
+          value = atof(options[optionIndex].c_str());
+          ++optionIndex;
+          contour->SetValue(numberOfValues, value);
+          ++numberOfValues;
+          }
+        else if (this->checkOption("COMPUTENORMALSON", name, options, optionIndex, /*minArgs*/0))
+          {
+          contour->ComputeNormalsOn();
+          }
+        else
+          {
+          if (optionIndex < options.size())
+            {
+            cerr << "'" << name << "' has unrecognised token '" << options[optionIndex] << "'\n";
+            return 0;
+            }
+          }
+        }
+      }
+
     else if (command == "vtkDataSetSurfaceFilter")
       {
       vtkNew<vtkDataSetSurfaceFilter> dataSetSurface;
@@ -470,6 +573,7 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
           cerr << "'" << name << "' requires only INPUT <algorithm> option.\n";
         }
       }
+
     else if (command == "vtkExtractEdges")
       {
       vtkNew<vtkExtractEdges> edges;
@@ -484,6 +588,7 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
           cerr << "'" << name << "' requires only INPUT <algorithm> option.\n";
         }
       }
+
     else if (command == "vtkFieldDataToAttributeDataFilter")
       {
       vtkNew<vtkFieldDataToAttributeDataFilter> fieldToAttribute;
@@ -544,7 +649,6 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
           }
         else if (0 != (inputAlgorithm = this->checkAlgorithmOption("DATAINPUT", name, options, optionIndex, objects)))
           {
-          // GRC following doesn't pipeline time:
           mergedDataSet->SetInputConnection(1, inputAlgorithm->GetOutputPort());
           }
         else if (this->checkOption("OUTPUTCELLDATA", name, options, optionIndex, /*minArgs*/0))
@@ -580,6 +684,10 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
         if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
           {
           polyMapper->SetInputConnection(inputAlgorithm->GetOutputPort());
+          }
+        else if (this->checkOption("SCALARVISIBILITYOFF", name, options, optionIndex, /*minArgs*/0))
+          {
+          polyMapper->ScalarVisibilityOff();
           }
         else if (this->checkOption("SCALARVISIBILITYON", name, options, optionIndex, /*minArgs*/0))
           {
@@ -624,6 +732,43 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
         }
       }
 
+    else if (command == "vtkTemporalInterpolator")
+      {
+      vtkNew<vtkTemporalInterpolator> temporalInterpolator;
+      object = temporalInterpolator.GetPointer();
+      while (optionIndex < options.size())
+        {
+        vtkAlgorithm *inputAlgorithm = 0;
+        if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
+          {
+          temporalInterpolator->SetInputConnection(inputAlgorithm->GetOutputPort());
+          }
+        else
+          {
+          if (optionIndex < options.size())
+            {
+            cerr << "'" << name << "' has unrecognised token '" << options[optionIndex] << "'\n";
+            return 0;
+            }
+          }
+        }
+      }
+
+    else if (command == "vtkVertexGlyphFilter")
+      {
+      vtkNew<vtkVertexGlyphFilter> vertex;
+      object = vertex.GetPointer();
+      vtkAlgorithm *inputAlgorithm = 0;
+      if (0 != (inputAlgorithm = this->checkAlgorithmOption("INPUT", name, options, optionIndex, objects)))
+        {
+        vertex->SetInputConnection(inputAlgorithm->GetOutputPort());
+        }
+      if (!inputAlgorithm || (optionIndex < options.size()))
+        {
+          cerr << "'" << name << "' requires only INPUT <algorithm> option.\n";
+        }
+      }
+
     else
       {
       cerr << "Unrecognised command or vtk class '" << command << "'\n";
@@ -644,6 +789,45 @@ int msvGridViewerPipeline::readGridFile(const char *gridFileName)
 vtkActorsMap *msvGridViewerPipeline::getActorsMap()
 {
 	return &(this->actorsMap);
+}
+
+vtkAlgorithm *msvGridViewerPipeline::getTimeVaryingMapper()
+{
+  vtkActorCollection *actors = this->threeDRenderer->GetActors();
+  if (actors)
+    {
+    actors->InitTraversal();
+    vtkActor *actor = 0;
+    while (0 != (actor = actors->GetNextActor()))
+      {
+      if (actor->GetVisibility())
+        {
+        vtkMapper *mapper = actor->GetMapper();
+        if (mapper)
+          {
+          for (int portIndex = 0;
+              portIndex < mapper->GetNumberOfInputPorts();
+              ++portIndex)
+            {
+            for (int connectionIndex = 0;
+              connectionIndex < mapper->GetNumberOfInputConnections(portIndex);
+              ++connectionIndex)
+              {
+                vtkStreamingDemandDrivenPipeline* sdd = vtkStreamingDemandDrivenPipeline::
+                  SafeDownCast(mapper->GetInputConnection(portIndex, connectionIndex)
+                    ->GetProducer()->GetExecutive());
+                vtkInformation* info = sdd->GetInputInformation(0)->GetInformationObject(0);
+                if (info->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+                  {
+                  return mapper;
+                  }
+              }
+            }
+          }
+        }
+      }
+    }
+  return 0;
 }
 
 void msvGridViewerPipeline::addToRenderWindow(vtkRenderWindow *renderWindow)
@@ -715,6 +899,15 @@ void msvGridViewerPipeline::updateTime(double time)
                     ->GetProducer()->GetExecutive());
 
                 sdd->SetUpdateTimeStep(portIndex, time);  // Request a time update
+                vtkAlgorithm *algorithm = mapper->GetInputConnection
+                  (portIndex, connectionIndex)->GetProducer();
+                vtkContourFilter *contourFilter = vtkContourFilter::SafeDownCast(algorithm);
+                vtkContourGrid *contourGrid = vtkContourGrid::SafeDownCast(algorithm);
+                if (contourFilter || contourGrid)
+                  {
+                  // workaround for contours which never redisplay if empty at one time
+                  algorithm->Modified();
+                  }
               }
             }
           }
