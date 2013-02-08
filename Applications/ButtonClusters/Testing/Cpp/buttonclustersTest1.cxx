@@ -31,7 +31,7 @@ int buttonclustersTest1(int argc, char * argv[])
 {
   QCoreApplication app(argc, argv);
   QString path = (argc > 2) ? ("\"" + QString(argv[2]) + "/") : "";
-  QString command = QString(path + "button_clusters\"");
+  QString command = QString(path + "ButtonClusters\"");
   QProcess process;
   process.start(command);
   bool res = process.waitForStarted();

@@ -12,10 +12,10 @@ set(LIBRARY_NAME msv${KIT})
 
 add_executable(msv${KIT}CxxTests ${Tests})
 target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
+
 #
 # Add Tests
 #
-
 add_test(
   NAME buttonclustersTest1
   COMMAND $<TARGET_FILE:msv${KIT}CxxTests> buttonclustersTest1
@@ -23,4 +23,3 @@ add_test(
 )
 
 SIMPLE_TEST( msvQButtonClustersMainWindowTest1 )
-SIMPLE_TEST( msvVTKButtonClustersTest1 )

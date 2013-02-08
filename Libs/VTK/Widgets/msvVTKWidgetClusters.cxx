@@ -604,7 +604,7 @@ void msvVTKWidgetClusters::SetRenderer(vtkRenderer* renderer)
 void msvVTKWidgetClusters::UpdateWidgets()
 {
   this->Clear();
-  if(!this->ClusteringEnabled)
+  if(!this->Clustering)
     {
     return;
     }
@@ -661,11 +661,8 @@ void msvVTKWidgetClusters::UpdateWidgets(vtkObject *   vtkNotUsed(caller),
     return;
     }
 
-  if(self->GetClusteringEnabled())
-    {
     self->UpdateWidgets();
     self->InvokeEvent (vtkCommand::UpdateDataEvent);
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -677,7 +674,7 @@ msvVTKWidgetClusters::msvVTKWidgetClusters()
   this->ColorLookUpTable->Build();
 
   this->UseImprovedClustering = false;
-  this->ClusteringEnabled     = true;
+  this->Clustering     = true;
   this->ButtonWidgetSize      = 3,
   this->PixelRadius           = 100;
   this->Renderer              = 0;

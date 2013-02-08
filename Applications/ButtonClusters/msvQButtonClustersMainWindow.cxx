@@ -247,34 +247,34 @@ void msvQButtonClustersMainWindowPrivate::showVolume(bool value)
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
 {
+  this->ButtonsManager->SetClustering(value);
   if(value)
-    {
-    this->ButtonsManager->ClusteringEnabledOn();
-    }
+  {
+    this->ButtonsManager->HideButtons();
+  }
   else
-    {
-    this->ButtonsManager->ClusteringEnabledOff();
+  {
     this->ButtonsManager->ShowButtons();
-    this->ButtonsManager->HideClusterButtons(1);
-    }
+  }
+  this->ButtonsManager->UpdateWidgets();
   this->update();
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::showLevel(int value)
 {
-  this->ButtonsManager->SetCustersButtonsVisibility(true);
-  if(value == 0)
+  int numberOfLevels = this->ButtonsManager->GetNumberOfLevels();
+  for(int i = 0; i < numberOfLevels; ++i)
+  {
+    if(i == value)
     {
-    this->Volume->VisibilityOn();
-    this->ButtonsManager->HideClusterButtons(1);
+    this->ButtonsManager->ShowClusterButtons(i);
     }
-  else
+    else
     {
-    this->SurfaceActor->VisibilityOn();
-    this->Volume->VisibilityOff();
-    this->ButtonsManager->HideClusterButtons(0);
+    this->ButtonsManager->HideClusterButtons(i);
     }
+  }
   this->updateView();
 }
 
@@ -356,24 +356,13 @@ void msvQButtonClustersMainWindowPrivate::update()
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::updateUi()
 {
-//   this->buttonsManager->ToggleShowClusters(
-//     this->ShowClusters->isChecked());
-//   this->buttonsManager->SetUseImprovedClustering(
-//     this->EnhanceClustering->isChecked());
-//   this->showLevel(this->ShowLevel->currentIndex());
-//   this->buttonsManager->ToggleShowClustersButtons(
-//     this->ShowClustersButtons->isChecked());
-  this->ButtonsManager->SetClusteringEnabled(this->EnableClustering->isChecked());
-  
   this->PixelRadius->setValue(this->ButtonsManager->GetPixelRadius());
-
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::updateView()
 {
   this->threeDView->GetRenderWindow()->Render();
-//   this->setLegend();
 }
 
 // ------------------------------------------------------------------------------
@@ -410,13 +399,18 @@ void msvQButtonClustersMainWindowPrivate::readSegmentedData(QDir dir, int level)
     reader->SetFileName(fileName.toLatin1().constData());
     reader->Update();
 
-    double point[3];
-    reader->GetOutput()->GetPoints()->GetPoint(0,point);
-    points->InsertNextPoint(point);
-    reader->GetOutput()->GetPoints()->GetPoint(
-      reader->GetOutput()->GetPoints()->GetNumberOfPoints()/2,point);
-    points->InsertNextPoint(point);
+    vtkIdType numPoints = reader->GetOutput()->GetPoints()->GetNumberOfPoints();
+    vtkIdType N = 10;
+    numPoints = numPoints > N ? numPoints/N : numPoints/(N/2);
 
+    for(vtkIdType i = 0; i < N; ++i)
+    {
+      double point[3] = {0};
+      reader->GetOutput()->GetPoints()->GetPoint(i*numPoints,point);
+      points->InsertNextPoint(point);
+    }
+    
+    
     // Add points to the widget manager
     this->ButtonsManager->SetDataSet(level,piece++,points.GetPointer());
 
