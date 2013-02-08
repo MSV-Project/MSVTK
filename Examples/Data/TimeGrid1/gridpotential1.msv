@@ -1,5 +1,10 @@
-# This doesn't animate potential with time because vtkMergeDataObjectFilter doesn't seem to propagate time
-#
+# Script for use with MSVTK Grid Viewer Demo Application
+# See: msvtk.org
+
+# Note this doesn't animate potential with time because
+# vtkMergeDataObjectFilter doesn't seem to propagate time
+# gridpotential2.msv is a workaround.
+
 msvVTKDataFileSeriesReader(potentialField
   READER vtkDataObjectReader TIMERANGE 0.0 10.0 FILES
   potential00.vtk potential01.vtk potential02.vtk potential03.vtk

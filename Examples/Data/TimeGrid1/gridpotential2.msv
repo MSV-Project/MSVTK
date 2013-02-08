@@ -1,5 +1,8 @@
+# Script for use with MSVTK Grid Viewer Demo Application
+# See: msvtk.org
+
 # This works only by needlessly making constant gridReader a time series reader
-#
+
 msvVTKDataFileSeriesReader(potentialField
   READER vtkDataObjectReader TIMERANGE 0.0 10.0 FILES
   potential00.vtk potential01.vtk potential02.vtk potential03.vtk
