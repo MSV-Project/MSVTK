@@ -66,9 +66,9 @@ public:
 
   // Description:
   // Set / Get the clustering status
-  vtkSetMacro(ClusteringEnabled,bool);
-  vtkGetMacro(ClusteringEnabled,bool);
-  vtkBooleanMacro(ClusteringEnabled,bool);
+  vtkSetMacro(Clustering,bool);
+  vtkGetMacro(Clustering,bool);
+  vtkBooleanMacro(Clustering,bool);
 
   // Description:
   // Set / Get the size of the button reprensentation
@@ -133,7 +133,7 @@ protected:
   double       ButtonWidgetSize;
   double       PixelRadius;
   bool         UseImprovedClustering;
-  bool         ClusteringEnabled;
+  bool         Clustering;
   vtkRenderer* Renderer;
 
 private:
