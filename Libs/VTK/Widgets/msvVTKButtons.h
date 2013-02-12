@@ -19,7 +19,9 @@
 ==============================================================================*/
 // .NAME msvVTKButtons -
 // .SECTION Description
-//
+// Wrapper around a vtk widget that adds extra functionalities
+// such as controlling the renderer current camera to zoom on the associated
+// data on click.
 
 // .SECTION See Also
 //
