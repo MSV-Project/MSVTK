@@ -17,7 +17,8 @@
 #  limitations under the License.
 #
 ###########################################################################
-
+#! \brief Add a ctest test and add the Qt library path to the PATH environment
+#! variable.
 macro(msv_test TEST_NAME)
   add_test(NAME ${TEST_NAME} COMMAND ${ARGN})
   if (WIN32)
@@ -31,12 +32,14 @@ macro(msv_test TEST_NAME)
   endif()
 endmacro()
 
+#! \brief Add ctest test.
 macro(simple_test TEST_NAME)
   msv_test(${TEST_NAME}
     $<TARGET_FILE:msv${KIT}CxxTests> ${TEST_NAME} ${ARGN}
     )
 endmacro()
 
+#! \brief Add ctest test with data as input.
 macro(simple_test_with_data TEST_NAME)
   simple_test(${TEST_NAME} ${ARGN} -D "${PROJECT_SOURCE_DIR}/Testing/Data/")
 endmacro()

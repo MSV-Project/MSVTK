@@ -24,7 +24,7 @@
 #!                             the generated executable.
 #! \param NAMESPACE &lt;namespace&gt; (optional) Supply a C++ namespace in
 #!                                    which the generated function declrarations
-      #!                              should be wrapped.
+#!                                    should be wrapped.
 #!
 #! \return This function sets the <code>CMakeDoxygenFilter_EXECUTABLE</code>
 #!         variable to the absolute path of the generated input filter executable
