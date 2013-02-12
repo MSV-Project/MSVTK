@@ -85,7 +85,7 @@ public:
 };
 
 //------------------------------------------------------------------------------
-// msvQECGMainWindowPrivate methods
+// msvQTimePlayerWidgetPrivate methods
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidgetPrivate::msvQTimePlayerWidgetPrivate
@@ -217,8 +217,8 @@ void msvQTimePlayerWidgetPrivate::setupUi(QWidget* widget)
   // Connect Menu ToolBars actions
   q->connect(this->firstFrameButton, SIGNAL(pressed()), q, SLOT(goToFirstFrame()));
   q->connect(this->previousFrameButton, SIGNAL(pressed()), q, SLOT(goToPreviousFrame()));
-  q->connect(this->playButton, SIGNAL(toggled(bool)), q, SLOT(onPlay(bool)));
-  q->connect(this->playReverseButton, SIGNAL(toggled(bool)), q, SLOT(onPlayReverse(bool)));
+  q->connect(this->playButton, SIGNAL(toggled(bool)), q, SLOT(playForward(bool)));
+  q->connect(this->playReverseButton, SIGNAL(toggled(bool)), q, SLOT(playBackward(bool)));
   q->connect(this->nextFrameButton, SIGNAL(pressed()), q, SLOT(goToNextFrame()));
   q->connect(this->lastFrameButton, SIGNAL(pressed()), q, SLOT(goToLastFrame()));
   q->connect(this->speedFactorSpinBox, SIGNAL(valueChanged(double)), q, SLOT(setPlaySpeed(double)));
@@ -321,7 +321,7 @@ bool msvQTimePlayerWidgetPrivate::isConnected()
 }
 
 //------------------------------------------------------------------------------
-// msvQECGMainWindow methods
+// msvQTimePlayerWidget methods
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidget::msvQTimePlayerWidget(QWidget* parentWidget)
@@ -497,14 +497,14 @@ void msvQTimePlayerWidget::stop()
 }
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::onPlay(bool play)
+void msvQTimePlayerWidget::playForward(bool play)
 {
   this->setDirection(QAbstractAnimation::Forward);
   this->play(play);
 }
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::onPlayReverse(bool play)
+void msvQTimePlayerWidget::playBackward(bool play)
 {
   this->setDirection(QAbstractAnimation::Backward);
   this->play(play);
@@ -529,7 +529,7 @@ void msvQTimePlayerWidget::onTick()
   if (d->playButton->isChecked() && !d->playReverseButton->isChecked()) {
     if (timeRequest > pipeInfo.timeRange[1] && !d->repeatButton->isChecked()) {
       d->processRequest(pipeInfo, timeRequest);
-      this->onPlay(false);
+      this->playForward(false);
       return;
     }
     else if (timeRequest > pipeInfo.timeRange[1] &&
@@ -541,7 +541,7 @@ void msvQTimePlayerWidget::onTick()
   else if (!d->playButton->isChecked() && d->playReverseButton->isChecked()) {
     if (timeRequest < pipeInfo.timeRange[0] && !d->repeatButton->isChecked()) {
       d->processRequest(pipeInfo, timeRequest);
-      this->onPlayReverse(false);
+      this->playBackward(false);
       return;
     }
     else if (timeRequest < pipeInfo.timeRange[0] &&
@@ -584,7 +584,7 @@ void msvQTimePlayerWidget::setPlaySpeed(double speedFactor)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::setfirstFrameIcon(const QIcon& ico)
+void msvQTimePlayerWidget::setFirstFrameIcon(const QIcon& ico)
 {
   Q_D(msvQTimePlayerWidget);
   d->firstFrameButton->setIcon(ico);

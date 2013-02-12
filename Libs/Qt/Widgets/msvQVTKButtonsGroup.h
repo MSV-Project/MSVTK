@@ -37,11 +37,9 @@ class vtkCommand;
 // Pimpl
 class msvQVTKButtonsGroupPrivate;
 
-/**
-Class name: msvQVTKButtonsGroup
-Manager class to manage groups of msvQVTKButtons
-*/
-
+/// \brief Qt wrapper around msvVTKButtonsGroup.
+/// It exposes Qt signal/slot mechanism for a msvVTKButtonsGroup.
+/// \sa msvVTKButtonsGroup
 class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface
 {
   Q_OBJECT

@@ -35,14 +35,22 @@ class vtkDataSet;
 // Pimpl
 class msvQVTKButtonsPrivate;
 
-/**
- Class name: msvQVTKButtons
- This is the tool representing a VTK buttons.
- */
+/// \brief Qt wrapper around msvVTKButtons.
+/// It exposes Qt signal/slot mechanism for a msvVTKButtons.
+/// \sa msvVTKButtons
 class MSV_QT_WIDGETS_EXPORT msvQVTKButtons : public msvQVTKButtonsInterface
 {
   Q_OBJECT
+  /// This property controls the camera behavior on click.
+  /// If true, the camera smoothly "flies" from the current position to the
+  /// location of the button, otherwise it "jumps" to its destination.
+  /// \sa flyTo(), setFlyTo()
   Q_PROPERTY(bool flyTo READ flyTo WRITE setFlyTo);
+  /// This property controls the location of the button with regard to the
+  /// bounding box of the data.
+  /// If true, the button is located on the center of the data, otherwise it is
+  /// on the lower left corner of the data
+  /// \sa onCenter(), setOnCenter()
   Q_PROPERTY(bool onCenter READ onCenter WRITE setOnCenter);
 
 public Q_SLOTS:
@@ -50,6 +58,7 @@ public Q_SLOTS:
   /*virtual*/ void update();
 
   /// Allow to set button position on center or on corner
+  /// \sa onCenter, onCenter()
   void setOnCenter(bool onCenter);
 
 public:
@@ -64,24 +73,29 @@ public:
   //void setIconFileName(QString iconFileName);
 
   // Allow to activate FlyTo animation
+  /// \sa flyTo, flyTo()
   void setFlyTo(bool active);
 
-  /// set bounds
+  /// Set the boundaries of the button's data.
+  /// \sa onCenter, setData()
   void setBounds(double b[6]);
 
-  /// Get the button preview image
+  /// Get the button preview image.
   QImage getPreview(int width, int height);
 
-  /// set the data for preview
+  /// Set the data for preview.
+  /// \sa getPreview, setBounds()
   void setData(vtkDataSet *data);
 
-  /// Return FlyTo flag
+  /// Return the flyTo flag.
+  /// \sa flyTo, setFlyTo()
   bool flyTo();
 
-  /// Return OnCenter flag
+  /// Return true if the button is centered, false otherwise.
+  /// \sa onCenter, setOnCenter()
   bool onCenter();
 
-  // Set the current renderer
+  // Set the renderer the button must be added into.
   void setCurrentRenderer(vtkRenderer *renderer);
 
 protected:

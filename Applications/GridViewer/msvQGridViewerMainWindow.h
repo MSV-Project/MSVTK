@@ -33,6 +33,7 @@
 class msvQGridViewerMainWindowPrivate;
 class QListWidgetItem;
 
+/// \brief Main window for the GridViewer demo.
 class MSV_GridViewer_EXPORT msvQGridViewerMainWindow : public QMainWindow
 {
   Q_OBJECT

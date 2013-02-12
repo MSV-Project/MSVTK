@@ -32,6 +32,7 @@
 
 class msvQGridViewerAboutDialogPrivate;
 
+/// \brief About dialog for the GridViewer demo.
 class MSV_GridViewer_EXPORT msvQGridViewerAboutDialog : public QDialog
 {
   Q_OBJECT

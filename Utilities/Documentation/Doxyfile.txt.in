@@ -55,7 +55,7 @@ PROJECT_NUMBER         = @MSVTK_VERSION@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description for a project that appears at the top of each page and should give viewer a quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "MSVTK is a community effort to provide support multi scale visualization."
+PROJECT_BRIEF          = "The multi scale visualisation toolkit."
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is
 # included in the documentation. The maximum height of the logo should not
@@ -873,7 +873,7 @@ COLS_IN_ALPHA_INDEX    = 3
 # The IGNORE_PREFIX tag can be used to specify one or more prefixes that
 # should be ignored while generating the index headers.
 
-IGNORE_PREFIX          = ctk
+IGNORE_PREFIX          = msv
 
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output

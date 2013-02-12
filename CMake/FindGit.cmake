@@ -101,6 +101,7 @@ find_program(GIT_EXECUTABLE ${git_names}
 mark_as_advanced(GIT_EXECUTABLE)
 
 if(GIT_EXECUTABLE)
+  #! \brief Extract information of a git working copy at a given location
   macro(GIT_WC_INFO dir prefix)
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify -q --short=7 HEAD
        WORKING_DIRECTORY ${dir}

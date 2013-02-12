@@ -17,7 +17,7 @@
 #  limitations under the License.
 #
 ###########################################################################
-
+#! \brief Automatically create dependencies between external projects.
 macro(msvMacroCheckExternalProjectDependency proj)
   # Set indent variable if needed
   if(NOT DEFINED __indent)

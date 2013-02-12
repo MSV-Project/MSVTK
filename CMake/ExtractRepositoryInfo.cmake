@@ -36,40 +36,37 @@
 #  and was partially funded by NIH grant 3P41RR013218-12S1
 #
 ################################################################################
-
-#
-# The following CMake macro will attempt to 'guess' which type of repository is
-# associated with the current source directory. Then, base on the type of repository,
-# it will extract its associated information.
-#
-
-#
-# extract_repository_info(VAR_PREFIX <var-prefix> [SOURCE_DIR <dir>])
-#
-# If no SOURCE_DIR is provided, it will default to CMAKE_CURRENT_SOURCE_DIR.
-#
-# The macro will define the following variables:
-#  <var-prefix>_WC_TYPE - Either 'git', 'svn' or 'local' - The type will also be 'svn' if 'git-svn' is used.
-#
-# If a GIT repository is associated with SOURCE_DIR, the macro
-# will define the following variables:
-#  <var-prefix>_WC_URL - url of the repository (at SOURCE_DIR)
-#  <var-prefix>_WC_ROOT - Same value as working copy URL
-#  <var-prefix>_WC_REVISION_NAME - url of the repository (at SOURCE_DIR)
-#  <var-prefix>_WC_REVISION_HASH - current revision
-#  <var-prefix>_WC_REVISION - Equal to <var-prefix>_WC_REVISION_HASH if not a git-svn repository
-#
-# If a SVN or GIT-SVN repository is associated with SOURCE_DIR, the macro
-# will define the following variables:
-#  <var-prefix>_WC_URL - url of the repository (at SOURCE_DIR)
-#  <var-prefix>_WC_ROOT - root url of the associated SVN repository
-#  <var-prefix>_WC_REVISION - current revision
-#  <var-prefix>_WC_LAST_CHANGED_AUTHOR - author of last commit
-#  <var-prefix>_WC_LAST_CHANGED_DATE - date of last commit
-#  <var-prefix>_WC_LAST_CHANGED_REV - revision of last commit
-#  <var-prefix>_WC_INFO
-#
-
+#!
+#! \brief Attempt to 'guess' which type of repository is associated with the
+#! current source directory. Then, base on the type of repository,
+#! it will extract its associated information.
+#!
+#! extract_repository_info(VAR_PREFIX <var-prefix> [SOURCE_DIR <dir>])
+#!
+#! If no SOURCE_DIR is provided, it will default to CMAKE_CURRENT_SOURCE_DIR.
+#!
+#! The macro will define the following variables:
+#!  <var-prefix>_WC_TYPE - Either 'git', 'svn' or 'local' - The type will also be 'svn' if 'git-svn' is used.
+#!
+#! If a GIT repository is associated with SOURCE_DIR, the macro
+#! will define the following variables:
+#!  <var-prefix>_WC_URL - url of the repository (at SOURCE_DIR)
+#!  <var-prefix>_WC_ROOT - Same value as working copy URL
+#!  <var-prefix>_WC_REVISION_NAME - url of the repository (at SOURCE_DIR)
+#!  <var-prefix>_WC_REVISION_HASH - current revision
+#!  <var-prefix>_WC_REVISION - Equal to <var-prefix>_WC_REVISION_HASH if not a git-svn repository
+#!
+#! If a SVN or GIT-SVN repository is associated with SOURCE_DIR, the macro
+#! will define the following variables:
+#!  <var-prefix>_WC_URL - url of the repository (at SOURCE_DIR)
+#!  <var-prefix>_WC_ROOT - root url of the associated SVN repository
+#!  <var-prefix>_WC_REVISION - current revision
+#!  <var-prefix>_WC_LAST_CHANGED_AUTHOR - author of last commit
+#!  <var-prefix>_WC_LAST_CHANGED_DATE - date of last commit
+#!  <var-prefix>_WC_LAST_CHANGED_REV - revision of last commit
+#!  <var-prefix>_WC_INFO
+#!
+#! \ingroup CMakeUtilities
 macro(extract_repository_info)
   include(CMakeParseArguments)
   set(options)
