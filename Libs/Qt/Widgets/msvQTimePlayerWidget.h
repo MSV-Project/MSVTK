@@ -237,8 +237,12 @@ public slots:
   /// Call play() on true, pause() on false.
   /// \sa play(), pause()
   void play(bool playPause);
-  void onPlay(bool);
-  void onPlayReverse(bool);
+  /// Browse the time steps in the forward order.
+  /// \sa playBackward(), play(), orientation
+  void playForward(bool playPause);
+  /// Browse the time steps in the backward order.
+  /// \sa playForward(), play(), orientation
+  void playBackward(bool playPause);
   /// Stop the browsing of the time steps and go back to the first frame.
   /// \sa play(), pause()
   void stop();
