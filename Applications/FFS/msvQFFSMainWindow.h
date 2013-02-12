@@ -32,6 +32,7 @@
 
 class msvQFFSMainWindowPrivate;
 
+/// \brief Main window for the FFS demo.
 class MSV_FFS_EXPORT msvQFFSMainWindow : public QMainWindow
 {
   Q_OBJECT

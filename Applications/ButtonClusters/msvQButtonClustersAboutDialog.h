@@ -32,6 +32,7 @@
 
 class msvQButtonClustersAboutDialogPrivate;
 
+/// \brief About dialog for the ButtonClusters demo.
 class MSV_ButtonClusters_EXPORT msvQButtonClustersAboutDialog : public QDialog
 {
   Q_OBJECT

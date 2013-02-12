@@ -37,63 +37,84 @@ class msvVTKButtonsInterface;
 // Pimpl
 class msvQVTKButtonsInterfacePrivate;
 
-/**
- Class name: msvQVTKButtonsInterface
- Interface class for buttons generalization
- */
+/// \brief Qt wrapper around msvVTKButtonsInterface.
+/// It exposes Qt signal/slot mechanism for a msvVTKButtonsInterface.
+/// \sa msvVTKButtonsInterface
 class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsInterface : public QObject {
   Q_OBJECT
+  /// \sa label(), setLabel(), showLabel
   Q_PROPERTY(QString label READ label WRITE setLabel);
+  /// This property controls the text shown on mouse over. The text can be
+  /// html code and therefore can contain images/tables/urls...
+  /// \sa toolTip(), setToolTip(), showTooltip
   Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip);
+  /// \sa image(), setImage()
   //Q_PROPERTY(QString image READ image WRITE setImage);
+  /// This property controls whether the button is visible or not.
+  /// \sa showButton(), setShowButton()
   Q_PROPERTY(bool showButton READ showButton WRITE setShowButton);
+  /// This property controls whether the label of the button is visible or not.
+  /// \sa showLabel(), setShowLabel(), label
   Q_PROPERTY(bool showLabel READ showLabel WRITE setShowLabel);
+  /// This property controls whether the tooltip are shown on mouse over.
+  /// \sa showToolTip(), setShowTooltip(), toolTip
+  Q_PROPERTY(bool showTooltip WRITE setShowTooltip);
 
 public:
   /// Object constructor
   msvQVTKButtonsInterface(QObject *parent = 0);
-
-  /// Allow to show/hide button
-  void setShowButton(bool visible);
-
-  /// Return showLabel flag
-  bool showButton();
-
-  /// Allow to show/hide label
-  void setShowLabel(bool show);
-
-  /// set the icon path
-  void setImage(QImage image);
-
-  /// Get the icon path
-  //QString image();
-
-  /// Return showLabel flag
-  bool showLabel();
-
-  /// set the text label
-  void setLabel(QString text);
-
-  /// Get The string
-  QString label();
-
-  /// set the tooltip string
-  void setToolTip(QString text);
-
-  /// Get the tooltip string
-  QString toolTip();
-
   /// Object destructor.
   virtual ~msvQVTKButtonsInterface();
 
-  /// retrieve button pointer.
+  /// Show/hide button in the renderer.
+  /// \sa showButton, showButton()
+  void setShowButton(bool visible);
+
+  /// Return true if the button is visible.
+  /// \sa showButton, setShowButton()
+  bool showButton();
+
+  /// Show/hide the label(text) of the button.
+  /// \sa showLabel, showLabel()
+  void setShowLabel(bool show);
+
+  /// Set the icon of the button.
+  /// \sa image, image()
+  void setImage(QImage image);
+
+  /// Return the icon of the button.
+  /// \sa image, setImage()
+  //QString image();
+
+  /// Return true if the label is visible, false otherwise.
+  /// \sa showLabel, setShowLabel()
+  bool showLabel();
+
+  /// Set the text label.
+  /// \sa label, label()
+  void setLabel(QString text);
+
+  /// Return the text label.
+  /// \sa label, setLabel()
+  QString label();
+
+  /// Set the tooltip that is visible on mouse hover.
+  /// \sa tooltip, tooltip()
+  void setToolTip(QString text);
+
+  /// Return the tooltip of the button.
+  /// \sa toolTip, setToolTip()
+  QString toolTip();
+
+  /// Set the tooltip visibility.
+  /// \sa showTooltip
+  void setShowTooltip(bool value);
+
+  /// Return the button widget.
   vtkButtonWidget *button();
 
-  /// add vtk button to Renderer
+  /// Add vtk button to Renderer.
   virtual void setCurrentRenderer(vtkRenderer *renderer)=0;
-
-  /// set the show/hide signal
-  void setShowTooltip(bool value);
 
   /// update graphic objects
   virtual void update() = 0;

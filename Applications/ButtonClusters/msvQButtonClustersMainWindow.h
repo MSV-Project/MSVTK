@@ -33,8 +33,9 @@ class QListWidgetItem;
 
 class msvQButtonClustersMainWindowPrivate;
 
-class MSV_ButtonClusters_EXPORT msvQButtonClustersMainWindow : public
-                                QMainWindow
+/// \brief Main window for the ButtonClusters demo
+class MSV_ButtonClusters_EXPORT msvQButtonClustersMainWindow
+  : public QMainWindow
 {
   Q_OBJECT
   QVTK_OBJECT

@@ -24,14 +24,12 @@
 // Qt includes
 #include <QDialog>
 
-// CTK includes
-#include <ctkPimpl.h>
-
 // ECG includes
 #include "msvECGExport.h"
 
 class msvQECGAboutDialogPrivate;
 
+/// \brief About dialog for the ECG demo.
 class MSV_ECG_EXPORT msvQECGAboutDialog : public QDialog
 {
   Q_OBJECT

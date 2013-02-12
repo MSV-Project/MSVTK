@@ -85,7 +85,7 @@ public:
 };
 
 //------------------------------------------------------------------------------
-// msvQECGMainWindowPrivate methods
+// msvQTimePlayerWidgetPrivate methods
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidgetPrivate::msvQTimePlayerWidgetPrivate
@@ -321,7 +321,7 @@ bool msvQTimePlayerWidgetPrivate::isConnected()
 }
 
 //------------------------------------------------------------------------------
-// msvQECGMainWindow methods
+// msvQTimePlayerWidget methods
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidget::msvQTimePlayerWidget(QWidget* parentWidget)
@@ -584,7 +584,7 @@ void msvQTimePlayerWidget::setPlaySpeed(double speedFactor)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::setfirstFrameIcon(const QIcon& ico)
+void msvQTimePlayerWidget::setFirstFrameIcon(const QIcon& ico)
 {
   Q_D(msvQTimePlayerWidget);
   d->firstFrameButton->setIcon(ico);
