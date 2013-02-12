@@ -128,7 +128,7 @@ public:
   /// \sa previousFrameIcon
   void setPreviousFrameIcon(const QIcon&);
   /// Return the previous frame icon.
-  /// \s previousFrameIcon
+  /// \sa previousFrameIcon
   QIcon previousFrameIcon() const;
   /// Set the play icon.
   /// \sa playIcon
