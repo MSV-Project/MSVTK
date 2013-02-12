@@ -36,6 +36,95 @@ set(PROJECT_NAME "@PROJECT_NAME@")
 #
 set(OUTPUT_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@")
 
+# INTERMEDIATE_DOX_DIR:
+# Directory where the intermediate Doxygen files should be stored (mainly
+# these headers files converted from the VTK format to the Doxygen format).
+# This directory is erased at the end of this script, unless you comment
+# the corresponding line.
+# DOXTEMP might be used to simplify the syntax.
+# Example:
+#   DOXTEMP=DOXTEMP=@VTK_BINARY_DIR@/Utilities/Doxygen
+#   INTERMEDIATE_DOX_DIR=$DOXTEMP/dox
+#
+set(DOXTEMP "@CMAKE_CURRENT_BINARY_DIR@")
+set(INTERMEDIATE_DOX_DIR "${DOXTEMP}/dox")
+
+# SOURCE_DIR:
+# Source directory. The top directory of the source files.
+# Example:
+#   SOURCE_DIR=@VTK_SOURCE_DIR@
+#
+set(SOURCE_DIR "@PROJECT_SOURCE_DIR@")
+
+# REL_PATH_TO_TOP:
+# Relative path from the top directory of the source files to the directory
+# (or top directory) holding the files to document. Useful if several parts
+# of the same source directory should be documented separately.
+# Example:
+#   REL_PATH_TO_TOP=.
+#   REL_PATH_TO_TOP=framework/src
+set(REL_PATH_TO_TOP "Libs/VTK")
+
+# ----------------------------------------------------------------------------
+# SOURCE_DIRECTORIES
+#
+# This list is processed by several perl scripts below. Keeping it in one
+# list avoids the possiblity that multiple lists might get out of sync with
+# rushed edits...
+#
+set(SOURCE_DIRECTORIES
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Charts"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Chemistry"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Common"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Filtering"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/GenericFiltering"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/GenericFiltering/Testing/Cxx"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Geovis"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Graphics"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/GUISupport/MFC"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/GUISupport/Qt"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Hybrid"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Imaging"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Infovis"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/IO"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Parallel"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Rendering"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/TextAnalysis"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Views"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/VolumeRendering"
+  "${SOURCE_DIR}/${REL_PATH_TO_TOP}/Widgets"
+)
+
+# ----------------------------------------------------------------------------
+# Convert the VTK headers to the Doxygen format.
+
+set(PATH_TO_VTK_DOX_SCRIPTS "@CMAKE_CURRENT_SOURCE_DIR@")
+execute_process(COMMAND ${PERL}
+  "${PATH_TO_VTK_DOX_SCRIPTS}/doc_header2doxygen.pl"
+  --to "${INTERMEDIATE_DOX_DIR}"
+  --relativeto "${SOURCE_DIR}"
+  -v
+  ${SOURCE_DIRECTORIES}
+  RESULT_VARIABLE rv
+)
+
+# ----------------------------------------------------------------------------
+# Generate documentation
+
+execute_process(
+  COMMAND "@DOXYGEN_EXECUTABLE@" "${OUTPUT_DIRECTORY}/UserDoxyfile.txt"
+  WORKING_DIRECTORY ${OUTPUT_DIRECTORY}
+  RESULT_VARIABLE rv
+  )
+
+if(rv)
+  message(FATAL_ERROR "error: Failed to generate documentation")
+endif()
+
+# ----------------------------------------------------------------------------
+# Create the *.tar.gz file
+
+
 # DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY:
 # Path to the Doxygen output directory (where the resulting archive(s) should be stored).
 # Example:
@@ -59,23 +148,6 @@ if (IS_RELEASE)
   set(SUFFIX "-@MSVTK_VERSION@${SUFFIX}")
 endif()
 set(RESULTING_HTML_TARZ_ARCHIVE_FILE "${DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY}/${PROJECT_NAME}${SUFFIX}.tar.gz")
-
-
-# ----------------------------------------------------------------------------
-# Generate documentation
-
-execute_process(
-  COMMAND "@DOXYGEN_EXECUTABLE@" "${OUTPUT_DIRECTORY}/UserDoxyfile.txt"
-  WORKING_DIRECTORY ${OUTPUT_DIRECTORY}
-  RESULT_VARIABLE rv
-  )
-
-if(rv)
-  message(FATAL_ERROR "error: Failed to generate documentation")
-endif()
-
-# ----------------------------------------------------------------------------
-# Create the *.tar.gz file
 
 #step(1 "build *.tar.gz file")
 if(CREATE_HTML_TARZ_ARCHIVE)
