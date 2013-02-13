@@ -1,22 +1,22 @@
 /*==============================================================================
 
-  Library: MSVTK
+   Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+   Copyright (c) Kitware Inc.
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0.txt
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
-==============================================================================*/
+   ==============================================================================*/
 // .NAME msvVTKWidgetClusters - button de-clutering manager
 // .SECTION Description
 // This class implements a button clustering strategy to decluter buttons from
@@ -41,6 +41,7 @@ class vtkInformationIntegerVectorKey;
 class vtkLookupTable;
 class vtkPoints;
 class vtkRenderer;
+class vtkImageData;
 
 class MSV_VTK_WIDGETS_EXPORT msvVTKWidgetClusters : public vtkObject
 {
@@ -86,12 +87,17 @@ public:
   vtkSetMacro(ClusteringWithinGroups,bool);
   vtkGetMacro(ClusteringWithinGroups,bool);
   vtkBooleanMacro(ClusteringWithinGroups,bool);
+  
+  // Description:
+  // Set / Get button icon
+  virtual void SetButtonIcon(vtkImageData *arg);
+  vtkGetMacro(ButtonIcon,vtkImageData*);
 
   // Description:
   // Set / Get the size of the button reprensentation
   virtual void SetColorLookUpTable(vtkLookupTable *arg);
   vtkGetMacro(ColorLookUpTable,vtkLookupTable*);
-  
+
   // Description:
   // Add widget positions
   virtual void SetDataSet(size_t group, size_t idx,
@@ -114,7 +120,7 @@ public:
   // Description:
   // Returns the number of groups.
   size_t GetNumberOfLevels();
-  
+
   static vtkInformationIdTypeKey* CLUSTER_IDX();
   static vtkInformationIdTypeKey* DATASET_BUTTONS_OFFSET();
   static vtkInformationIntegerVectorKey* CLUSTER_BUTTONS_OFFSET();
@@ -158,7 +164,9 @@ private:
   vtkInternal* Internal;
 
   vtkLookupTable *ColorLookUpTable;
-  
+
+  vtkImageData *ButtonIcon;
+
 };
 
 #endif // __msvVTKWidgetClusters_h

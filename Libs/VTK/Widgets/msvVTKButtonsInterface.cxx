@@ -64,6 +64,10 @@ msvVTKButtonsInterface::~msvVTKButtonsInterface()
     delete[] this->LabelText;
     this->LabelText = NULL;
     }
+  if(this->ButtonWidget != NULL)
+  {
+    this->ButtonWidget->Delete();
+  }
 }
 
 //----------------------------------------------------------------------

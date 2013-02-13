@@ -42,6 +42,7 @@
 #include "vtkNew.h"
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkPNGReader.h"
 #include "vtkPolyDataReader.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
@@ -84,6 +85,7 @@ protected:
 
   // buttonsManager
   vtkSmartPointer<msvVTKWidgetClusters> ButtonsManager;
+  vtkSmartPointer<vtkPNGReader>         buttonsIcon;
 
   class EndInteractionCallbackCommand;
   EndInteractionCallbackCommand *EndInteractionCommand;
@@ -206,9 +208,12 @@ msvQButtonClustersMainWindowPrivate::msvQButtonClustersMainWindowPrivate(
   this->VolumeProperty->SetSpecular(0.2);
 
   // Set the buttons manager
+  this->buttonsIcon = vtkSmartPointer<vtkPNGReader>::New();
+  this->buttonsIcon->SetFileName("Resources/Logo/icon.png");
+  this->buttonsIcon->Update();
   this->ButtonsManager = vtkSmartPointer<msvVTKWidgetClusters>::New();
   this->ButtonsManager->SetUseImprovedClustering(true);
-
+  this->ButtonsManager->SetButtonIcon(this->buttonsIcon->GetOutput());
   // Set interaction callback to track when interaction ended
   this->EndInteractionCommand       = EndInteractionCallbackCommand::New();
   this->EndInteractionCommand->Self = this;
@@ -283,7 +288,7 @@ void msvQButtonClustersMainWindowPrivate::setPixelRadius(double value)
 {
   this->ButtonsManager->SetPixelRadius(value);
   this->ButtonsManager->UpdateWidgets();
-  this->update();
+  this->updateView();
 }
 
 // ------------------------------------------------------------------------------
@@ -358,7 +363,7 @@ void msvQButtonClustersMainWindowPrivate::update()
 void msvQButtonClustersMainWindowPrivate::updateUi()
 {
   this->enableClustering(this->EnableClustering->isChecked());
-  this->PixelRadius->setValue(this->ButtonsManager->GetPixelRadius());
+  this->setPixelRadius(this->PixelRadius->value());
 }
 
 // ------------------------------------------------------------------------------

@@ -119,6 +119,10 @@ public:
   // Calculate position (center or corner)
   void CalculatePosition();
 
+  // Description:
+  // Get the size of the elemets array
+  size_t GetNumberOfElements();
+
 protected:
   // Object constructor
   msvVTKButtonsGroup();
