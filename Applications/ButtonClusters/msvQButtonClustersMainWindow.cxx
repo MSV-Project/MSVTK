@@ -1,22 +1,22 @@
 /*==============================================================================
 
-  Library: MSVTK
+   Library: MSVTK
 
-  Copyright (c) Kitware Inc.
+   Copyright (c) Kitware Inc.
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
       http://www.apache.org/licenses/LICENSE-2.0.txt
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
-==============================================================================*/
+   ==============================================================================*/
 
 // Qt includes
 #include <QDebug>
@@ -41,6 +41,7 @@
 #include "vtkNew.h"
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkPNGReader.h"
 #include "vtkPolyDataReader.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
@@ -66,10 +67,10 @@ protected:
   vtkSmartPointer<vtkOrientationMarkerWidget> OrientationMarker;
   vtkSmartPointer<vtkAxesActor>               Axes;
   vtkSmartPointer<vtkRenderer>                ThreeDRenderer;
-  
+
   // Segmentation Pipeline
   vtkSmartPointer<vtkAppendPolyData> PolyDataMerger;
-  
+
   // Volume Pipeline
   vtkSmartPointer<vtkStructuredPointsReader> VolumeDataReader;
   vtkSmartPointer<vtkPiecewiseFunction>      ScalarOpacity;
@@ -79,11 +80,12 @@ protected:
   vtkSmartPointer<vtkVolumeProperty>         VolumeProperty;
   vtkSmartPointer<vtkVolume>                 Volume;
 
-  vtkSmartPointer<vtkPolyDataMapper>       SurfaceMapper;
-  vtkSmartPointer<vtkActor>                SurfaceActor;
+  vtkSmartPointer<vtkPolyDataMapper> SurfaceMapper;
+  vtkSmartPointer<vtkActor>          SurfaceActor;
 
   // buttonsManager
   vtkSmartPointer<msvVTKWidgetClusters> ButtonsManager;
+  vtkSmartPointer<vtkPNGReader>         buttonsIcon;
 
   class EndInteractionCallbackCommand;
   EndInteractionCallbackCommand *EndInteractionCommand;
@@ -155,7 +157,7 @@ msvQButtonClustersMainWindowPrivate::msvQButtonClustersMainWindowPrivate(
   this->ThreeDRenderer->SetGradientBackground(true);
 
   this->Axes = vtkSmartPointer<vtkAxesActor>::New();
-  
+
   this->OrientationMarker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
   this->OrientationMarker->SetOutlineColor(0.9300, 0.5700, 0.1300);
   this->OrientationMarker->SetOrientationMarker(Axes);
@@ -209,9 +211,12 @@ msvQButtonClustersMainWindowPrivate::msvQButtonClustersMainWindowPrivate(
   this->Volume->SetProperty(this->VolumeProperty);
 
   // Set the buttons manager
+  this->buttonsIcon = vtkSmartPointer<vtkPNGReader>::New();
+  this->buttonsIcon->SetFileName("Resources/Logo/icon.png");
+  this->buttonsIcon->Update();
   this->ButtonsManager = vtkSmartPointer<msvVTKWidgetClusters>::New();
   this->ButtonsManager->SetUseImprovedClustering(true);
-
+  this->ButtonsManager->SetButtonIcon(this->buttonsIcon->GetOutput());
   // Set interaction callback to track when interaction ended
   this->EndInteractionCommand       = EndInteractionCallbackCommand::New();
   this->EndInteractionCommand->Self = this;
@@ -249,13 +254,13 @@ void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
 {
   this->ButtonsManager->SetClustering(value);
   if(value)
-  {
+    {
     this->ButtonsManager->HideButtons();
-  }
+    }
   else
-  {
+    {
     this->ButtonsManager->ShowButtons();
-  }
+    }
   this->ButtonsManager->UpdateWidgets();
   this->update();
 }
@@ -265,16 +270,16 @@ void msvQButtonClustersMainWindowPrivate::showLevel(int value)
 {
   int numberOfLevels = this->ButtonsManager->GetNumberOfLevels();
   for(int i = 0; i < numberOfLevels; ++i)
-  {
+    {
     if(i == value)
-    {
-    this->ButtonsManager->ShowClusterButtons(i);
-    }
+      {
+      this->ButtonsManager->ShowClusterButtons(i);
+      }
     else
-    {
-    this->ButtonsManager->HideClusterButtons(i);
+      {
+      this->ButtonsManager->HideClusterButtons(i);
+      }
     }
-  }
   this->updateView();
 }
 
@@ -320,7 +325,7 @@ void msvQButtonClustersMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   q->connect(this->actionClose, SIGNAL(triggered()), q, SLOT(closeData()));
   q->connect(this->actionExit, SIGNAL(triggered()), q, SLOT(close()));
   q->connect(this->actionAboutButtonClustersApplication, SIGNAL(triggered()),
-             q, SLOT(aboutApplication()));
+    q, SLOT(aboutApplication()));
 
   // Customize QAction icons with standard pixmaps
   QIcon dirIcon         = q->style()->standardIcon(QStyle::SP_DirIcon);
@@ -400,17 +405,17 @@ void msvQButtonClustersMainWindowPrivate::readSegmentedData(QDir dir, int level)
     reader->Update();
 
     vtkIdType numPoints = reader->GetOutput()->GetPoints()->GetNumberOfPoints();
-    vtkIdType N = 10;
+    vtkIdType N         = 10;
     numPoints = numPoints > N ? numPoints/N : numPoints/(N/2);
 
     for(vtkIdType i = 0; i < N; ++i)
-    {
+      {
       double point[3] = {0};
       reader->GetOutput()->GetPoints()->GetPoint(i*numPoints,point);
       points->InsertNextPoint(point);
-    }
-    
-    
+      }
+
+
     // Add points to the widget manager
     this->ButtonsManager->SetDataSet(level,piece++,points.GetPointer());
 

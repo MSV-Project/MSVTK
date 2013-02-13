@@ -494,3 +494,8 @@ void msvVTKButtonsGroup::CalculatePosition()
   rep->Modified();
   this->GetButton()->SetRepresentation(rep);
 }
+
+size_t msvVTKButtonsGroup::GetNumberOfElements()
+{
+  return this->Elements.size();
+}
