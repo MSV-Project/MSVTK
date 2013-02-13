@@ -76,31 +76,43 @@ public:
   vtkGetMacro(ButtonWidgetSize,double);
 
   // Description:
+  // Set / Get ShiftWidgetCenterToCorner
+  vtkSetMacro(ShiftWidgetCenterToCorner,bool);
+  vtkGetMacro(ShiftWidgetCenterToCorner,bool);
+  vtkBooleanMacro(ShiftWidgetCenterToCorner,bool);
+
+  // Description:
+  // Set / Get cluster groups boolean
+  vtkSetMacro(ClusteringWithinGroups,bool);
+  vtkGetMacro(ClusteringWithinGroups,bool);
+  vtkBooleanMacro(ClusteringWithinGroups,bool);
+
+  // Description:
   // Set / Get the size of the button reprensentation
   virtual void SetColorLookUpTable(vtkLookupTable *arg);
   vtkGetMacro(ColorLookUpTable,vtkLookupTable*);
   
   // Description:
   // Add widget positions
-  virtual void SetDataSet(size_t level, size_t idx,
+  virtual void SetDataSet(size_t group, size_t idx,
                           vtkPoints* dataSet);
 
   // Description:
-  // Set the number of data set at a given level.
-  void SetNumberOfDataSets(size_t level, size_t numdatasets);
+  // Set the number of data set at a given group.
+  void SetNumberOfDataSets(size_t group, size_t numdatasets);
 
   // Description:
-  // Returns the number of data sets available at any level.
-  size_t GetNumberOfDataSets(size_t level);
+  // Returns the number of data sets available at any group.
+  size_t GetNumberOfDataSets(size_t group);
 
   // Description:
-  // Set the number of refinement levels. This call might cause
-  // allocation if the new number of levels is larger than the
+  // Set the number of refinement groups. This call might cause
+  // allocation if the new number of groups is larger than the
   // current one.
   void SetNumberOfLevels(size_t numLevels);
 
   // Description:
-  // Returns the number of levels.
+  // Returns the number of groups.
   size_t GetNumberOfLevels();
   
   static vtkInformationIdTypeKey* CLUSTER_IDX();
@@ -114,10 +126,10 @@ public:
   virtual void HideButtons();
   virtual void ShowClusterButtons();
   virtual void HideClusterButtons();
-  virtual void ShowButtons(size_t level);
-  virtual void HideButtons(size_t level);
-  virtual void ShowClusterButtons(size_t level);
-  virtual void HideClusterButtons(size_t level);
+  virtual void ShowButtons(size_t group);
+  virtual void HideButtons(size_t group);
+  virtual void ShowClusterButtons(size_t group);
+  virtual void HideClusterButtons(size_t group);
 
 protected:
   msvVTKWidgetClusters();
@@ -134,6 +146,8 @@ protected:
   double       PixelRadius;
   bool         UseImprovedClustering;
   bool         Clustering;
+  bool         ShiftWidgetCenterToCorner;
+  bool         ClusteringWithinGroups;
   vtkRenderer* Renderer;
 
 private:

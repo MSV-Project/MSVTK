@@ -55,7 +55,6 @@ protected slots:
   void on_ShowVolume_stateChanged(int state);
   void on_EnableClustering_stateChanged(int state);
   void on_PixelRadius_valueChanged(double value);
-  void on_ShowLevel_currentIndexChanged(int value);
 
 protected:
   QScopedPointer<msvQButtonClustersMainWindowPrivate> d_ptr;

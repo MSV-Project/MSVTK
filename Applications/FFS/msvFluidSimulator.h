@@ -15,14 +15,11 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-
+kile
 ==============================================================================*/
 
 #ifndef __msvFluidSimulator_h
 #define __msvFluidSimulator_h
-
-// STL includes
-#include <string>
 
 // VTK includes
 #include <vtkObject.h>
@@ -100,9 +97,11 @@ public:
   virtual void SetAMRDataset(vtkHierarchicalBoxDataSet*);
   vtkGetMacro(AMRDataset,vtkHierarchicalBoxDataSet*);
   
+  // Description:
   // Initialize AMR data structure, solver and main algorithms
   virtual void Init(vtkPolyData *polydata);
 
+  // Description:
   // Run one time-step of the fluid solver
   virtual void Run();
 
