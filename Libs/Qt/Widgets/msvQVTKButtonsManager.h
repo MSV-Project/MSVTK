@@ -59,6 +59,15 @@ public:
   /// Set the renderer
   void setRenderer(vtkRenderer* renderer);
 
+  /// Remove all camera brakepoints for path animation
+  void clearCameraBrakPoints();
+
+  /// Add a camera breakpoint for path animation
+  void addCameraBreakPoint(double pos[3],double fop[3],double vup[3]);
+
+  ///
+  void animate();
+
 protected:
   QScopedPointer<msvQVTKButtonsManagerPrivate> d_ptr;
   msvQVTKButtonsManager(QObject *parent = 0);

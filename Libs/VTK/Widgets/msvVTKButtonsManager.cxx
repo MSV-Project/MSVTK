@@ -24,6 +24,7 @@
 #include "vtkRenderer.h"
 
 // MSVTK includes
+#include "msvVTKAnimatePath.h"
 #include "msvVTKButtons.h"
 #include "msvVTKButtonsInterface.h"
 #include "msvVTKButtonsManager.h"
@@ -54,7 +55,7 @@ public:
       rendererSize[0] = static_cast<double>(intRendererSize[0]);
       rendererSize[1] = static_cast<double>(intRendererSize[1]);
 
-      for(int i = 0; i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
+      for (int i = 0; i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
         {
         msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(
               msvVTKButtonsManager::GetInstance()->GetElement(i));
@@ -68,7 +69,7 @@ public:
           double extBounds[6];
           toolButton->GetBounds(bounds);
 
-          for(int i=0; i< 5; i+=2)
+          for (int i=0; i< 5; i+=2)
             {
             extBounds[i] = bounds[i] - (bounds[i+1] - bounds[i])/2.;
             extBounds[i+1] = bounds[i+1] + (bounds[i+1] - bounds[i])/2.;
@@ -116,7 +117,7 @@ public:
     double yTolerance = 24;
     // Sort buttons along y axis
     std::vector<msvVTKButtons*> sortedElements;
-    for(int i = 0;
+    for (int i = 0;
         i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
       {
       msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(
@@ -129,7 +130,7 @@ public:
         toolButton->SetYOffset(0);
         bool added = false;
 
-        for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin();
+        for (std::vector<msvVTKButtons*>::iterator it = sortedElements.begin();
             it != sortedElements.end(); ++it)
           {
           double curPos[2];
@@ -148,9 +149,9 @@ public:
         }
       }
 
-    for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin()+1; it != sortedElements.end(); ++it)
+    for (std::vector<msvVTKButtons*>::iterator it = sortedElements.begin()+1; it != sortedElements.end(); ++it)
     {
-      for(std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin(); it2 != it; ++it2)
+      for (std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin(); it2 != it; ++it2)
       {
       double pos[2];
       (*it)->GetDisplayPosition(pos);
@@ -173,12 +174,13 @@ public:
 msvVTKButtonsManager::msvVTKButtonsManager()
 {
   this->CameraCallback = NULL;
+  this->Animation = new msvVTKAnimatePath();
 }
 
 //------------------------------------------------------------------------------
 msvVTKButtonsManager::~msvVTKButtonsManager()
 {
-
+  delete this->Animation;
 }
 
 //------------------------------------------------------------------------------
@@ -230,4 +232,25 @@ void msvVTKButtonsManager::SetRenderer(vtkRenderer *renderer)
   this->CameraCallback = vtkCameraCallback::New();
   renderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,CameraCallback);
   vtkCameraCallback::SafeDownCast(CameraCallback)->Renderer = renderer;
+  this->Renderer = renderer;
+}
+
+//------------------------------------------------------------------------------
+void msvVTKButtonsManager::ClearCameraBrakPoints()
+{
+  Animation->ClearPoints();
+}
+
+//------------------------------------------------------------------------------
+void msvVTKButtonsManager::AddCameraBreakPoint(double pos[3],double fop[3],double vup[3])
+{
+    Animation->AddCameraPoint(pos,fop,vup);
+}
+
+//------------------------------------------------------------------------------
+void msvVTKButtonsManager::Animate()
+{
+  double bounds[6];
+  Animation->Execute(this->Renderer,bounds,480);
+  //delete Animation;
 }

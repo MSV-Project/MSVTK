@@ -34,6 +34,8 @@
 #include "msvVTKButtonsGroup.h"
 
 class vtkCameraCallback;
+class vtkRenderer;
+class msvVTKAnimatePath;
 
 class MSV_VTK_WIDGETS_EXPORT msvVTKButtonsManager : public vtkObject
 {
@@ -82,12 +84,31 @@ public:
   // Set the renderer
   void SetRenderer(vtkRenderer* renderer);
 
+  // Description:
+  // Clear all camera breakpoints for path animation
+  void ClearCameraBrakPoints();
+
+  // Description:
+  // Add a camera breakpoint for path animation
+  void AddCameraBreakPoint(double pos[3],double fop[3],double vup[3]);
+
+  // Description:
+  // Start path animation
+  void Animate();
+
+
 private:
   // Vector of elements
   std::vector<msvVTKButtonsInterface*> Elements;
 
   // Callback for camera modified event
   vtkCameraCallback* CameraCallback;
+
+  // Path animation
+  msvVTKAnimatePath *Animation;
+
+  // Current renderer
+  vtkRenderer * Renderer;
 };
 
 #endif // __msvVTKButtonsManager_h

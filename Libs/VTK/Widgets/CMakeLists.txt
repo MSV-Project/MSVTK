@@ -69,6 +69,7 @@ endif()
 # --------------------------------------------------------------------------
 set(msvVTKWidgets_SRCS
   msvVTKAnimate.cxx
+  msvVTKAnimatePath.cxx
   msvVTKButtons.cxx
   msvVTKButtonsAction.cxx
   msvVTKButtonsGroup.cxx

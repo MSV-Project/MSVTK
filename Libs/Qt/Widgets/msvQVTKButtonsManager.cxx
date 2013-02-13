@@ -40,6 +40,7 @@ public:
   void setElementProperty(QString name, QVariant value);
   msvQVTKButtonsGroup *createGroup();
   msvQVTKButtons *createButtons();
+
 };
 
 //------------------------------------------------------------------------------
@@ -133,4 +134,22 @@ void msvQVTKButtonsManager::setShowLabel(bool show)
 void msvQVTKButtonsManager::setRenderer(vtkRenderer* renderer)
 {
   msvVTKButtonsManager::GetInstance()->SetRenderer(renderer);
-};
+}
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsManager::clearCameraBrakPoints()
+{
+  msvVTKButtonsManager::GetInstance()->ClearCameraBrakPoints();
+}
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsManager::addCameraBreakPoint(double pos[3],double fop[3],double vup[3])
+{
+  msvVTKButtonsManager::GetInstance()->AddCameraBreakPoint(pos,fop,vup);
+}
+
+//------------------------------------------------------------------------------
+void msvQVTKButtonsManager::animate()
+{
+  msvVTKButtonsManager::GetInstance()->Animate();
+}
