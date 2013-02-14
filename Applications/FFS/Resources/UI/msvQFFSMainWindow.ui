@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>698</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -109,6 +109,23 @@
        </property>
        <property name="checked">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Time Steps:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="numberOfTimeSteps"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="runTimeStep">
+       <property name="text">
+        <string>Run</string>
        </property>
       </widget>
      </item>

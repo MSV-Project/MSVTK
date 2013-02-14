@@ -51,7 +51,9 @@ public slots:
   void on_showSurface_stateChanged(int state);
   void on_showCartesianGrid_stateChanged(int state);
   void on_showOutlineCorners_stateChanged(int state);
+  void on_runTimeStep_clicked();
   void on_showBoundaryEdges_stateChanged(int state);
+  void on_numberOfTimeSteps_valueChanged(int value);
 
 protected:
   QScopedPointer<msvQFFSMainWindowPrivate> d_ptr;

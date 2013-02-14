@@ -134,6 +134,8 @@ protected:
 
   unsigned int       currentColor;
   const unsigned int colorCount;
+  
+  unsigned int numTimeSteps;
 public:
   msvQFFSMainWindowPrivate(msvQFFSMainWindow& object);
   ~msvQFFSMainWindowPrivate();
@@ -144,6 +146,8 @@ public:
   virtual void update();
   virtual void updateUi();
   virtual void updateView();
+  virtual void runTimeStep();
+  virtual void numberOfTimeSteps(int value);
 
   void renderSurfaceVectorField();
 
@@ -242,6 +246,22 @@ msvQFFSMainWindowPrivate::msvQFFSMainWindowPrivate(msvQFFSMainWindow& object)
 
 }
 
+//------------------------------------------------------------------------------
+void msvQFFSMainWindowPrivate::numberOfTimeSteps(int value)
+{
+  this->numTimeSteps = value;
+}
+
+//------------------------------------------------------------------------------
+void msvQFFSMainWindowPrivate::runTimeStep()
+{
+  for(unsigned int i = 0; i < this->numTimeSteps; ++i)
+  {
+    this->fluidSimulator->Run();
+  }
+}
+
+//------------------------------------------------------------------------------
 void msvQFFSMainWindowPrivate::renderSurfaceVectorField()
 {
   this->arrowSource = vtkSmartPointer<vtkArrowSource>::New();
@@ -266,12 +286,13 @@ void msvQFFSMainWindowPrivate::renderSurfaceVectorField()
   this->vectorActor->SetMapper(this->vectorMapper);
 }
 
+//------------------------------------------------------------------------------
 void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
 {
   if (dir.cd(QString("Morpho")))
     {
     this->polyDataReader->SetFileName(
-      dir.filePath("zmMesh.vtk").toLatin1().constData());
+      dir.filePath("geometry.vtk").toLatin1().constData());
     this->polyDataReader->Update();
     }
   else { return; }
@@ -288,11 +309,11 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
 
   const char *fileName = "Resources/simulator.config";
   this->fluidSimulator->SetInitFile(fileName);
-  this->fluidSimulator->SetMaxLevels(5);
-  this->fluidSimulator->SetDataLevel(4);
-  this->fluidSimulator->SetCoarsestGridSpacing(4);
+  this->fluidSimulator->SetMaxLevels(8);
+  this->fluidSimulator->SetDataLevel(5);
+  this->fluidSimulator->SetRefinamentRatio(4);
+  this->fluidSimulator->SetCoarsestGridSpacing(8);
   this->fluidSimulator->Init(data);
-//   this->fluidSimulator->SetDataSet();
   // Render
   double extent[6];
   this->amrLagrangianSurfaceMapper->GetBounds(extent);
@@ -476,6 +497,23 @@ void msvQFFSMainWindow::on_showOutlineCorners_stateChanged(int state)
     {
     d->amrOutlineCornerActor->VisibilityOff();
     }
+}
+
+//------------------------------------------------------------------------------
+void msvQFFSMainWindow::on_numberOfTimeSteps_valueChanged(int value)
+{
+  Q_D(msvQFFSMainWindow);
+  
+  d->numberOfTimeSteps(value);
+}
+
+//------------------------------------------------------------------------------
+void msvQFFSMainWindow::on_runTimeStep_clicked()
+{
+  Q_D(msvQFFSMainWindow);
+  
+  d->runTimeStep();
+  
 }
 
 //------------------------------------------------------------------------------
