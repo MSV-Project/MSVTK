@@ -69,7 +69,7 @@ protected:
   vtkSmartPointer<vtkAxesActor>               Axes;
   vtkSmartPointer<vtkRenderer>                ThreeDRenderer;
 
-  // Segmentation Pipeline
+  // Model Pipeline
   vtkSmartPointer<vtkAppendPolyData> PolyDataMerger;
 
   // Volume Pipeline

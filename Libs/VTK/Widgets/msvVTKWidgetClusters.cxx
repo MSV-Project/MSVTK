@@ -16,7 +16,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   ==============================================================================*/
+==============================================================================*/
 
 // VTK includes
 #include <vtkButtonWidget.h>
@@ -291,7 +291,7 @@ void msvVTKWidgetClusters::vtkInternal::SetButtons(
       msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonList->GetElement(i));
       double pos[2];
       button->GetDisplayPosition(pos);
-      std::cout << " button[" << i << "] = " << "[" << pos[0] << "," << pos[1] << "]" << std::endl;
+      std::cout << " button[" << i << "] -> " << "[" << pos[0] << "," << pos[1] << "]" << std::endl;
     }
 }
 
@@ -825,6 +825,14 @@ void msvVTKWidgetClusters::Clear()
 //------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowClusterButtons()
 {
+  msvVTKButtonsManager *buttonManager = this->Internal->ButtonManager;
+  msvVTKButtonsGroup *clusterGroup = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(0));
+  size_t numButtons = clusterGroup->GetNumberOfElements();
+  for(size_t i = 0; i < numButtons; ++i)
+  {
+    msvVTKButtons *button = msvVTKButtons::SafeDownCast(clusterGroup->GetElement(i));
+    button->SetShowButton(true);
+  }
   size_t end = this->Internal->ClusterButtons.size();
   for (size_t i = 0; i != end; ++i)
     {
@@ -835,6 +843,14 @@ void msvVTKWidgetClusters::ShowClusterButtons()
 //------------------------------------------------------------------------------
 void msvVTKWidgetClusters::HideClusterButtons()
 {
+  msvVTKButtonsManager *buttonManager = this->Internal->ButtonManager;
+  msvVTKButtonsGroup *clusterGroup = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(0));
+  size_t numButtons = clusterGroup->GetNumberOfElements();
+  for(size_t i = 0; i < numButtons; ++i)
+  {
+    msvVTKButtons *button = msvVTKButtons::SafeDownCast(clusterGroup->GetElement(i));
+    button->SetShowButton(false);
+  }
   size_t end = this->Internal->ClusterButtons.size();
   for (size_t i = 0; i != end; ++i)
     {
@@ -845,6 +861,18 @@ void msvVTKWidgetClusters::HideClusterButtons()
 //------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowButtons()
 {
+  msvVTKButtonsManager *buttonManager = this->Internal->ButtonManager;
+  size_t numButtonGroups = buttonManager->GetNumberOfElements();
+  for(size_t i = 1; i< numButtonGroups; ++i)
+  {
+    msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(i));
+    size_t numButtons = buttonGroup->GetNumberOfElements();
+    for(size_t j = 0; j < numButtons; ++j)
+    {
+      msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(j));
+      button->SetShowButton(true);
+    }
+  }
   size_t end = this->Internal->ButtonList.size();
   for (size_t i = 0; i != end; ++i)
     {
@@ -855,6 +883,18 @@ void msvVTKWidgetClusters::ShowButtons()
 //------------------------------------------------------------------------------
 void msvVTKWidgetClusters::HideButtons()
 {
+  msvVTKButtonsManager *buttonManager = this->Internal->ButtonManager;
+  size_t numButtonGroups = buttonManager->GetNumberOfElements();
+  for(size_t i = 1; i< numButtonGroups; ++i)
+  {
+    msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(i));
+    size_t numButtons = buttonGroup->GetNumberOfElements();
+    for(size_t j = 0; j < numButtons; ++j)
+    {
+      msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(j));
+      button->SetShowButton(false);
+    }
+  }
   size_t end =this->Internal->ButtonList.size();
   for (size_t i = 0; i != end; ++i)
     {

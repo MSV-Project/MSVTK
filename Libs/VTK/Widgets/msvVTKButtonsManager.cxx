@@ -16,7 +16,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   ==============================================================================*/
+==============================================================================*/
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
@@ -203,8 +203,7 @@ msvVTKButtonsManager::~msvVTKButtonsManager()
 msvVTKButtonsGroup *msvVTKButtonsManager::CreateGroup()
 {
   Elements.push_back(msvVTKButtonsGroup::New());
-  return msvVTKButtonsGroup::SafeDownCast(Elements.back());
-//   return msvVTKButtonsGroup::SafeDownCast(Elements.at(Elements.size()-1));
+  return msvVTKButtonsGroup::SafeDownCast(Elements.at(Elements.size()-1));
 }
 
 //------------------------------------------------------------------------------
@@ -249,5 +248,5 @@ void msvVTKButtonsManager::SetRenderer(vtkRenderer *renderer)
   this->CameraCallback = vtkCameraCallback::New();
   renderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,
     CameraCallback);
-  vtkCameraCallback::SafeDownCast(CameraCallback)->Renderer = renderer;
+  this->CameraCallback->Renderer = renderer;
 }
