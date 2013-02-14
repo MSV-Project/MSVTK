@@ -274,14 +274,24 @@ void msvVTKWidgetClusters::vtkInternal::SetButtons(
                                  center[2] - size / 2,
                                  center[2] + size / 2};
     msvVTKButtons *button = buttonList->CreateButtons();
+    const char label[] = {"Zoom"};
     button->SetBounds(bounds);
     button->SetShowButton(true);
+    button->SetOnCenter(true);
     button->SetCurrentRenderer(this->External->Renderer);
+    button->SetLabelText(label);
     if(this->External->ButtonIcon)
       {
       button->SetImage(this->External->ButtonIcon);
       }
     button->Update();
+    }
+    for(size_t i = 0; i < buttonList->GetNumberOfElements(); ++i)
+    {
+      msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonList->GetElement(i));
+      double pos[2];
+      button->GetDisplayPosition(pos);
+      std::cout << " button[" << i << "] = " << "[" << pos[0] << "," << pos[1] << "]" << std::endl;
     }
 }
 
@@ -340,7 +350,7 @@ void msvVTKWidgetClusters::vtkInternal::GetClustersPositions(
       math->Add(center,point,center);
       }
     math->MultiplyScalar(center,1.0/numberOfElements);
-    if(this->External->GetShiftWidgetCenterToCorner())
+    if(this->External->ShiftWidgetCenterToCorner)
       {
       vtkNew<vtkPoints> points;
       for (size_t j = 0; j < numberOfElements; ++j)
@@ -372,7 +382,9 @@ void msvVTKWidgetClusters::vtkInternal::ClearClusterButtons()
     {
     this->ClusterButtons[i]->Delete();
     }
-
+  msvVTKButtonsGroup *clusterButtons 
+    = msvVTKButtonsGroup::SafeDownCast(this->ButtonManager->GetElement(0));
+  clusterButtons->RemoveElements();
   this->ClusterButtons.clear();
   this->IndexMaps.clear();
 }
@@ -559,13 +571,13 @@ msvVTKWidgetClusters::msvVTKWidgetClusters()
   this->ColorLookUpTable->SetNumberOfColors(5);
   this->ColorLookUpTable->Build();
 
-  this->UseImprovedClustering     = false;
+  this->UseImprovedClustering     = true;
   this->Clustering                = true;
   this->ButtonWidgetSize          = 3,
   this->PixelRadius               = 100;
   this->Renderer                  = 0;
   this->ShiftWidgetCenterToCorner = false;
-  this->ClusteringWithinGroups    = true;
+  this->ClusteringWithinGroups    = false;
 }
 
 //------------------------------------------------------------------------------
@@ -593,7 +605,6 @@ void msvVTKWidgetClusters::SetDataSet(size_t group, size_t idx,
     this->Internal->GetChild(group));
   if (groupDS)
     {
-
     vtkNew<vtkPolyData> polyData;
     polyData->SetPoints(points);
     groupDS->SetPiece(idx, polyData.GetPointer());
@@ -606,9 +617,12 @@ void msvVTKWidgetClusters::SetDataSet(size_t group, size_t idx,
       vtkIdType offset = this->Internal->ButtonList.size();
       info->Set(DATASET_BUTTONS_OFFSET(), offset);
       }
-    msvVTKButtonsGroup *buttonGroup =
+    msvVTKButtonsGroup *buttonGroup = 
       this->Internal->ButtonManager->CreateGroup();
     this->Internal->SetButtons(points,buttonGroup);
+    
+    std::cout << "Number of buttons in group [" << group << ", idx " << idx << "] = " << buttonGroup->GetNumberOfElements() << std::endl;
+
     }
 }
 
@@ -688,8 +702,6 @@ void msvVTKWidgetClusters::SetRenderer(vtkRenderer* renderer)
 
   this->Renderer->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->
     AddObserver(vtkCommand::EndInteractionEvent, callbackCommand);
-
-  this->Internal->ButtonManager->SetRenderer(renderer);
 }
 
 //------------------------------------------------------------------------------
@@ -746,9 +758,10 @@ void msvVTKWidgetClusters::UpdateWidgets()
           info->Set(CLUSTER_BUTTONS_OFFSET(), range, 2);
           }
 
+        msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(this->Internal->ButtonManager->GetElement(
+            0));
         this->Internal->SetButtons(
-          clusterPositions.GetPointer(),
-          this->Internal->ClusterButtons);
+          clusterPositions.GetPointer(), buttonGroup);
 
         continue;
         }

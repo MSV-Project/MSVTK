@@ -203,7 +203,8 @@ msvVTKButtonsManager::~msvVTKButtonsManager()
 msvVTKButtonsGroup *msvVTKButtonsManager::CreateGroup()
 {
   Elements.push_back(msvVTKButtonsGroup::New());
-  return msvVTKButtonsGroup::SafeDownCast(Elements.at(Elements.size()-1));
+  return msvVTKButtonsGroup::SafeDownCast(Elements.back());
+//   return msvVTKButtonsGroup::SafeDownCast(Elements.at(Elements.size()-1));
 }
 
 //------------------------------------------------------------------------------

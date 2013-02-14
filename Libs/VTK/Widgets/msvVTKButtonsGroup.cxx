@@ -237,10 +237,23 @@ void msvVTKButtonsGroup::RemoveElement(msvVTKButtonsInterface* buttons)
     {
     if (*buttonsIt == buttons)
       {
+      buttons->GetButton()->Delete();
       Elements.erase(buttonsIt);
       return;
       }
     }
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsGroup::RemoveElements()
+{
+  //int index = 0;
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); ++buttonsIt)
+    {
+    (*buttonsIt)->GetButton()->Delete();
+    }
+  Elements.clear();
 }
 
 //----------------------------------------------------------------------
