@@ -55,6 +55,9 @@ protected slots:
   void on_ShowDiscs_stateChanged(int state);
   void on_ShowVolume_stateChanged(int state);
   void on_EnableClustering_stateChanged(int state);
+  void on_ClusterWithinGroups_stateChanged(int state);
+  void on_UsePlainVTKButtons_stateChanged(int state);
+  void on_ShowClustersRep_stateChanged(int state);
   void on_PixelRadius_valueChanged(double value);
 
 protected:

@@ -105,6 +105,9 @@ public:
   virtual void showGroup(int value);
   virtual void showDiscs(bool value);
   virtual void enableClustering(bool value);
+  virtual void clusterWithinGroups(bool value);
+  virtual void usePlainVTKButtons(bool value);
+  virtual void showClustersRep(bool value);
   virtual void setPixelRadius(double value);
 
   virtual void clear();
@@ -213,8 +216,12 @@ msvQButtonClustersMainWindowPrivate::msvQButtonClustersMainWindowPrivate(
   this->buttonsIcon->Update();
   this->ButtonsManager = vtkSmartPointer<msvVTKWidgetClusters>::New();
   this->ButtonsManager->UseImprovedClusteringOn();
-  this->ButtonsManager->ClusteringWithinGroupsOn();
+  this->ButtonsManager->ClusteringWithinGroupsOff();
   this->ButtonsManager->ShiftWidgetCenterToCornerOff();
+  this->ButtonsManager->ClusteringOff();
+  this->ButtonsManager->CreateClustersRepresentationsOff();
+  this->ButtonsManager->UsePlainVTKButtonsOff();
+  
   this->ButtonsManager->SetButtonIcon(this->buttonsIcon->GetOutput());
   // Set interaction callback to track when interaction ended
   this->EndInteractionCommand       = EndInteractionCallbackCommand::New();
@@ -257,6 +264,7 @@ void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
   this->ButtonsManager->SetClustering(value);
   if(value)
     {
+    
     this->ButtonsManager->HideButtons();
     }
   else
@@ -268,9 +276,33 @@ void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
 }
 
 // ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindowPrivate::clusterWithinGroups(bool value)
+{
+  this->ButtonsManager->SetClusteringWithinGroups(value);
+  this->ButtonsManager->UpdateWidgets();
+  this->updateView();
+}
+
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindowPrivate::showClustersRep(bool value)
+{
+  this->ButtonsManager->SetCreateClustersRepresentations(value);
+  this->ButtonsManager->UpdateWidgets();
+  this->updateView();
+}
+
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindowPrivate::usePlainVTKButtons(bool value)
+{
+  this->ButtonsManager->SetUsePlainVTKButtons(value);
+  this->ButtonsManager->UpdateWidgets();
+  this->updateView();
+}
+
+// ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::showGroup(int value)
 {
-  int numberOfLevels = this->ButtonsManager->GetNumberOfLevels();
+  int numberOfLevels = this->ButtonsManager->GetNumberOfGroups();
   for(int i = 0; i < numberOfLevels; ++i)
     {
     if(i == value)
@@ -364,8 +396,8 @@ void msvQButtonClustersMainWindowPrivate::update()
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::updateUi()
 {
-  this->enableClustering(this->EnableClustering->isChecked());
-  this->setPixelRadius(this->PixelRadius->value());
+//   this->enableClustering(this->EnableClustering->isChecked());
+//   this->setPixelRadius(this->PixelRadius->value());
 }
 
 // ------------------------------------------------------------------------------
@@ -586,6 +618,30 @@ void msvQButtonClustersMainWindow::on_EnableClustering_stateChanged(int state)
 }
 
 // ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindow::on_ClusterWithinGroups_stateChanged(int state)
+{
+  Q_D(msvQButtonClustersMainWindow);
+
+  d->clusterWithinGroups(state);
+}
+
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindow::on_UsePlainVTKButtons_stateChanged(int state)
+{
+  Q_D(msvQButtonClustersMainWindow);
+
+  d->usePlainVTKButtons(state);
+}
+
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindow::on_ShowClustersRep_stateChanged(int state)
+{
+  Q_D(msvQButtonClustersMainWindow);
+
+  d->showClustersRep(state);
+}
+
+// ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindow::on_PixelRadius_valueChanged(double value)
 {
   Q_D(msvQButtonClustersMainWindow);
@@ -616,12 +672,3 @@ void msvQButtonClustersMainWindow::updateView()
 
   d->updateView();
 }
-
-
-
-
-
-
-
-
-

@@ -83,10 +83,22 @@ public:
   vtkBooleanMacro(ShiftWidgetCenterToCorner,bool);
 
   // Description:
+  // Set / Get ShiftWidgetCenterToCorner
+  vtkSetMacro(CreateClustersRepresentations,bool);
+  vtkGetMacro(CreateClustersRepresentations,bool);
+  vtkBooleanMacro(CreateClustersRepresentations,bool);
+
+  // Description:
   // Set / Get cluster groups boolean
   vtkSetMacro(ClusteringWithinGroups,bool);
   vtkGetMacro(ClusteringWithinGroups,bool);
   vtkBooleanMacro(ClusteringWithinGroups,bool);
+
+  // Description:
+  // Set / Get cluster groups boolean
+  vtkSetMacro(UsePlainVTKButtons,bool);
+  vtkGetMacro(UsePlainVTKButtons,bool);
+  vtkBooleanMacro(UsePlainVTKButtons,bool);
   
   // Description:
   // Set / Get button icon
@@ -119,7 +131,7 @@ public:
 
   // Description:
   // Returns the number of groups.
-  size_t GetNumberOfLevels();
+  size_t GetNumberOfGroups();
 
   static vtkInformationIdTypeKey* CLUSTER_IDX();
   static vtkInformationIdTypeKey* DATASET_BUTTONS_OFFSET();
@@ -129,13 +141,15 @@ public:
   virtual void Clear();
   virtual void SetCustersButtonsVisibility(bool show);
   virtual void ShowButtons();
-  virtual void HideButtons();
-  virtual void ShowClusterButtons();
-  virtual void HideClusterButtons();
   virtual void ShowButtons(size_t group);
+  virtual void HideButtons();
   virtual void HideButtons(size_t group);
+  virtual void ShowClusterButtons();
   virtual void ShowClusterButtons(size_t group);
+  virtual void HideClusterButtons();
   virtual void HideClusterButtons(size_t group);
+  virtual void SetClustersRepresentations();
+  virtual void SetClustersRepresentations(size_t group);
 
 protected:
   msvVTKWidgetClusters();
@@ -154,6 +168,8 @@ protected:
   bool         Clustering;
   bool         ShiftWidgetCenterToCorner;
   bool         ClusteringWithinGroups;
+  bool         UsePlainVTKButtons;
+  bool         CreateClustersRepresentations;
   vtkRenderer* Renderer;
 
 private:

@@ -73,6 +73,13 @@
       <number>0</number>
      </property>
      <item>
+      <widget class="QLabel" name="DataLabel">
+       <property name="text">
+        <string>Data:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QCheckBox" name="ShowVolume">
        <property name="text">
         <string>Show Volume</string>
@@ -100,7 +107,7 @@
       </widget>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetNoConstraint</enum>
        </property>
@@ -113,7 +120,21 @@
        <property name="bottomMargin">
         <number>1</number>
        </property>
-       <item row="1" column="0">
+       <item row="0" column="0">
+        <widget class="QLabel" name="AlgorithmsLabel">
+         <property name="text">
+          <string>Algorithm:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="PixelRadiusLabel">
+         <property name="text">
+          <string>Pixel Radius</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <widget class="QDoubleSpinBox" name="PixelRadius">
          <property name="maximumSize">
           <size>
@@ -134,18 +155,35 @@
           <double>10.000000000000000</double>
          </property>
          <property name="value">
-          <double>0.000000000000000</double>
+          <double>100.000000000000000</double>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="PixelRadiusLabel">
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="ShowClustersRep">
          <property name="text">
-          <string>Pixel Radius</string>
+          <string>Show Clusters Rep.</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="UsePlainVTKButtons">
+         <property name="text">
+          <string>Use Plain VTKButtons</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="ClusterWithinGroups">
+         <property name="text">
+          <string>Cluster Within Groups</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QCheckBox" name="EnableClustering">
          <property name="text">
           <string>Enable Clustering</string>
@@ -153,6 +191,13 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer">
