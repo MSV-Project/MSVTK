@@ -135,7 +135,6 @@ protected:
   unsigned int       currentColor;
   const unsigned int colorCount;
   
-  unsigned int numTimeSteps;
 public:
   msvQFFSMainWindowPrivate(msvQFFSMainWindow& object);
   ~msvQFFSMainWindowPrivate();
@@ -147,7 +146,6 @@ public:
   virtual void updateUi();
   virtual void updateView();
   virtual void runTimeStep();
-  virtual void numberOfTimeSteps(int value);
 
   void renderSurfaceVectorField();
 
@@ -247,18 +245,16 @@ msvQFFSMainWindowPrivate::msvQFFSMainWindowPrivate(msvQFFSMainWindow& object)
 }
 
 //------------------------------------------------------------------------------
-void msvQFFSMainWindowPrivate::numberOfTimeSteps(int value)
-{
-  this->numTimeSteps = value;
-}
-
-//------------------------------------------------------------------------------
 void msvQFFSMainWindowPrivate::runTimeStep()
 {
-  for(unsigned int i = 0; i < this->numTimeSteps; ++i)
-  {
+  unsigned int count = static_cast<unsigned int>(
+    this->numberOfTimeSteps->value());
+  qDebug() << "Running " << count << " time steps.";
+  for(unsigned int i = 0; i < count; ++i)
+    {
     this->fluidSimulator->Run();
-  }
+    }
+  qDebug() << "End of running time steps.";
 }
 
 //------------------------------------------------------------------------------
@@ -289,13 +285,16 @@ void msvQFFSMainWindowPrivate::renderSurfaceVectorField()
 //------------------------------------------------------------------------------
 void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
 {
-  if (dir.cd(QString("Morpho")))
+  bool res = dir.cd(QString("Morpho"));
+  if (!res || !dir.exists("geometry.vtk"))
     {
-    this->polyDataReader->SetFileName(
-      dir.filePath("geometry.vtk").toLatin1().constData());
-    this->polyDataReader->Update();
+    qCritical() << "The selected directory should contain a "
+                << "\"Morpho/geometry.vtk\" file.";
+    return;
     }
-  else { return; }
+  this->polyDataReader->SetFileName(
+    dir.filePath("geometry.vtk").toLatin1().constData());
+  this->polyDataReader->Update();
 
   double bounds[6] = {0};
   this->polyDataReader->GetOutput()->GetBounds(bounds);
@@ -309,8 +308,8 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
 
   QFileInfo simulatorConfig(QDir(qApp->applicationDirPath()), "Resources/simulator.config");
   this->fluidSimulator->SetInitFile(simulatorConfig.absoluteFilePath().toLatin1());
-  this->fluidSimulator->SetMaxLevels(8);
-  this->fluidSimulator->SetDataLevel(5);
+  this->fluidSimulator->SetMaxLevels(this->maxLevelsSpinBox->value());
+  this->fluidSimulator->SetDataLevel(this->dataLevelsSpinBox->value());
   this->fluidSimulator->SetRefinamentRatio(4);
   this->fluidSimulator->SetCoarsestGridSpacing(8);
   this->fluidSimulator->Init(data);
@@ -324,6 +323,10 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
   this->threeDRenderer->AddActor(this->amrSelectBoundaryActor);
 //   this->threeDRenderer->AddActor(this->sourceActor);
   this->threeDRenderer->ResetCamera(extent);
+
+  this->LoadingGroupBox->setEnabled(false);
+  this->VisualisationGroupBox->setEnabled(true);
+  this->SimulationGroupBox->setEnabled(true);
 }
 
 
@@ -337,6 +340,9 @@ msvQFFSMainWindowPrivate::~msvQFFSMainWindowPrivate()
 void msvQFFSMainWindowPrivate::clear()
 {
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
+  this->LoadingGroupBox->setEnabled(true);
+  this->VisualisationGroupBox->setEnabled(false);
+  this->SimulationGroupBox->setEnabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -427,7 +433,10 @@ void msvQFFSMainWindow::openData()
     this, tr("Select root Data Folder"), QDir::homePath(),
     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
   if (dir.isEmpty())
+    {
+    qDebug() << "Cancel loading...";
     return;
+    }
 
   d->clear();             // Clean Up data and scene
   d->readImmersedBoundary(dir);  // Load data
@@ -444,71 +453,47 @@ void msvQFFSMainWindow::closeData()
 }
 
 //------------------------------------------------------------------------------
+void msvQFFSMainWindow::on_maxLevelsSpinBox_valueChanged(int value)
+{
+  Q_D(msvQFFSMainWindow);
+  d->dataLevelsSpinBox->setMaximum(value-1);
+  this->updateView();
+}
+
+//------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showCartesianGrid_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrHierarchicalActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrHierarchicalActor->VisibilityOff();
-    }
+  d->amrHierarchicalActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showSurface_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrLagrangianSurfaceActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrLagrangianSurfaceActor->VisibilityOff();
-    }
+  d->amrLagrangianSurfaceActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showBoundaryEdges_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrSelectBoundaryActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrSelectBoundaryActor->VisibilityOff();
-    }
+  d->amrSelectBoundaryActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showOutlineCorners_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrOutlineCornerActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrOutlineCornerActor->VisibilityOff();
-    }
+  d->amrOutlineCornerActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
-void msvQFFSMainWindow::on_numberOfTimeSteps_valueChanged(int value)
-{
-  Q_D(msvQFFSMainWindow);
-  
-  d->numberOfTimeSteps(value);
-}
-
-//------------------------------------------------------------------------------
-void msvQFFSMainWindow::on_runTimeStep_clicked()
+void msvQFFSMainWindow::on_runTimeSteps_clicked()
 {
   Q_D(msvQFFSMainWindow);
   
