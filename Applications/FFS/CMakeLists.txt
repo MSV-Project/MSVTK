@@ -92,9 +92,10 @@ target_link_libraries(msv${KIT}
   msvVTKParallel
   msvVTKWidgets
   msvQtWidgets
-  msvIBTK  
+  msvIBTK
   msvIBAMR
   )
+file(COPY Resources/simulator.config DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources)
 
 install(TARGETS msv${KIT}
   RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries

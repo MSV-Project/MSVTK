@@ -307,8 +307,8 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
   data->GetBounds(bounds);
   std::cout << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << bounds[4] << " " << bounds[5] << " " << std::endl;
 
-  const char *fileName = "Resources/simulator.config";
-  this->fluidSimulator->SetInitFile(fileName);
+  QFileInfo simulatorConfig(QDir(qApp->applicationDirPath()), "Resources/simulator.config");
+  this->fluidSimulator->SetInitFile(simulatorConfig.absoluteFilePath().toLatin1());
   this->fluidSimulator->SetMaxLevels(8);
   this->fluidSimulator->SetDataLevel(5);
   this->fluidSimulator->SetRefinamentRatio(4);
