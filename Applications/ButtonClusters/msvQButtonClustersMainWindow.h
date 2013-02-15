@@ -52,8 +52,9 @@ public slots:
   void updateView();
 
 protected slots:
-  void on_ShowDiscs_stateChanged(int state);
-  void on_ShowVolume_stateChanged(int state);
+//   void on_ShowDiscs_stateChanged(int state);
+//   void on_ShowVolume_stateChanged(int state);
+  void on_DataLoader_checkedIndexesChanged();
   void on_EnableClustering_stateChanged(int state);
   void on_ClusterWithinGroups_stateChanged(int state);
   void on_UsePlainVTKButtons_stateChanged(int state);

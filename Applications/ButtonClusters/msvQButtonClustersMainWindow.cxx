@@ -22,8 +22,8 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QModelIndex>
 #include <QString>
-#include <unistd.h>
 
 // MSV includes
 #include "msvQButtonClustersMainWindow.h"
@@ -39,6 +39,7 @@
 #include "vtkCamera.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkGenericOpenGLRenderWindow.h"
+#include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkPiecewiseFunction.h"
@@ -54,6 +55,7 @@
 #include "vtkStructuredPointsReader.h"
 #include "vtkVolumeProperty.h"
 #include "vtkVolume.h"
+
 
 
 // ------------------------------------------------------------------------------
@@ -81,8 +83,10 @@ protected:
   vtkSmartPointer<vtkPolyDataMapper> SurfaceMapper;
   vtkSmartPointer<vtkActor>          SurfaceActor;
 
-  std::vector<vtkVolume*> VolumeList;
-
+  std::vector<vtkSmartPointer<vtkVolume> > VolumeList;
+  std::vector<vtkSmartPointer<vtkPolyData> > PolyDataList;
+  std::map<int,vtkProp3D*>                   dataActorMap;
+  
   // buttonsManager
   vtkSmartPointer<msvVTKWidgetClusters> ButtonsManager;
   vtkSmartPointer<vtkPNGReader>         buttonsIcon;
@@ -101,14 +105,14 @@ public:
   virtual void updateUi();
   virtual void updateView();
 
-  virtual void showVolume(bool value);
+  virtual void showData(int idx, bool value);
   virtual void showGroup(int value);
-  virtual void showDiscs(bool value);
   virtual void enableClustering(bool value);
   virtual void clusterWithinGroups(bool value);
   virtual void usePlainVTKButtons(bool value);
   virtual void showClustersRep(bool value);
   virtual void setPixelRadius(double value);
+  virtual void getMaximumExtent(double extent[6]);
 
   virtual void clear();
 
@@ -242,19 +246,9 @@ msvQButtonClustersMainWindowPrivate::~msvQButtonClustersMainWindowPrivate()
 }
 
 // ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindowPrivate::showDiscs(bool value)
+void msvQButtonClustersMainWindowPrivate::showData(int idx, bool value)
 {
-  this->SurfaceActor->SetVisibility(value);
-  this->updateView();
-}
-
-// ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindowPrivate::showVolume(bool value)
-{
-  for(size_t i = 0, end = this->VolumeList.size(); i < end; ++i)
-    {
-    this->VolumeList[i]->SetVisibility(value);
-    }
+  this->dataActorMap[idx]->SetVisibility(value);
   this->updateView();
 }
 
@@ -369,7 +363,7 @@ void msvQButtonClustersMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   this->actionOpen->setIcon(dirIcon);
   this->actionAboutButtonClustersApplication->setIcon(informationIcon);
-
+  
 }
 
 // ------------------------------------------------------------------------------
@@ -446,6 +440,7 @@ void msvQButtonClustersMainWindowPrivate::readVolumeData(const QString &file,
     }
   this->ButtonsManager->SetDataSet(group,idx,points.GetPointer());
   this->VolumeList.push_back(volume.GetPointer());
+  this->dataActorMap[idx] = volume.GetPointer();
 }
 
 // ------------------------------------------------------------------------------
@@ -454,9 +449,18 @@ void msvQButtonClustersMainWindowPrivate::readPolyData(const QString &file,
 {
   vtkNew<vtkPolyDataReader> reader;
   vtkNew<vtkPoints>         points;
-
+  vtkNew<vtkPolyDataMapper> dataMapper;
+  vtkNew<vtkActor>          dataActor;
+  
   reader->SetFileName(file.toLatin1().constData());
   reader->Update();
+
+  dataMapper->ScalarVisibilityOff();
+  dataMapper->SetInput(reader->GetOutput());
+  dataActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
+  dataActor->GetProperty()->BackfaceCullingOn();
+  dataActor->SetMapper(dataMapper.GetPointer());
+  
 
   // Pick ten points to place the buttons
   vtkIdType numPoints =
@@ -473,8 +477,10 @@ void msvQButtonClustersMainWindowPrivate::readPolyData(const QString &file,
 
   // Add points to the widget manager
   this->ButtonsManager->SetDataSet(group,idx,points.GetPointer());
-
-  this->PolyDataMerger->AddInput(reader->GetOutput());
+  this->ThreeDRenderer->AddActor(dataActor.GetPointer());
+  this->PolyDataList.push_back(reader->GetOutput());
+  this->dataActorMap[idx] = dataActor.GetPointer();
+//   this->PolyDataMerger->AddInput(reader->GetOutput());
 }
 
 // ------------------------------------------------------------------------------
@@ -488,7 +494,9 @@ void msvQButtonClustersMainWindowPrivate::readDataFiles(const QString& dirName,
   foreach(const QString &file, dataFiles)
     {
     QString fileName = QFileInfo(dir,file).absoluteFilePath();
+    this->DataLoader->insertItem(idx,file); 
     readDataFile(fileName,idx,group);
+    this->DataLoader->setItemData(idx-1, Qt::Checked, Qt::CheckStateRole);
     }
 }
 
@@ -506,8 +514,8 @@ void msvQButtonClustersMainWindowPrivate::readDataFile(const QString& fileName,
     }
   else if(reader->IsFileStructuredPoints())
     {
-//     readVolumeData(fileName,idx,group);
-//     idx++;
+    readVolumeData(fileName,idx,group);
+    idx++;
     }
   else
     {
@@ -530,7 +538,9 @@ void msvQButtonClustersMainWindowPrivate::readData(const QString& rootDirectory)
   foreach(const QString &file, files)
     {
     QString fileName = QFileInfo(dir,file).absoluteFilePath();
+    this->DataLoader->insertItem(idx,file);
     readDataFile(fileName,idx,group);
+    this->DataLoader->setItemData(idx-1, Qt::Checked, Qt::CheckStateRole);
     }
   foreach(const QString &directory, directories)
     {
@@ -539,10 +549,53 @@ void msvQButtonClustersMainWindowPrivate::readData(const QString& rootDirectory)
 
   // Render
   double extent[6];
-  this->SurfaceMapper->GetBounds(extent);
-  this->ThreeDRenderer->AddActor(this->SurfaceActor);
+  this->getMaximumExtent(extent);
   this->ThreeDRenderer->ResetCamera(extent);
 
+}
+
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindowPrivate::getMaximumExtent(double extent[6])
+{
+  vtkNew<vtkMath> math;
+  extent[0] = extent[2] = extent[4] = math->Inf();
+  extent[1] = extent[3] = extent[5] = math->NegInf();
+  
+  size_t size = this->VolumeList.size();
+  for(size_t i = 0; i < size; ++i)
+  {
+    double bounds[6] = {0};
+    this->VolumeList[i]->GetBounds(bounds);
+    for(int j = 0; j < 6; j+=2)
+    {
+      if(bounds[j] < extent[j])
+      {
+        extent[j] = bounds[j];
+      }
+      if(bounds[j+1] > extent[j+1])
+      {
+        extent[j+1] = bounds[j+1];
+      }
+      
+    }
+  }
+  size = this->PolyDataList.size();
+  for(size_t i = 0; i < size; ++i)
+  {
+    double bounds[6] = {0};
+    this->PolyDataList[i]->GetBounds(bounds);
+    for(int j = 0; j < 6; j+=2)
+    {
+      if(bounds[j] < extent[j])
+      {
+        extent[j] = bounds[j];
+      }
+      if(bounds[j+1] > extent[j+1])
+      {
+        extent[j+1] = bounds[j+1];
+      }      
+    }
+  }
 }
 
 // ------------------------------------------------------------------------------
@@ -593,21 +646,21 @@ void msvQButtonClustersMainWindow::openData()
 }
 
 
-// ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindow::on_ShowVolume_stateChanged(int state)
-{
-  Q_D(msvQButtonClustersMainWindow);
-
-  d->showVolume(state);
-}
-
-// ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindow::on_ShowDiscs_stateChanged(int state)
-{
-  Q_D(msvQButtonClustersMainWindow);
-
-  d->showDiscs(state);
-}
+// // ------------------------------------------------------------------------------
+// void msvQButtonClustersMainWindow::on_ShowVolume_stateChanged(int state)
+// {
+//   Q_D(msvQButtonClustersMainWindow);
+// 
+//   d->showVolume(state);
+// }
+// 
+// // ------------------------------------------------------------------------------
+// void msvQButtonClustersMainWindow::on_ShowDiscs_stateChanged(int state)
+// {
+//   Q_D(msvQButtonClustersMainWindow);
+// 
+//   d->showDiscs(state);
+// }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindow::on_EnableClustering_stateChanged(int state)
@@ -650,6 +703,21 @@ void msvQButtonClustersMainWindow::on_PixelRadius_valueChanged(double value)
 }
 
 // ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindow::on_DataLoader_checkedIndexesChanged( )
+{
+  Q_D(msvQButtonClustersMainWindow);
+  QModelIndexList dataList = d->DataLoader->checkedIndexes();
+  for(size_t i = 0, end = d->dataActorMap.size(); i < end; ++i)
+  {
+    d->showData(i,false);
+  }
+  foreach(const QModelIndex &index, dataList)
+  {
+    d->showData(index.row(),true);
+  }
+}
+
+// ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindow::closeData()
 {
   Q_D(msvQButtonClustersMainWindow);
@@ -672,3 +740,4 @@ void msvQButtonClustersMainWindow::updateView()
 
   d->updateView();
 }
+
