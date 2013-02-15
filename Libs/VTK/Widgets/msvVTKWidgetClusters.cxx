@@ -48,6 +48,7 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkVertex.h>
 #include <vtkWidgetEvent.h>
 #include <vtkSmartPointer.h>
 
@@ -71,9 +72,9 @@ public:
   {
     ClusterProp();
 
-    vtkSmartPointer<vtkPolyData>       SpiderWeb;
-    vtkSmartPointer<vtkPolyDataMapper> SpiderWebMapper;
-    vtkSmartPointer<vtkActor>          SpiderWebActor;
+    vtkSmartPointer<vtkPolyData>       Graph;
+    vtkSmartPointer<vtkPolyDataMapper> GraphMapper;
+    vtkSmartPointer<vtkActor>          GraphActor;
 
     bool Hidden;
   };
@@ -194,12 +195,12 @@ msvVTKWidgetClusters::vtkInternal::ButtonProp::ButtonProp()
 // ------------------------------------------------------------------------------
 msvVTKWidgetClusters::vtkInternal::ClusterProp::ClusterProp()
 {
-  this->SpiderWeb       = vtkPolyData::New();
-  this->SpiderWebMapper = vtkPolyDataMapper::New();
-  this->SpiderWebActor  = vtkActor::New();
+  this->Graph       = vtkPolyData::New();
+  this->GraphMapper = vtkPolyDataMapper::New();
+  this->GraphActor  = vtkActor::New();
 
-  this->SpiderWebMapper->SetInput(this->SpiderWeb);
-  this->SpiderWebActor->SetMapper(this->SpiderWebMapper);
+  this->GraphMapper->SetInput(this->Graph);
+  this->GraphActor->SetMapper(this->GraphMapper);
 
   this->Hidden = false;
 }
@@ -294,8 +295,8 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
       double clusterCenter[3] = {0};
       clusterPoints->GetPoint(j,clusterCenter);
 
-      vtkNew<vtkPoints>      spiderWebPoints;
-      vtkNew<vtkCellArray>   spiderWebLines;
+      vtkNew<vtkPoints>      graphPoints;
+      vtkNew<vtkCellArray>   graphLines;
       vtkNew<vtkLookupTable> clusterColor;
       vtkNew<vtkFloatArray>  cellData;
 
@@ -305,30 +306,30 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
       double color[3] = {math->Random(0.,1.),math->Random(0.,1.),math->Random(
                            0.,1.)};
 
-      spiderWebPoints->SetNumberOfPoints(clusterPointsSize+1);
-      spiderWebPoints->SetPoint(0,clusterCenter);
+      graphPoints->SetNumberOfPoints(clusterPointsSize+1);
+      graphPoints->SetPoint(0,clusterCenter);
       for(size_t k = 0; k < clusterPointsSize; ++k)
         {
         double clusterSatelite[3] = {0};
         groupPoints->GetPoint(map[j][k],clusterSatelite);
-        spiderWebPoints->SetPoint(k,clusterSatelite);
+        graphPoints->SetPoint(k+1,clusterSatelite);
         vtkNew<vtkLine> line;
         line->GetPointIds()->SetId(0,0);
         line->GetPointIds()->SetId(0,k+1);
-        spiderWebLines->InsertNextCell(line.GetPointer());
+        graphLines->InsertNextCell(line.GetPointer());
         cellData->InsertNextValue(k + 1);
         clusterColor->SetTableValue(k,color[0],color[1],color[2]);
         }
       ClustersRepresentations.push_back(new ClusterProp());
-      ClusterProp *clusterSpiderWeb = ClustersRepresentations.back();
-      clusterSpiderWeb->SpiderWeb->SetPoints(spiderWebPoints.GetPointer());
-      clusterSpiderWeb->SpiderWeb->SetLines(spiderWebLines.GetPointer());
-      clusterSpiderWeb->SpiderWeb->Update();
-      clusterSpiderWeb->SpiderWeb->GetCellData()->SetScalars(
+      ClusterProp *clusterGraph = ClustersRepresentations.back();
+      clusterGraph->Graph->SetPoints(graphPoints.GetPointer());
+      clusterGraph->Graph->SetLines(graphLines.GetPointer());
+      clusterGraph->Graph->Update();
+      clusterGraph->Graph->GetCellData()->SetScalars(
         cellData.GetPointer());
-      clusterSpiderWeb->SpiderWebMapper->SetLookupTable(
+      clusterGraph->GraphMapper->SetLookupTable(
         clusterColor.GetPointer());
-      this->External->Renderer->AddActor(clusterSpiderWeb->SpiderWebActor);
+      this->External->Renderer->AddActor(clusterGraph->GraphActor);
       }
     }
 
@@ -355,8 +356,8 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
       double clusterCenter[3] = {0};
       clusterPoints->GetPoint(j,clusterCenter);
 
-      vtkNew<vtkPoints>      spiderWebPoints;
-      vtkNew<vtkCellArray>   spiderWebLines;
+      vtkNew<vtkPoints>      graphPoints;
+      vtkNew<vtkCellArray>   graphLines;
       vtkNew<vtkLookupTable> clusterColor;
       vtkNew<vtkFloatArray>  cellData;
 
@@ -366,34 +367,33 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
       double color[3] = {math->Random(0.,1.),math->Random(0.,1.),math->Random(
                            0.,1.)};
 
-      spiderWebPoints->SetNumberOfPoints(clusterPointsSize+1);
-      spiderWebPoints->SetPoint(0,clusterCenter);
+      graphPoints->SetNumberOfPoints(clusterPointsSize+1);
+      graphPoints->SetPoint(0,clusterCenter);
+      ClustersRepresentations.push_back(new ClusterProp());
+      ClusterProp *clusterGraph = ClustersRepresentations.back();
       for(size_t k = 0; k < clusterPointsSize; ++k)
         {
         double clusterSatelite[3] = {0};
         dataSetPoints->GetPoint(map[j][k],clusterSatelite);
-        spiderWebPoints->SetPoint(k,clusterSatelite);
+        graphPoints->SetPoint(k+1,clusterSatelite);
         vtkNew<vtkLine> line;
         line->GetPointIds()->SetId(0,0);
         line->GetPointIds()->SetId(0,k+1);
-        spiderWebLines->InsertNextCell(line.GetPointer());
+        graphLines->InsertNextCell(line.GetPointer());
         cellData->InsertNextValue(k + 1);
         clusterColor->SetTableValue(k,color[0],color[1],color[2]);
         }
-      ClustersRepresentations.push_back(new ClusterProp());
-      ClusterProp *clusterSpiderWeb = ClustersRepresentations.back();
-      clusterSpiderWeb->SpiderWeb->SetPoints(spiderWebPoints.GetPointer());
-      clusterSpiderWeb->SpiderWeb->SetLines(spiderWebLines.GetPointer());
-      clusterSpiderWeb->SpiderWeb->Update();
-      clusterSpiderWeb->SpiderWeb->GetCellData()->SetScalars(
+      clusterGraph->Graph->SetPoints(graphPoints.GetPointer());
+      clusterGraph->Graph->SetLines(graphLines.GetPointer());
+      clusterGraph->Graph->Update();
+      clusterGraph->Graph->GetCellData()->SetScalars(
         cellData.GetPointer());
-      clusterSpiderWeb->SpiderWebMapper->SetLookupTable(
+      clusterGraph->GraphMapper->SetLookupTable(
         clusterColor.GetPointer());
-      this->External->Renderer->AddActor(clusterSpiderWeb->SpiderWebActor);
+      this->External->Renderer->AddActor(clusterGraph->GraphActor);
       }
     }
 }
-
 
 // ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::SetButtons(
@@ -573,7 +573,7 @@ void msvVTKWidgetClusters::vtkInternal::ClearClusterButtons()
   this->IndexMaps.clear();
   for(size_t i = 0, end = this->ClustersRepresentations.size(); i < end; ++i)
   {    
-      this->External->Renderer->RemoveActor(ClustersRepresentations[i]->SpiderWebActor);
+      this->External->Renderer->RemoveActor(ClustersRepresentations[i]->GraphActor);
   }
   this->ClustersRepresentations.clear();
 }
