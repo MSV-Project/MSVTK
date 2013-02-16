@@ -60,6 +60,10 @@ public:
   void RemoveElement(msvVTKButtonsInterface* buttons);
 
   // Description:
+  // Remove all buttons from the buttons' vector
+  void RemoveElements();
+
+  // Description:
   // Get the specified element
   msvVTKButtonsInterface* GetElement(unsigned int index);
 
@@ -118,6 +122,10 @@ public:
   // Description:
   // Calculate position (center or corner)
   void CalculatePosition();
+
+  // Description:
+  // Get the size of the elemets array
+  size_t GetNumberOfElements();
 
 protected:
   // Object constructor

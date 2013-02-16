@@ -8,7 +8,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+    http://www.apache.org/licenses/LICENSE-2.0.txt
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,10 +35,10 @@ class msvQButtonClustersMainWindowPrivate;
 
 /// \brief Main window for the ButtonClusters demo
 class MSV_ButtonClusters_EXPORT msvQButtonClustersMainWindow
-  : public QMainWindow
+  : public                      QMainWindow
 {
   Q_OBJECT
-  QVTK_OBJECT
+                                QVTK_OBJECT
 
 public:
   typedef QMainWindow Superclass;
@@ -52,11 +52,14 @@ public slots:
   void updateView();
 
 protected slots:
-  void on_ShowDiscs_stateChanged(int state);
-  void on_ShowVolume_stateChanged(int state);
+//   void on_ShowDiscs_stateChanged(int state);
+//   void on_ShowVolume_stateChanged(int state);
+  void on_DataLoader_checkedIndexesChanged();
   void on_EnableClustering_stateChanged(int state);
+  void on_ClusterWithinGroups_stateChanged(int state);
+  void on_UsePlainVTKButtons_stateChanged(int state);
+  void on_ShowClustersRep_stateChanged(int state);
   void on_PixelRadius_valueChanged(double value);
-  void on_ShowLevel_currentIndexChanged(int value);
 
 protected:
   QScopedPointer<msvQButtonClustersMainWindowPrivate> d_ptr;
