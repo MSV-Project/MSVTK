@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Time player</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="margin">
@@ -21,6 +21,9 @@
     <widget class="QToolButton" name="firstFrameButton">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Go to start</string>
      </property>
      <property name="text">
       <string>&lt;&lt;</string>
@@ -41,6 +44,9 @@
     <widget class="QToolButton" name="previousFrameButton">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Step backward</string>
      </property>
      <property name="text">
       <string>&lt;</string>
@@ -64,6 +70,9 @@
     <widget class="QToolButton" name="playReverseButton">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Play backward / Pause</string>
      </property>
      <property name="text">
       <string>PlayBack</string>
@@ -89,6 +98,9 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string>Play forward / Pause</string>
+     </property>
      <property name="text">
       <string>Play</string>
      </property>
@@ -113,6 +125,9 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string>Step forward</string>
+     </property>
      <property name="text">
       <string>&gt;</string>
      </property>
@@ -136,6 +151,9 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string>Go to end</string>
+     </property>
      <property name="text">
       <string>&gt;&gt;</string>
      </property>
@@ -153,6 +171,9 @@
    </item>
    <item>
     <widget class="QToolButton" name="repeatButton">
+     <property name="toolTip">
+      <string>Repeat</string>
+     </property>
      <property name="text">
       <string>Repeat</string>
      </property>
@@ -176,6 +197,9 @@
    </item>
    <item>
     <widget class="QDoubleSpinBox" name="speedFactorSpinBox">
+     <property name="toolTip">
+      <string>Time speed ratio</string>
+     </property>
      <property name="prefix">
       <string>x </string>
      </property>

@@ -31,6 +31,7 @@
 class vtkPolyData;
 class vtkRenderer;
 
+/// \brief Helper class to manage vtk buttons within the ECG demo application.
 class MSV_ECG_EXPORT msvVTKECGButtonsManager : public vtkObject
 {
 public:

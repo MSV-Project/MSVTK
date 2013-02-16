@@ -47,7 +47,7 @@ protected:
 
   vtkSmartPointer<vtkAlgorithm> filter;
 
-  bool   automaticSingleStep;             // Compute singleStep as the time between frames, true by default
+  bool automaticSingleStep;             // Compute singleStep as the time between frames, true by default
   double maxFrameRate;                    // Time Playing speed factor.
   QTimer* timer;                          // Timer to process the player.
   QTime realTime;                         // Time to reference the real one.
@@ -64,14 +64,15 @@ public:
     {
     PipelineInfoType();
 
-    int    numberOfTimeSteps;
+    bool isConnected;
+    unsigned int numberOfTimeSteps;
     double timeRange[2];
-    double lastTimeRequest;
-    bool   isConnected;
+    double currentTime;
 
+    void printSelf()const;
     double clampTimeInterval(double, double) const; // Tranform a frameRate into a time interval
     double frameToTime(int) const;    // Convert a frame index into a time.
-    int timeToFrame(double) const;    // Convert a time into its closest frame.
+    unsigned int timeToFrame(double) const;    // Convert a time into its closest frame.
     double timeNextFrame() const;     // Get the time corresponding to the next frame.
     double timePreviousFrame() const; // Get the time corresponding to the previous frame.
     };
@@ -84,7 +85,7 @@ public:
 };
 
 //------------------------------------------------------------------------------
-// msvQECGMainWindowPrivate methods
+// msvQTimePlayerWidgetPrivate methods
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidgetPrivate::msvQTimePlayerWidgetPrivate
@@ -102,11 +103,24 @@ msvQTimePlayerWidgetPrivate::~msvQTimePlayerWidgetPrivate()
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidgetPrivate::PipelineInfoType::PipelineInfoType()
+  : isConnected(false)
+  , numberOfTimeSteps(0)
+  , currentTime(0.)
 {
-  this->numberOfTimeSteps = 0;
-  this->timeRange[0]      = this->timeRange[1] = 0;
-  this->lastTimeRequest   = 0;
-  this->isConnected       = false;
+  this->timeRange[0] = 0.;
+  this->timeRange[1] = 0.;
+}
+
+//------------------------------------------------------------------------------
+void msvQTimePlayerWidgetPrivate::PipelineInfoType::printSelf()const
+{
+  std::cout << "---------------------------------------------------------------" << std::endl
+            << "Pipeline info: " << this << std::endl
+            << "Number of time steps: " << this->numberOfTimeSteps << std::endl
+            << "Time range: " << this->timeRange[0] << " " << this->timeRange[1] << std::endl
+            << "Last time request: " << this->currentTime << std::endl
+            << "Is connected: " << this->isConnected << std::endl;
+
 }
 
 //------------------------------------------------------------------------------
@@ -131,10 +145,11 @@ msvQTimePlayerWidgetPrivate::retrievePipelineInfo()
     info->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   info->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), pipeInfo.timeRange);
 
-  if (info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())) {
-    pipeInfo.lastTimeRequest =
-      info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
-  }
+  pipeInfo.currentTime =
+    info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) ?
+    info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]:
+    0.;
+
   return pipeInfo;
 }
 
@@ -155,34 +170,40 @@ clampTimeInterval(double playbackSpeed, double maxFrameRate) const
 double msvQTimePlayerWidgetPrivate::PipelineInfoType::frameToTime(int frame) const
 {
   double period = this->timeRange[1] - this->timeRange[0];
-  if (this->numberOfTimeSteps == 0 || period == 0)
+  if (this->numberOfTimeSteps == 0)
     return vtkMath::Nan();
+  else if (this->numberOfTimeSteps == 1)
+    return this->timeRange[0];
 
-  return period / static_cast<double>(this->numberOfTimeSteps-1) * frame;
+  double time= (period * frame) / static_cast<double>(this->numberOfTimeSteps-1);
+  return time;
 }
 
 //------------------------------------------------------------------------------
-int msvQTimePlayerWidgetPrivate::PipelineInfoType::timeToFrame(double time) const
+unsigned int msvQTimePlayerWidgetPrivate::PipelineInfoType::timeToFrame(double time) const
 {
   double period = this->timeRange[1] - this->timeRange[0];
-  if (this->numberOfTimeSteps == 0 || period == 0)
+  if (this->numberOfTimeSteps == 0)
     return -1;
-
-  return static_cast<int>(((this->numberOfTimeSteps-1)/period)*time);
+  else if (period == 0.)
+    return 0;
+  unsigned int frame = qRound(((this->numberOfTimeSteps-1)/period)*time);
+  return frame;
 }
 
 //------------------------------------------------------------------------------
 double msvQTimePlayerWidgetPrivate::PipelineInfoType::timePreviousFrame() const
 {
-  int currentFrame = this->timeToFrame(this->lastTimeRequest);
+  int currentFrame = this->timeToFrame(this->currentTime);
   return this->frameToTime(currentFrame-1);
 }
 
 //------------------------------------------------------------------------------
 double msvQTimePlayerWidgetPrivate::PipelineInfoType::timeNextFrame() const
 {
-  int currentFrame = this->timeToFrame(this->lastTimeRequest);
-  return this->frameToTime(currentFrame+1);
+  int currentFrame = this->timeToFrame(this->currentTime);
+  double res = this->frameToTime(currentFrame+1);
+  return res;
 }
 
 //------------------------------------------------------------------------------
@@ -196,8 +217,8 @@ void msvQTimePlayerWidgetPrivate::setupUi(QWidget* widget)
   // Connect Menu ToolBars actions
   q->connect(this->firstFrameButton, SIGNAL(pressed()), q, SLOT(goToFirstFrame()));
   q->connect(this->previousFrameButton, SIGNAL(pressed()), q, SLOT(goToPreviousFrame()));
-  q->connect(this->playButton, SIGNAL(toggled(bool)), q, SLOT(onPlay(bool)));
-  q->connect(this->playReverseButton, SIGNAL(toggled(bool)), q, SLOT(onPlayReverse(bool)));
+  q->connect(this->playButton, SIGNAL(toggled(bool)), q, SLOT(playForward(bool)));
+  q->connect(this->playReverseButton, SIGNAL(toggled(bool)), q, SLOT(playBackward(bool)));
   q->connect(this->nextFrameButton, SIGNAL(pressed()), q, SLOT(goToNextFrame()));
   q->connect(this->lastFrameButton, SIGNAL(pressed()), q, SLOT(goToLastFrame()));
   q->connect(this->speedFactorSpinBox, SIGNAL(valueChanged(double)), q, SLOT(setPlaySpeed(double)));
@@ -221,18 +242,18 @@ void msvQTimePlayerWidgetPrivate::updateUi()
 void msvQTimePlayerWidgetPrivate::updateUi(const PipelineInfoType& pipeInfo)
 {
   // Buttons
-  this->firstFrameButton->setEnabled((pipeInfo.lastTimeRequest > pipeInfo.timeRange[0]));
-  this->previousFrameButton->setEnabled((pipeInfo.lastTimeRequest > pipeInfo.timeRange[0]));
+  this->firstFrameButton->setEnabled((pipeInfo.currentTime > pipeInfo.timeRange[0]));
+  this->previousFrameButton->setEnabled((pipeInfo.currentTime > pipeInfo.timeRange[0]));
   this->playButton->setEnabled((pipeInfo.numberOfTimeSteps > 1));
   this->playReverseButton->setEnabled((pipeInfo.numberOfTimeSteps > 1));
-  this->nextFrameButton->setEnabled((pipeInfo.lastTimeRequest < pipeInfo.timeRange[1]));
-  this->lastFrameButton->setEnabled((pipeInfo.lastTimeRequest < pipeInfo.timeRange[1]));
+  this->nextFrameButton->setEnabled((pipeInfo.currentTime < pipeInfo.timeRange[1]));
+  this->lastFrameButton->setEnabled((pipeInfo.currentTime < pipeInfo.timeRange[1]));
 
   // Slider
   this->timeSlider->blockSignals(true);
   this->timeSlider->setEnabled((pipeInfo.timeRange[0]!=pipeInfo.timeRange[1]));
   this->timeSlider->setRange(pipeInfo.timeRange[0], pipeInfo.timeRange[1]);
-  this->timeSlider->setValue(pipeInfo.lastTimeRequest);
+  this->timeSlider->setValue(pipeInfo.currentTime);
 
   // Set the slider default singleStep to a frame in automatique mode.
   if (this->automaticSingleStep)
@@ -250,7 +271,7 @@ void msvQTimePlayerWidgetPrivate::requestData(const PipelineInfoType& pipeInfo,
   time = qBound( pipeInfo.timeRange[0], time, pipeInfo.timeRange[1]);
 
   // Abort the request
-  if (!pipeInfo.isConnected || time == pipeInfo.lastTimeRequest)
+  if (!pipeInfo.isConnected || time == pipeInfo.currentTime)
     return;
 
   for (int portIndex = 0;
@@ -292,18 +313,15 @@ void msvQTimePlayerWidgetPrivate::processRequest(const PipelineInfoType& pipeInf
 //------------------------------------------------------------------------------
 bool msvQTimePlayerWidgetPrivate::isConnected()
 {
-  if (this->filter                 &&
-      this->filter->HasExecutive() &&
-      this->filter->GetExecutive()->GetInputInformation(0) &&
-      this->filter->GetExecutive()->GetInputInformation(0)->
-        GetInformationObject(0))
-    return true;
-
-  return false;
+  return this->filter &&
+    this->filter->HasExecutive() &&
+    this->filter->GetExecutive()->GetInputInformation(0) &&
+    this->filter->GetExecutive()->GetInputInformation(0)->
+      GetInformationObject(0);
 }
 
 //------------------------------------------------------------------------------
-// msvQECGMainWindow methods
+// msvQTimePlayerWidget methods
 
 //------------------------------------------------------------------------------
 msvQTimePlayerWidget::msvQTimePlayerWidget(QWidget* parentWidget)
@@ -426,7 +444,7 @@ void msvQTimePlayerWidget::play()
       }
 
     // We reset the Slider to the initial value if we play from the end
-    if (pipeInfo.lastTimeRequest == pipeInfo.timeRange[1])
+    if (pipeInfo.currentTime == pipeInfo.timeRange[1])
       d->timeSlider->setValue(pipeInfo.timeRange[0]);
   }
   else if (d->direction == QAbstractAnimation::Backward) {
@@ -442,7 +460,7 @@ void msvQTimePlayerWidget::play()
       }
 
     // We reset the Slider to the initial value if we play from the beginning
-    if (pipeInfo.lastTimeRequest == pipeInfo.timeRange[0])
+    if (pipeInfo.currentTime == pipeInfo.timeRange[0])
       d->timeSlider->setValue(pipeInfo.timeRange[1]);
   }
 
@@ -479,14 +497,14 @@ void msvQTimePlayerWidget::stop()
 }
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::onPlay(bool play)
+void msvQTimePlayerWidget::playForward(bool play)
 {
   this->setDirection(QAbstractAnimation::Forward);
   this->play(play);
 }
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::onPlayReverse(bool play)
+void msvQTimePlayerWidget::playBackward(bool play)
 {
   this->setDirection(QAbstractAnimation::Backward);
   this->play(play);
@@ -504,14 +522,14 @@ void msvQTimePlayerWidget::onTick()
   msvQTimePlayerWidgetPrivate::PipelineInfoType
     pipeInfo = d->retrievePipelineInfo();
 
-  double timeRequest = pipeInfo.lastTimeRequest + d->realTime.restart() *
+  double timeRequest = pipeInfo.currentTime + d->realTime.restart() *
                        d->speedFactorSpinBox->value() *
                        ((d->direction == QAbstractAnimation::Forward) ? 1 : -1);
 
   if (d->playButton->isChecked() && !d->playReverseButton->isChecked()) {
     if (timeRequest > pipeInfo.timeRange[1] && !d->repeatButton->isChecked()) {
       d->processRequest(pipeInfo, timeRequest);
-      this->onPlay(false);
+      this->playForward(false);
       return;
     }
     else if (timeRequest > pipeInfo.timeRange[1] &&
@@ -523,7 +541,7 @@ void msvQTimePlayerWidget::onTick()
   else if (!d->playButton->isChecked() && d->playReverseButton->isChecked()) {
     if (timeRequest < pipeInfo.timeRange[0] && !d->repeatButton->isChecked()) {
       d->processRequest(pipeInfo, timeRequest);
-      this->onPlayReverse(false);
+      this->playBackward(false);
       return;
     }
     else if (timeRequest < pipeInfo.timeRange[0] &&
@@ -566,7 +584,7 @@ void msvQTimePlayerWidget::setPlaySpeed(double speedFactor)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-void msvQTimePlayerWidget::setfirstFrameIcon(const QIcon& ico)
+void msvQTimePlayerWidget::setFirstFrameIcon(const QIcon& ico)
 {
   Q_D(msvQTimePlayerWidget);
   d->firstFrameButton->setIcon(ico);

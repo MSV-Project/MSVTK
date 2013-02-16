@@ -25,7 +25,7 @@
 
 // MSVTK
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 // VTK includes
 #include "vtkNew.h"
@@ -51,7 +51,7 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
 
   // Create the pipeline
   vtkNew<vtkPolyDataReader> polyDataReader;
-  vtkNew<msvVTKPolyDataFileSeriesReader> fileSeriesReader;
+  vtkNew<msvVTKDataFileSeriesReader> fileSeriesReader;
   fileSeriesReader->SetReader(polyDataReader.GetPointer());
 
   vtkNew<vtkPolyDataMapper> polyMapper;
@@ -108,14 +108,14 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
   timePlayerWidget->setCurrentTime(1.);
   timePlayerWidget->goToFirstFrame();
   timePlayerWidget->play(false);
-  timePlayerWidget->onPlay(true);
-  timePlayerWidget->onPlayReverse(true);
+  timePlayerWidget->playForward(true);
+  timePlayerWidget->playBackward(true);
   timePlayerWidget->pause();
   timePlayerWidget->stop();
 
   // We reset the Slider to the initial value if we play from the end
   timePlayerWidget->goToLastFrame();
-  timePlayerWidget->onPlay(true);
+  timePlayerWidget->playForward(true);
 
   QEventLoop* loop = new QEventLoop();
   QObject::connect(timePlayerWidget, SIGNAL(onTimeout()), loop, SLOT(quit()));
@@ -124,7 +124,7 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
   // when it plays in the forward direction.
   timePlayerWidget->goToFirstFrame();
   timePlayerWidget->setRepeat(false);
-  timePlayerWidget->onPlay(true);
+  timePlayerWidget->playForward(true);
   loop->exec();
   loop->exec();
   if (timePlayerWidget->currentTime() != 1) {
@@ -135,7 +135,7 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
   // When the time arrives at the beginning of the range, it stops itself
   // when it plays in the backward direction.
   timePlayerWidget->goToLastFrame();
-  timePlayerWidget->onPlayReverse(true);
+  timePlayerWidget->playBackward(true);
   loop->exec();
   loop->exec();
   if (timePlayerWidget->currentTime() != 0) {
@@ -147,7 +147,7 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
   // when it plays in the forward direction.
   timePlayerWidget->goToFirstFrame();
   timePlayerWidget->setRepeat(true);
-  timePlayerWidget->onPlay(true);
+  timePlayerWidget->playForward(true);
   loop->exec();
   loop->exec();
   if (timePlayerWidget->currentTime() != 0) {
@@ -159,7 +159,7 @@ int msvQTimePlayerWidgetTestPlayback(int argc, char * argv[])
   // when it plays in the backward direction.
   timePlayerWidget->goToLastFrame();
   timePlayerWidget->setRepeat(true);
-  timePlayerWidget->onPlayReverse(true);
+  timePlayerWidget->playBackward(true);
   loop->exec();
   loop->exec();
   if (timePlayerWidget->currentTime() != 1) {
