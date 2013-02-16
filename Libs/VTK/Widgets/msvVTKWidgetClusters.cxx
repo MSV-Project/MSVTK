@@ -8,7 +8,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+    http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +21,13 @@
 // VTK includes
 #include <vtkButtonWidget.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
 #include <vtkCommand.h>
 #include <vtkCamera.h>
 #include <vtkCubeSource.h>
+#include <vtkFloatArray.h>
+#include <vtkImageData.h>
 #include <vtkIdList.h>
 #include <vtkInformation.h>
 #include <vtkInformationDoubleVectorKey.h>
@@ -31,6 +35,7 @@
 #include <vtkInformationIntegerVectorKey.h>
 #include <vtkInformationKey.h>
 #include <vtkKdTreePointLocator.h>
+#include <vtkLine.h>
 #include <vtkLookupTable.h>
 #include <vtkMath.h>
 #include <vtkMultiPieceDataSet.h>
@@ -43,24 +48,36 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkVertex.h>
 #include <vtkWidgetEvent.h>
 #include <vtkSmartPointer.h>
-#include <vtkUnstructuredGrid.h>
 
 // MSVTK includes
 #include "msvVTKWidgetClusters.h"
 #include "msvVTKProp3DButtonRepresentation.h"
+#include "msvVTKButtonsManager.h"
 
 // STD Includes
 #include <map>
 #include <vector>
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 class msvVTKWidgetClusters::vtkInternal
 {
 public:
   vtkInternal(msvVTKWidgetClusters* external);
   ~vtkInternal();
+
+  struct ClusterProp : vtkObjectBase
+  {
+    ClusterProp();
+
+    vtkSmartPointer<vtkPolyData>       Graph;
+    vtkSmartPointer<vtkPolyDataMapper> GraphMapper;
+    vtkSmartPointer<vtkActor>          GraphActor;
+
+    bool Hidden;
+  };
 
   struct ButtonProp : vtkObjectBase
   {
@@ -97,6 +114,9 @@ public:
   typedef std::vector<IndexMapType>   VectorOfIndexMaps;
   typedef std::vector<vtkDataSetItem> VectorOfDataObjets;
 
+  typedef std::vector<vtkSmartPointer<ClusterProp> >
+    VectorOfClusterRepresentations;
+
   void GetDisplayCoordinates(vtkPoints* from,vtkPoints* to);
   void ClearClusterButtons();
   size_t ComputeClusters(vtkPoints* positions);
@@ -107,17 +127,17 @@ public:
                      double                 radius,
                      const vtkIdType        queryPointId,
                      vtkIdList *            neighbors);
-  void GetClustersPositions(vtkPoints*    widgetPositions,
-                            IndexMapType& indexMap,
-                            vtkPoints*    clusterPositions);
+  void GetClustersButtonPositions(vtkPoints*    widgetPositions,
+                                  IndexMapType& indexMap,
+                                  vtkPoints*    clusterPositions);
   ButtonHandleReprensentation* GetButtonHandle();
   void SetButtons(vtkPoints *points, ButtonListType& buttonList);
+  void SetButtons(vtkPoints *points, msvVTKButtonsGroup *buttonList);
   vtkDataObject *GetChild(size_t index);
   void SetChild(size_t index, vtkDataObject*);
-  size_t GetNumberOfChildren() {
-    return Children.size();
-  }
+  size_t GetNumberOfChildren();
   void SetNumberOfChildren(size_t num);
+  void CreateClustersRepresentations(size_t group);
 
   msvVTKWidgetClusters* External;
 
@@ -129,17 +149,24 @@ public:
   ButtonListType ClusterButtons;
 
   VectorOfDataObjets Children;
+
+  VectorOfClusterRepresentations ClustersRepresentations;
+
+  vtkSmartPointer<msvVTKButtonsManager> ButtonManager;
 };
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // vtkInternal methods
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::vtkInternal::vtkInternal(msvVTKWidgetClusters* ext)
 {
-  this->External = ext;
+  this->External      = ext;
+  this->ButtonManager = msvVTKButtonsManager::New();
+  // Create the group containing clusters buttons
+  this->ButtonManager->CreateGroup();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::vtkInternal::~vtkInternal()
 {
   this->ClearClusterButtons();
@@ -149,9 +176,10 @@ msvVTKWidgetClusters::vtkInternal::~vtkInternal()
     this->ButtonList[i]->Delete();
     }
   this->ButtonList.clear();
+  this->ClustersRepresentations.clear();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::vtkInternal::ButtonProp::ButtonProp()
 {
   this->Cube       = vtkCubeSource::New();
@@ -164,7 +192,20 @@ msvVTKWidgetClusters::vtkInternal::ButtonProp::ButtonProp()
   this->Hidden = false;
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+msvVTKWidgetClusters::vtkInternal::ClusterProp::ClusterProp()
+{
+  this->Graph       = vtkPolyData::New();
+  this->GraphMapper = vtkPolyDataMapper::New();
+  this->GraphActor  = vtkActor::New();
+
+  this->GraphMapper->SetInput(this->Graph);
+  this->GraphActor->SetMapper(this->GraphMapper);
+
+  this->Hidden = false;
+}
+
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::
   ButtonHandleReprensentation()
 {
@@ -172,21 +213,21 @@ msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::
   this->PropButton   = new ButtonProp();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::Show()
 {
   this->ButtonWidget->GetRepresentation()->VisibilityOn();
   this->ButtonWidget->EnabledOn();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::Hide()
 {
   this->ButtonWidget->GetRepresentation()->VisibilityOff();
   this->ButtonWidget->EnabledOff();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation*
 msvVTKWidgetClusters::vtkInternal::GetButtonHandle()
 {
@@ -203,7 +244,7 @@ msvVTKWidgetClusters::vtkInternal::GetButtonHandle()
     this->External->ColorLookUpTable);
   vtkNew<vtkButtonWidget> buttonWidget;
   buttonWidget->SetInteractor(
-    this->External->GetRenderer()->GetRenderWindow()->GetInteractor());
+    this->External->Renderer->GetRenderWindow()->GetInteractor());
   buttonWidget->SetRepresentation(rep.GetPointer());
   buttonWidget->SetEnabled(1);
 
@@ -212,7 +253,176 @@ msvVTKWidgetClusters::vtkInternal::GetButtonHandle()
   return buttonHandle;
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
+  size_t group)
+{
+  vtkNew<vtkMath>       math;
+  vtkMultiPieceDataSet* groupDS = vtkMultiPieceDataSet::SafeDownCast(this->GetChild(
+      group));
+  unsigned int numPieces = groupDS->GetNumberOfPieces();
+  if(this->External->ClusteringWithinGroups)
+    {
+    vtkNew<vtkPoints> groupPoints;
+    for(size_t i = 0; i < numPieces; ++i)
+      {
+      vtkPolyData* ds = vtkPolyData::SafeDownCast(groupDS->GetPiece(i));
+
+      vtkPoints *points = ds->GetPoints();
+      for(vtkIdType j = 0; j < points->GetNumberOfPoints(); ++j)
+        {
+        double point[3] = {0};
+        points->GetPoint(j, point);
+        groupPoints->InsertNextPoint(point);
+        }
+      }
+
+    vtkIdType       clusterIndex   = 0;
+    int             buttonRange[2] = {0};
+    vtkInformation* info           = groupDS->GetMetaData(0u);
+    if(info)
+      {
+      clusterIndex = info->Get(CLUSTER_IDX());
+      info->Get(CLUSTER_BUTTONS_OFFSET(),buttonRange);
+      }
+
+    vtkInternal::IndexMapType &map = this->IndexMaps.at(clusterIndex);
+
+    vtkNew<vtkPoints> clusterPoints;
+    this->GetClustersButtonPositions(
+      groupPoints.GetPointer(),map,clusterPoints.GetPointer());
+
+    for(vtkIdType j = 0, end = clusterPoints->GetNumberOfPoints(); j < end; ++j)
+      {
+      double clusterCenter[3] = {0};
+      clusterPoints->GetPoint(j,clusterCenter);
+
+      vtkNew<vtkPoints>      graphPoints;
+      vtkNew<vtkCellArray>   graphLines;
+      vtkNew<vtkLookupTable> clusterColor;
+      vtkNew<vtkFloatArray>  cellData;
+
+      size_t clusterPointsSize = map[j].size();
+      clusterColor->SetNumberOfTableValues(clusterPointsSize);
+
+      double color[3] = {math->Random(0.,1.),math->Random(0.,1.),math->Random(
+                           0.,           1.)};
+
+      graphPoints->SetNumberOfPoints(clusterPointsSize+1);
+      graphPoints->SetPoint(0,clusterCenter);
+      for(size_t k = 0; k < clusterPointsSize; ++k)
+        {
+        vtkNew<vtkLine> line;
+        double          clusterSatelite[3] = {0};
+        groupPoints->GetPoint(map[j][k],clusterSatelite);
+        graphPoints->SetPoint(k+1,clusterSatelite);
+        line->GetPointIds()->SetId(0,0);
+        line->GetPointIds()->SetId(0,k+1);
+        graphLines->InsertNextCell(line.GetPointer());
+        cellData->InsertNextValue(k + 1);
+        clusterColor->SetTableValue(k,color[0],color[1],color[2]);
+        }
+      ClustersRepresentations.push_back(new ClusterProp());
+      ClusterProp *clusterGraph = ClustersRepresentations.back();
+      clusterGraph->Graph->SetPoints(graphPoints.GetPointer());
+      clusterGraph->Graph->SetLines(graphLines.GetPointer());
+      clusterGraph->Graph->Update();
+      clusterGraph->Graph->GetCellData()->SetScalars(
+        cellData.GetPointer());
+      clusterGraph->GraphMapper->SetLookupTable(
+        clusterColor.GetPointer());
+      if(!this->External->UsePlainVTKButtons)
+        {
+        msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(ButtonManager->GetElement(
+            0));
+        msvVTKButtons *button           = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(
+            buttonRange[0]+j));
+        button->SetBounds(clusterGraph->Graph->GetBounds());
+        button->SetData(clusterGraph->Graph);
+        button->Update();
+        }
+      this->External->Renderer->AddActor(clusterGraph->GraphActor);
+      }
+    return;
+    }
+
+  for(unsigned int i = 0; i < numPieces; ++i)
+    {
+    vtkPolyData* dataSet =
+      vtkPolyData::SafeDownCast(groupDS->GetPiece(i));
+    vtkPoints *     dataSetPoints  = dataSet->GetPoints();
+    vtkIdType       clusterIndex   = 0;
+    int             buttonRange[2] = {0};
+    vtkInformation* info           = groupDS->GetMetaData(i);
+    if(info)
+      {
+      clusterIndex = info->Get(CLUSTER_IDX());
+      info->Get(CLUSTER_BUTTONS_OFFSET(),buttonRange);
+      }
+
+    vtkInternal::IndexMapType &map = this->IndexMaps.at(clusterIndex);
+
+    vtkNew<vtkPoints> clusterPoints;
+    this->GetClustersButtonPositions(dataSetPoints,map,
+      clusterPoints.GetPointer());
+
+    for(vtkIdType j = 0, end = clusterPoints->GetNumberOfPoints(); j < end; ++j)
+      {
+      double clusterCenter[3] = {0};
+      clusterPoints->GetPoint(j,clusterCenter);
+
+      vtkNew<vtkPoints>      graphPoints;
+      vtkNew<vtkCellArray>   graphLines;
+      vtkNew<vtkLookupTable> clusterColor;
+      vtkNew<vtkFloatArray>  cellData;
+
+      size_t clusterPointsSize = map[j].size();
+      clusterColor->SetNumberOfTableValues(clusterPointsSize);
+
+      double color[3] =
+        {
+        math->Random(0.,1.),
+        math->Random(0.,1.),
+        math->Random(0.,1.)
+        };
+
+      graphPoints->SetNumberOfPoints(clusterPointsSize+1);
+      graphPoints->SetPoint(0,clusterCenter);
+      ClustersRepresentations.push_back(new ClusterProp());
+      ClusterProp *clusterGraph = ClustersRepresentations.back();
+      for(size_t k = 0; k < clusterPointsSize; ++k)
+        {
+        vtkNew<vtkLine> line;
+        double          clusterSatelite[3] = {0};
+        dataSetPoints->GetPoint(map[j][k],clusterSatelite);
+        graphPoints->SetPoint(k+1,clusterSatelite);
+        line->GetPointIds()->SetId(0,0);
+        line->GetPointIds()->SetId(0,k+1);
+        graphLines->InsertNextCell(line.GetPointer());
+        cellData->InsertNextValue(k + 1);
+        clusterColor->SetTableValue(k,color[0],color[1],color[2]);
+        }
+      clusterGraph->Graph->SetPoints(graphPoints.GetPointer());
+      clusterGraph->Graph->SetLines(graphLines.GetPointer());
+      clusterGraph->Graph->Update();
+      clusterGraph->Graph->GetCellData()->SetScalars(cellData.GetPointer());
+      clusterGraph->GraphMapper->SetLookupTable(clusterColor.GetPointer());
+      if(!this->External->UsePlainVTKButtons)
+        {
+        msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(ButtonManager->GetElement(
+            0));
+        msvVTKButtons *button           = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(
+            buttonRange[0]+j));
+        button->SetBounds(clusterGraph->Graph->GetBounds());
+        button->SetData(clusterGraph->Graph);
+        button->Update();
+        }
+      this->External->Renderer->AddActor(clusterGraph->GraphActor);
+      }
+    }
+}
+
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::SetButtons(
   vtkPoints*                   points,
   vtkInternal::ButtonListType& buttonList)
@@ -244,13 +454,68 @@ void msvVTKWidgetClusters::vtkInternal::SetButtons(
     }
 }
 
-//----------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+void msvVTKWidgetClusters::vtkInternal::SetButtons(
+  vtkPoints*          points,
+  msvVTKButtonsGroup* buttonList)
+{
+  vtkIdType numberOfPoints = points->GetNumberOfPoints();
+  if (numberOfPoints == 0)
+    {
+    return;
+    }
+
+  double size      = this->External->ButtonWidgetSize;
+  double center[3] = {};
+  for(vtkIdType i = 0; i < numberOfPoints; ++i)
+    {
+    points->GetPoint(i,center);
+    double         bounds[6] = { center[0] - size / 2,
+                                 center[0] + size / 2,
+                                 center[1] - size / 2,
+                                 center[1] + size / 2,
+                                 center[2] - size / 2,
+                                 center[2] + size / 2};
+    msvVTKButtons *button  = buttonList->CreateButtons();
+    const char     label[] = {"Zoom"};
+    button->SetShowButton(true);
+    button->SetOnCenter(true);
+    button->SetCurrentRenderer(this->External->Renderer);
+    button->SetLabelText(label);
+    if(this->External->ButtonIcon)
+      {
+      button->SetImage(this->External->ButtonIcon);
+      }
+    if(this->External->UsePlainVTKButtons)
+      {
+      button->SetBounds(bounds);
+      button->Update();
+      }
+    }
+//   for(size_t i = 0; i < buttonList->GetNumberOfElements(); ++i)
+//     {
+//     msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonList->GetElement(
+//         i));
+//     double pos[2];
+//     button->GetDisplayPosition(pos);
+//     std::cout << " button[" << i << "] -> " << "[" << pos[0] << "," << pos[1] <<
+//       "]" << std::endl;
+//     }
+}
+
+// ----------------------------------------------------------------------------
+size_t msvVTKWidgetClusters::vtkInternal::GetNumberOfChildren()
+{
+  return Children.size();
+}
+
+// ----------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::SetNumberOfChildren(size_t num)
 {
   this->Children.resize(num);
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 vtkDataObject *msvVTKWidgetClusters::vtkInternal::GetChild(size_t index)
 {
   if(index < this->Children.size())
@@ -260,7 +525,7 @@ vtkDataObject *msvVTKWidgetClusters::vtkInternal::GetChild(size_t index)
   return 0;
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::SetChild(size_t         index,
                                                  vtkDataObject* dobj)
 {
@@ -273,8 +538,8 @@ void msvVTKWidgetClusters::vtkInternal::SetChild(size_t         index,
   item.DataObject = dobj;
 }
 
-//------------------------------------------------------------------------------
-void msvVTKWidgetClusters::vtkInternal::GetClustersPositions(
+// ------------------------------------------------------------------------------
+void msvVTKWidgetClusters::vtkInternal::GetClustersButtonPositions(
   vtkPoints *                widgetPositions,
   vtkInternal::IndexMapType &indexMap,
   vtkPoints *                clusterPositions
@@ -299,7 +564,8 @@ void msvVTKWidgetClusters::vtkInternal::GetClustersPositions(
       math->Add(center,point,center);
       }
     math->MultiplyScalar(center,1.0/numberOfElements);
-    if(this->External->GetShiftWidgetCenterToCorner())
+
+    if(this->External->ShiftWidgetCenterToCorner)
       {
       vtkNew<vtkPoints> points;
       for (size_t j = 0; j < numberOfElements; ++j)
@@ -311,11 +577,11 @@ void msvVTKWidgetClusters::vtkInternal::GetClustersPositions(
 
       double bounds[6] = {0};
       points->GetBounds(bounds);
-      double ext[3] = 
+      double ext[3] =
         {
-           .5*(bounds[0]-bounds[1]),
-           .5*(bounds[2]-bounds[3]),
-           .5*(bounds[4]-bounds[5])
+        .5*(bounds[0]-bounds[1]),
+        .5*(bounds[2]-bounds[3]),
+        .5*(bounds[4]-bounds[5])
         };
       math->Add(center,ext,center);
       }
@@ -323,7 +589,7 @@ void msvVTKWidgetClusters::vtkInternal::GetClustersPositions(
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::ClearClusterButtons()
 {
   // We have to first delete the HandleReprensentation of each vtkButtonWidget
@@ -331,12 +597,19 @@ void msvVTKWidgetClusters::vtkInternal::ClearClusterButtons()
     {
     this->ClusterButtons[i]->Delete();
     }
-
+  msvVTKButtonsGroup *clusterButtons
+    = msvVTKButtonsGroup::SafeDownCast(this->ButtonManager->GetElement(0));
+  clusterButtons->RemoveElements();
   this->ClusterButtons.clear();
   this->IndexMaps.clear();
+  for(size_t i = 0, end = this->ClustersRepresentations.size(); i < end; ++i)
+    {
+    this->External->Renderer->RemoveActor(ClustersRepresentations[i]->GraphActor);
+    }
+  this->ClustersRepresentations.clear();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 size_t msvVTKWidgetClusters::vtkInternal::ComputeClusters(
   vtkPoints* positions)
 {
@@ -411,7 +684,7 @@ size_t msvVTKWidgetClusters::vtkInternal::ComputeClusters(
   return this->IndexMaps.size()-1;
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::RefineClusters(
   vtkPoints *       displayPoints,
   std::vector<int> &clusterLabels,
@@ -432,7 +705,7 @@ void msvVTKWidgetClusters::vtkInternal::RefineClusters(
   vtkNew<vtkMath> math;
 
   vtkNew<vtkPoints> clusterPoints;
-  this->GetClustersPositions(displayPoints, indexMap,
+  this->GetClustersButtonPositions(displayPoints, indexMap,
     clusterPoints.GetPointer());
 
   for(vtkIdType i = 0; i < numberOfPoints; ++i)
@@ -454,7 +727,7 @@ void msvVTKWidgetClusters::vtkInternal::RefineClusters(
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::FindNeighbors(
   vtkKdTreePointLocator* kdtree, double radius,
   const vtkIdType queryPointId,
@@ -471,7 +744,7 @@ void msvVTKWidgetClusters::vtkInternal::FindNeighbors(
   neighbors->DeleteId(queryPointId);
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::vtkInternal::GetDisplayCoordinates(vtkPoints* from,
                                                               vtkPoints* to)
 {
@@ -481,7 +754,7 @@ void msvVTKWidgetClusters::vtkInternal::GetDisplayCoordinates(vtkPoints* from,
     }
 
   vtkIdType    sizeFrom = from->GetNumberOfPoints();
-  vtkRenderer *renderer = this->External->GetRenderer();
+  vtkRenderer *renderer = this->External->Renderer;
 
   for(vtkIdType i = 0; i < sizeFrom; ++i)
     {
@@ -501,16 +774,16 @@ void msvVTKWidgetClusters::vtkInternal::GetDisplayCoordinates(vtkPoints* from,
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // msvVTKWidgetClusters methods
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 vtkStandardNewMacro(msvVTKWidgetClusters);
 vtkInformationKeyMacro(msvVTKWidgetClusters, CLUSTER_IDX, IdType);
 vtkInformationKeyMacro(msvVTKWidgetClusters, DATASET_BUTTONS_OFFSET, IdType);
 vtkInformationKeyRestrictedMacro(msvVTKWidgetClusters, CLUSTER_BUTTONS_OFFSET,
   IntegerVector, 2);
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::msvVTKWidgetClusters()
 {
   this->Internal         = new vtkInternal(this);
@@ -518,30 +791,34 @@ msvVTKWidgetClusters::msvVTKWidgetClusters()
   this->ColorLookUpTable->SetNumberOfColors(5);
   this->ColorLookUpTable->Build();
 
-  this->UseImprovedClustering     = false;
+  this->UseImprovedClustering     = true;
   this->Clustering                = true;
   this->ButtonWidgetSize          = 3,
   this->PixelRadius               = 100;
   this->Renderer                  = 0;
   this->ShiftWidgetCenterToCorner = false;
-  this->ClusteringWithinGroups    = true;
+  this->ClusteringWithinGroups    = false;
+  this->UsePlainVTKButtons        = true;
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 msvVTKWidgetClusters::~msvVTKWidgetClusters()
 {
   delete this->Internal;
   this->ColorLookUpTable->Delete();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 vtkCxxSetObjectMacro(msvVTKWidgetClusters,ColorLookUpTable,vtkLookupTable);
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+vtkCxxSetObjectMacro(msvVTKWidgetClusters,ButtonIcon,vtkImageData);
+
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::SetDataSet(size_t group, size_t idx,
                                       vtkPoints* points)
 {
-  if (group >= this->GetNumberOfLevels())
+  if (group >= this->GetNumberOfGroups())
     {
     this->SetNumberOfLevels(group+1);
     }
@@ -549,9 +826,9 @@ void msvVTKWidgetClusters::SetDataSet(size_t group, size_t idx,
     this->Internal->GetChild(group));
   if (groupDS)
     {
-    vtkSmartPointer<vtkUnstructuredGrid> grid = vtkUnstructuredGrid::New();
-    grid->SetPoints(points);
-    groupDS->SetPiece(idx, grid);
+    vtkNew<vtkPolyData> polyData;
+    polyData->SetPoints(points);
+    groupDS->SetPiece(idx, polyData.GetPointer());
 
     vtkInformation* info = groupDS->GetMetaData(idx);
     if (info)
@@ -561,11 +838,25 @@ void msvVTKWidgetClusters::SetDataSet(size_t group, size_t idx,
       vtkIdType offset = this->Internal->ButtonList.size();
       info->Set(DATASET_BUTTONS_OFFSET(), offset);
       }
-    this->Internal->SetButtons(points,this->Internal->ButtonList);
+//     if(this->UsePlainVTKButtons)
+//       {
+//       this->Internal->SetButtons(points, this->Internal->ButtonList);
+//       }
+//     else
+//       {
+//       msvVTKButtonsGroup *buttonGroup =
+//         this->Internal->ButtonManager->CreateGroup();
+//       this->Internal->SetButtons(points,buttonGroup);
+//       std::cout << "Number of buttons in group ["
+//                 << group
+//                 << ", idx "
+//                 << idx
+//                 << "] = " << buttonGroup->GetNumberOfElements() << std::endl;
+//       }
     }
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void msvVTKWidgetClusters::SetNumberOfLevels(size_t numLevels)
 {
   this->Internal->SetNumberOfChildren(numLevels);
@@ -586,11 +877,11 @@ void msvVTKWidgetClusters::SetNumberOfLevels(size_t numLevels)
     }
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void msvVTKWidgetClusters::SetNumberOfDataSets(size_t group,
                                                size_t numDS)
 {
-  if (group >= this->GetNumberOfLevels())
+  if (group >= this->GetNumberOfGroups())
     {
     this->SetNumberOfLevels(group+1);
     }
@@ -602,7 +893,7 @@ void msvVTKWidgetClusters::SetNumberOfDataSets(size_t group,
     }
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 size_t msvVTKWidgetClusters::GetNumberOfDataSets(size_t group)
 {
   vtkMultiPieceDataSet* groupDS = vtkMultiPieceDataSet::SafeDownCast(
@@ -614,13 +905,13 @@ size_t msvVTKWidgetClusters::GetNumberOfDataSets(size_t group)
   return 0;
 }
 
-//----------------------------------------------------------------------------
-size_t msvVTKWidgetClusters::GetNumberOfLevels()
+// ----------------------------------------------------------------------------
+size_t msvVTKWidgetClusters::GetNumberOfGroups()
 {
   return this->Internal->GetNumberOfChildren();
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void msvVTKWidgetClusters::SetRenderer(vtkRenderer* renderer)
 {
   if (!renderer)
@@ -643,7 +934,7 @@ void msvVTKWidgetClusters::SetRenderer(vtkRenderer* renderer)
     AddObserver(vtkCommand::EndInteractionEvent, callbackCommand);
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::UpdateWidgets()
 {
   this->Clear();
@@ -652,7 +943,7 @@ void msvVTKWidgetClusters::UpdateWidgets()
     return;
     }
 
-  size_t numGroups = this->GetNumberOfLevels();
+  size_t numGroups = this->GetNumberOfGroups();
   for(size_t groupIdx = 0; groupIdx < numGroups; ++groupIdx)
     {
     vtkMultiPieceDataSet* groupDS = vtkMultiPieceDataSet::SafeDownCast(
@@ -660,19 +951,21 @@ void msvVTKWidgetClusters::UpdateWidgets()
     size_t numDataSets = this->GetNumberOfDataSets(groupIdx);
     if(groupDS)
       {
-      if(this->GetClusteringWithinGroups())
+
+      if(this->ClusteringWithinGroups)
         {
         vtkNew<vtkPoints> groupPoints;
         for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
           {
-          vtkUnstructuredGrid* ds
-            = vtkUnstructuredGrid::SafeDownCast(groupDS->GetPiece(dataSetIdx));
+
+          vtkPolyData* ds
+            = vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx));
 
           vtkPoints *points = ds->GetPoints();
           for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
             {
             double point[3] = {0};
-            points->GetPoint(i,point);
+            points->GetPoint(i,  point);
             groupPoints->InsertNextPoint(point);
             }
           }
@@ -684,29 +977,52 @@ void msvVTKWidgetClusters::UpdateWidgets()
           this->Internal->IndexMaps[clusterIdx];
 
         vtkNew<vtkPoints> clusterPositions;
-        this->Internal->GetClustersPositions(groupPoints.GetPointer(),indexMap,
+
+        this->Internal->GetClustersButtonPositions(
+          groupPoints.GetPointer(),indexMap,
           clusterPositions.GetPointer());
 
         vtkInformation* info = groupDS->GetMetaData(0u);
-        if(info)
+
+        if(this->UsePlainVTKButtons)
           {
-          int range[2] = {0};
-          range[0] = this->Internal->ClusterButtons.size();
-          range[1] = clusterPositions->GetNumberOfPoints();
-          info->Set(CLUSTER_IDX(), clusterIdx);
-          info->Set(CLUSTER_BUTTONS_OFFSET(), range, 2);
+          if(info)
+            {
+            int range[2] = {0};
+            range[0] = this->Internal->ClusterButtons.size();
+            range[1] = clusterPositions->GetNumberOfPoints();
+            info->Set(CLUSTER_IDX(),clusterIdx);
+            info->Set(CLUSTER_BUTTONS_OFFSET(),range, 2);
+            }
+          this->Internal->SetButtons(clusterPositions.GetPointer(),
+            this->Internal->ClusterButtons);
           }
-
-        this->Internal->SetButtons(
-          clusterPositions.GetPointer(),
-          this->Internal->ClusterButtons);
-
+        else
+          {
+          msvVTKButtonsGroup *buttonGroup
+            = msvVTKButtonsGroup::SafeDownCast(
+            this->Internal->ButtonManager->GetElement(0));
+          if(info)
+            {
+            int range[2] = {0};
+            range[0] = buttonGroup->GetNumberOfElements();
+            range[1] = clusterPositions->GetNumberOfPoints();
+            info->Set(CLUSTER_IDX(),clusterIdx);
+            info->Set(CLUSTER_BUTTONS_OFFSET(),range,2);
+            }
+          this->Internal->SetButtons(clusterPositions.GetPointer(),buttonGroup);
+          }
+        if(this->CreateClustersRepresentations)
+          {
+          SetClustersRepresentations(groupIdx);
+          }
         continue;
         }
       for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
         {
-        vtkUnstructuredGrid* ds
-          = vtkUnstructuredGrid::SafeDownCast(groupDS->GetPiece(dataSetIdx));
+
+        vtkPolyData* ds
+          = vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx));
         // Recompute clusters for each dataset
         vtkPoints *points     = ds->GetPoints();
         size_t     clusterIdx = this->Internal->ComputeClusters(points);
@@ -716,25 +1032,49 @@ void msvVTKWidgetClusters::UpdateWidgets()
           this->Internal->IndexMaps[clusterIdx];
 
         vtkNew<vtkPoints> clusterPositions;
-        this->Internal->GetClustersPositions(points,indexMap,
+        this->Internal->GetClustersButtonPositions(points,indexMap,
           clusterPositions.GetPointer());
         vtkInformation* info = groupDS->GetMetaData(dataSetIdx);
-        if(info)
+
+        if(this->UsePlainVTKButtons)
           {
-          int range[2] = {0};
-          range[0] = this->Internal->ClusterButtons.size();
-          range[1] = clusterPositions->GetNumberOfPoints();
-          info->Set(CLUSTER_IDX(),clusterIdx);
-          info->Set(CLUSTER_BUTTONS_OFFSET(),range,2);
+          if(info)
+            {
+            int range[2] = {0};
+            range[0] = this->Internal->ClusterButtons.size();
+            range[1] = clusterPositions->GetNumberOfPoints();
+            info->Set(CLUSTER_IDX(),clusterIdx);
+            info->Set(CLUSTER_BUTTONS_OFFSET(),range,2);
+            }
+          this->Internal->SetButtons(
+            clusterPositions.GetPointer(), this->Internal->ClusterButtons);
           }
-        this->Internal->SetButtons(
-          clusterPositions.GetPointer(), this->Internal->ClusterButtons);
+        else
+          {
+          msvVTKButtonsGroup *buttonGroup
+            = msvVTKButtonsGroup::SafeDownCast(
+            this->Internal->ButtonManager->GetElement(0));
+          if(info)
+            {
+            int range[2] = {0};
+            range[0] = buttonGroup->GetNumberOfElements();
+            range[1] = clusterPositions->GetNumberOfPoints();
+            info->Set(CLUSTER_IDX(),clusterIdx);
+            info->Set(CLUSTER_BUTTONS_OFFSET(),range,2);
+            }
+          this->Internal->SetButtons(clusterPositions.GetPointer(),
+            buttonGroup);
+          }
         }
+      }
+    if(this->CreateClustersRepresentations)
+      {
+      SetClustersRepresentations(groupIdx);
       }
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::UpdateWidgets(vtkObject *   vtkNotUsed(caller),
                                          unsigned long vtkNotUsed(event),
                                          void *        clientData,
@@ -752,53 +1092,125 @@ void msvVTKWidgetClusters::UpdateWidgets(vtkObject *   vtkNotUsed(caller),
   self->InvokeEvent (vtkCommand::UpdateDataEvent);
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::Clear()
 {
   this->Internal->ClearClusterButtons();
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowClusterButtons()
 {
-  size_t end = this->Internal->ClusterButtons.size();
-  for (size_t i = 0; i != end; ++i)
+  if(this->UsePlainVTKButtons)
     {
-    this->Internal->ClusterButtons[i]->Show();
+    size_t end = this->Internal->ClusterButtons.size();
+    for (size_t i = 0; i != end; ++i)
+      {
+      this->Internal->ClusterButtons[i]->Show();
+      }
+    }
+  else
+    {
+    msvVTKButtonsManager *buttonManager = this->Internal->ButtonManager;
+    msvVTKButtonsGroup *  clusterGroup  = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(
+        0));
+    size_t numButtons = clusterGroup->GetNumberOfElements();
+    for(size_t i = 0; i < numButtons; ++i)
+      {
+      msvVTKButtons *button = msvVTKButtons::SafeDownCast(clusterGroup->GetElement(
+          i));
+      button->SetShowButton(true);
+      }
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::HideClusterButtons()
 {
-  size_t end = this->Internal->ClusterButtons.size();
-  for (size_t i = 0; i != end; ++i)
+  if(this->UsePlainVTKButtons)
     {
-    this->Internal->ClusterButtons[i]->Hide();
+    size_t end = this->Internal->ClusterButtons.size();
+    for (size_t i = 0; i != end; ++i)
+      {
+      this->Internal->ClusterButtons[i]->Hide();
+      }
+    }
+  else
+    {
+    msvVTKButtonsManager *buttonManager = this->Internal->ButtonManager;
+    msvVTKButtonsGroup *  clusterGroup  = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(
+        0));
+    size_t numButtons = clusterGroup->GetNumberOfElements();
+    for(size_t i = 0; i < numButtons; ++i)
+      {
+      msvVTKButtons *button = msvVTKButtons::SafeDownCast(clusterGroup->GetElement(
+          i));
+      button->SetShowButton(false);
+      }
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowButtons()
 {
-  size_t end = this->Internal->ButtonList.size();
-  for (size_t i = 0; i != end; ++i)
+  if(this->UsePlainVTKButtons)
     {
-    this->Internal->ButtonList[i]->Show();
+    for (size_t i = 0, end = this->Internal->ButtonList.size(); i != end; ++i)
+      {
+      this->Internal->ButtonList[i]->Show();
+      }
+    }
+  else
+    {
+    msvVTKButtonsManager *buttonManager   = this->Internal->ButtonManager;
+    size_t                numButtonGroups =
+      buttonManager->GetNumberOfElements();
+    for(size_t i = 1; i< numButtonGroups; ++i)
+      {
+      msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(
+          i));
+      size_t numButtons = buttonGroup->GetNumberOfElements();
+      for(size_t j = 0; j < numButtons; ++j)
+        {
+        msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(
+            j));
+        button->SetShowButton(true);
+        }
+      }
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::HideButtons()
 {
-  size_t end =this->Internal->ButtonList.size();
-  for (size_t i = 0; i != end; ++i)
+  if(this->UsePlainVTKButtons)
     {
-    this->Internal->ButtonList[i]->Hide();
+    for (size_t i = 0, end = this->Internal->ButtonList.size(); i != end; ++i)
+      {
+      this->Internal->ButtonList[i]->Hide();
+      }
+    }
+  else
+    {
+    msvVTKButtonsManager *buttonManager   = this->Internal->ButtonManager;
+    size_t                numButtonGroups =
+      buttonManager->GetNumberOfElements();
+    for(size_t i = 1; i< numButtonGroups; ++i)
+      {
+      msvVTKButtonsGroup *buttonGroup = msvVTKButtonsGroup::SafeDownCast(buttonManager->GetElement(
+          i));
+      size_t numButtons = buttonGroup->GetNumberOfElements();
+      for(size_t j = 0; j < numButtons; ++j)
+        {
+        msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(
+            j));
+        button->SetShowButton(false);
+        }
+      }
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowClusterButtons(size_t group)
 {
   vtkMultiPieceDataSet* groupDS = vtkMultiPieceDataSet::SafeDownCast(
@@ -838,7 +1250,7 @@ void msvVTKWidgetClusters::ShowClusterButtons(size_t group)
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::HideClusterButtons(size_t group)
 {
   if(this->Internal->ClusterButtons.size() == 0)
@@ -881,7 +1293,7 @@ void msvVTKWidgetClusters::HideClusterButtons(size_t group)
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowButtons(size_t group)
 {
   if(this->Internal->ClusterButtons.size() == 0)
@@ -899,7 +1311,7 @@ void msvVTKWidgetClusters::ShowButtons(size_t group)
       size_t numButtons = 0;
       for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
         {
-        numButtons += vtkUnstructuredGrid::SafeDownCast(groupDS->GetPiece(
+        numButtons += vtkPolyData::SafeDownCast(groupDS->GetPiece(
             dataSetIdx))->GetPoints()->GetNumberOfPoints();;
         }
       vtkInformation* info = groupDS->GetMetaData(0u);
@@ -915,8 +1327,10 @@ void msvVTKWidgetClusters::ShowButtons(size_t group)
       }
     for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
       {
-      size_t numButtons = vtkUnstructuredGrid::SafeDownCast(groupDS->GetPiece(
-          dataSetIdx))->GetPoints()->GetNumberOfPoints();
+
+      size_t numButtons =
+        vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx))->GetPoints()->
+          GetNumberOfPoints();
       vtkInformation* info = groupDS->GetMetaData(dataSetIdx);
       if(info)
         {
@@ -930,7 +1344,7 @@ void msvVTKWidgetClusters::ShowButtons(size_t group)
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::HideButtons(size_t group)
 {
   vtkMultiPieceDataSet* groupDS = vtkMultiPieceDataSet::SafeDownCast(
@@ -944,8 +1358,8 @@ void msvVTKWidgetClusters::HideButtons(size_t group)
       size_t numButtons = 0;
       for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
         {
-        numButtons += vtkUnstructuredGrid::SafeDownCast(groupDS->GetPiece(
-            dataSetIdx))->GetPoints()->GetNumberOfPoints();;
+        numButtons += vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx))
+                        ->GetPoints()->GetNumberOfPoints();
         }
       vtkInformation* info = groupDS->GetMetaData(0u);
       if(info)
@@ -960,8 +1374,9 @@ void msvVTKWidgetClusters::HideButtons(size_t group)
       }
     for(size_t dataSetIdx = 0; dataSetIdx < numDataSets; ++dataSetIdx)
       {
-      size_t numButtons = vtkUnstructuredGrid::SafeDownCast(groupDS->GetPiece(
-          dataSetIdx))->GetPoints()->GetNumberOfPoints();
+      size_t numButtons =
+        vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx))->GetPoints()->
+          GetNumberOfPoints();
       vtkInformation* info = groupDS->GetMetaData(dataSetIdx);
       if(info)
         {
@@ -975,7 +1390,7 @@ void msvVTKWidgetClusters::HideButtons(size_t group)
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::SetCustersButtonsVisibility(bool show)
 {
   if(show)
@@ -990,7 +1405,25 @@ void msvVTKWidgetClusters::SetCustersButtonsVisibility(bool show)
     }
 }
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+void msvVTKWidgetClusters::SetClustersRepresentations()
+{
+  size_t numberOfGroups = this->GetNumberOfGroups();
+  for(size_t i = 0; i < numberOfGroups; ++i)
+    {
+    this->Internal->CreateClustersRepresentations(i);
+    }
+}
+
+// ------------------------------------------------------------------------------
+void msvVTKWidgetClusters::SetClustersRepresentations(size_t group)
+{
+  this->Internal->CreateClustersRepresentations(group);
+}
+
+
+
+// ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::PrintSelf(ostream& os, vtkIndent indent)
 {
   Superclass::PrintSelf(os,indent);
@@ -1009,4 +1442,3 @@ void msvVTKWidgetClusters::PrintSelf(ostream& os, vtkIndent indent)
 //     os << indent << "  (" << i << "): " << (*it).first << "\n";
 //     }
 }
-

@@ -8,7 +8,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0.txt
+  http://www.apache.org/licenses/LICENSE-2.0.txt
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,7 @@ class vtkInformationIntegerVectorKey;
 class vtkLookupTable;
 class vtkPoints;
 class vtkRenderer;
+class vtkImageData;
 
 class MSV_VTK_WIDGETS_EXPORT msvVTKWidgetClusters : public vtkObject
 {
@@ -82,16 +83,33 @@ public:
   vtkBooleanMacro(ShiftWidgetCenterToCorner,bool);
 
   // Description:
+  // Set / Get ShiftWidgetCenterToCorner
+  vtkSetMacro(CreateClustersRepresentations,bool);
+  vtkGetMacro(CreateClustersRepresentations,bool);
+  vtkBooleanMacro(CreateClustersRepresentations,bool);
+
+  // Description:
   // Set / Get cluster groups boolean
   vtkSetMacro(ClusteringWithinGroups,bool);
   vtkGetMacro(ClusteringWithinGroups,bool);
   vtkBooleanMacro(ClusteringWithinGroups,bool);
 
   // Description:
+  // Set / Get cluster groups boolean
+  vtkSetMacro(UsePlainVTKButtons,bool);
+  vtkGetMacro(UsePlainVTKButtons,bool);
+  vtkBooleanMacro(UsePlainVTKButtons,bool);
+
+  // Description:
+  // Set / Get button icon
+  virtual void SetButtonIcon(vtkImageData *arg);
+  vtkGetMacro(ButtonIcon,vtkImageData*);
+
+  // Description:
   // Set / Get the size of the button reprensentation
   virtual void SetColorLookUpTable(vtkLookupTable *arg);
   vtkGetMacro(ColorLookUpTable,vtkLookupTable*);
-  
+
   // Description:
   // Add widget positions
   virtual void SetDataSet(size_t group, size_t idx,
@@ -113,8 +131,8 @@ public:
 
   // Description:
   // Returns the number of groups.
-  size_t GetNumberOfLevels();
-  
+  size_t GetNumberOfGroups();
+
   static vtkInformationIdTypeKey* CLUSTER_IDX();
   static vtkInformationIdTypeKey* DATASET_BUTTONS_OFFSET();
   static vtkInformationIntegerVectorKey* CLUSTER_BUTTONS_OFFSET();
@@ -123,13 +141,15 @@ public:
   virtual void Clear();
   virtual void SetCustersButtonsVisibility(bool show);
   virtual void ShowButtons();
-  virtual void HideButtons();
-  virtual void ShowClusterButtons();
-  virtual void HideClusterButtons();
   virtual void ShowButtons(size_t group);
+  virtual void HideButtons();
   virtual void HideButtons(size_t group);
+  virtual void ShowClusterButtons();
   virtual void ShowClusterButtons(size_t group);
+  virtual void HideClusterButtons();
   virtual void HideClusterButtons(size_t group);
+  virtual void SetClustersRepresentations();
+  virtual void SetClustersRepresentations(size_t group);
 
 protected:
   msvVTKWidgetClusters();
@@ -148,6 +168,8 @@ protected:
   bool         Clustering;
   bool         ShiftWidgetCenterToCorner;
   bool         ClusteringWithinGroups;
+  bool         UsePlainVTKButtons;
+  bool         CreateClustersRepresentations;
   vtkRenderer* Renderer;
 
 private:
@@ -158,7 +180,9 @@ private:
   vtkInternal* Internal;
 
   vtkLookupTable *ColorLookUpTable;
-  
+
+  vtkImageData *ButtonIcon;
+
 };
 
 #endif // __msvVTKWidgetClusters_h
