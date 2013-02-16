@@ -33,6 +33,7 @@ class QListWidgetItem;
 
 class msvQVTKButtonsMainWindowPrivate;
 
+/// \brief Main window for the VTKButtons demo.
 class MSV_VTKButtons_EXPORT msvQVTKButtonsMainWindow : public QMainWindow
 {
   Q_OBJECT

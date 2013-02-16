@@ -1,3 +1,23 @@
+###########################################################################
+#
+#  Library: MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
 project(msvTimeExamples)
 set(KIT TimeExamples)
 
@@ -17,9 +37,9 @@ include_directories(${include_dirs})
 add_definitions( -DDATA_TESTING_PATH="${PROJECT_SOURCE_DIR}/../Data/" )
 
 # msvQTimePlayerWidget
-add_executable(TimePlayerWidget msvQTimePlayerWidget.cxx)
-target_link_libraries(TimePlayerWidget msvQtWidgets)
+add_executable(TimePlayerWidgetExample msvQTimePlayerWidgetExample.cxx)
+target_link_libraries(TimePlayerWidgetExample msvQtWidgets)
 
 # msvVTKFileSeriesReader
-add_executable(FileSeriesReader msvVTKFileSeriesReader.cxx)
-target_link_libraries(FileSeriesReader msvVTKParallel)
+add_executable(FileSeriesReaderExample msvVTKFileSeriesReaderExample.cxx)
+target_link_libraries(FileSeriesReaderExample msvVTKParallel)

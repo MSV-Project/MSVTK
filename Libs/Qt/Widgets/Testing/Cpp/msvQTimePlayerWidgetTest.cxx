@@ -28,7 +28,7 @@
 
 // MSVTK
 #include "msvQTimePlayerWidget.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
+#include "msvVTKDataFileSeriesReader.h"
 
 // STD includes
 #include <cstdlib>

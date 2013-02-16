@@ -1,10 +1,31 @@
+###########################################################################
+#
+#  Library: MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
 set(KIT VTKWidgets)
 
 set(KIT_TEST_SRCS
   msvVTKProp3DButtonRepresentationTest1.cxx
+  msvVTKWidgetClustersTest1.cxx
   )
 
-create_test_sourcelist(Tests ${KIT}CxxTests.cxx
+create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
   ${KIT_TEST_SRCS}
   )
 
@@ -13,11 +34,12 @@ create_test_sourcelist(Tests ${KIT}CxxTests.cxx
 
 set(LIBRARY_NAME msv${KIT})
 
-add_executable(${KIT}CxxTests ${Tests})
-target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
+add_executable(msv${KIT}CxxTests ${Tests})
+target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
 
 #
 # Add Tests
 #
+SIMPLE_TEST( msvVTKProp3DButtonRepresentationTest1 )
+SIMPLE_TEST( msvVTKWidgetClustersTest1 )
 
-simple_test( msvVTKProp3DButtonRepresentationTest1 )

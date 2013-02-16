@@ -51,7 +51,6 @@
 
 // MSVTK includes
 #include "msvVTKXMLMultiblockLODReader.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
 
 struct vtkXMLCompositeDataReaderEntry
 {

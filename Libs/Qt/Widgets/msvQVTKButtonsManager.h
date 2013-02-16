@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsManager_H
-#define msvQVTKButtonsManager_H
+#ifndef __msvQVTKButtonsManager_h
+#define __msvQVTKButtonsManager_h
 
 // MSVTK includes
 #include "msvQVTKButtons.h"
@@ -56,6 +56,18 @@ public:
   /// Set show label property for children elements
   void setShowLabel(bool show);
 
+  /// Set the renderer
+  void setRenderer(vtkRenderer* renderer);
+
+  /// Remove all camera brakepoints for path animation
+  void clearCameraBrakPoints();
+
+  /// Add a camera breakpoint for path animation
+  void addCameraBreakPoint(double pos[3],double fop[3],double vup[3]);
+
+  ///
+  void animate();
+
 protected:
   QScopedPointer<msvQVTKButtonsManagerPrivate> d_ptr;
   msvQVTKButtonsManager(QObject *parent = 0);
@@ -65,8 +77,4 @@ private:
   Q_DISABLE_COPY(msvQVTKButtonsManager);
 };
 
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-#endif // msvQVTKButtonsManager_H
+#endif // __msvQVTKButtonsManager_h

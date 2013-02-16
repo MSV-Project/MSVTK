@@ -27,8 +27,8 @@
 // MSV includes
 #include "msvQECGMainWindow.h"
 #include "msvQTimePlayerWidget.h"
+#include "msvVTKDataFileSeriesReader.h"
 #include "msvVTKECGButtonsManager.h"
-#include "msvVTKPolyDataFileSeriesReader.h"
 #include "ui_msvQECGMainWindow.h"
 #include "msvQECGAboutDialog.h"
 
@@ -50,6 +50,7 @@
 #include "vtkPlotLine.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPolyDataReader.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
@@ -88,7 +89,7 @@ protected:
   vtkSmartPointer<vtkTable> currentTimeLine;
 
   // CartoPoints Pipeline
-  vtkSmartPointer<msvVTKPolyDataFileSeriesReader> cartoPointsReader;
+  vtkSmartPointer<msvVTKDataFileSeriesReader> cartoPointsReader;
   vtkSmartPointer<vtkPolyDataReader>              polyDataReader;
   vtkSmartPointer<vtkPolyDataMapper>              cartoPointsMapper;
   vtkSmartPointer<vtkActor>                       cartoPointsActor;
@@ -165,7 +166,7 @@ msvQECGMainWindowPrivate::msvQECGMainWindowPrivate(msvQECGMainWindow& object)
   // CartoPoints Readers
   this->polyDataReader    = vtkSmartPointer<vtkPolyDataReader>::New();
   this->cartoPointsReader =
-    vtkSmartPointer<msvVTKPolyDataFileSeriesReader>::New();
+    vtkSmartPointer<msvVTKDataFileSeriesReader>::New();
   this->cartoPointsReader->SetReader(this->polyDataReader);
 
   this->delaunayFilter = vtkSmartPointer<vtkDelaunay3D>::New();
@@ -316,7 +317,6 @@ void msvQECGMainWindowPrivate::updateView()
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 {
-  Q_Q(msvQECGMainWindow);
   QDir dir(rootDirectory);
 
   if (dir.cd(QString("CartoSignals"))) {
@@ -377,13 +377,14 @@ void msvQECGMainWindowPrivate::readCartoSignals(QDir dir)
   dir.setNameFilters(signalFileFilters);
   QStringList signalFiles = dir.entryList(QDir::Files,QDir::Name);
 
-  if (signalFiles.size() == 0){
+  if (signalFiles.size() == 0)
+    {
     qWarning() << "No carto signals in" << dir;
-  }
+    }
 
   // Resort files using their index number
   qSort(signalFiles.begin(), signalFiles.end(),
-        msvQECGMainWindowPrivate::fileLessThan);
+      msvQECGMainWindowPrivate::fileLessThan);
 
   // Fill the FileSerieReader
   foreach(const QString& signalFile, signalFiles)
@@ -421,8 +422,6 @@ bool msvQECGMainWindowPrivate::fileLessThan(const QString &s1, const QString &s2
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::addCartoSignal(vtkDelimitedTextReader* signal)
 {
-  Q_Q(msvQECGMainWindow);
-
   ctkVTKChartView* ecgView = new ctkVTKChartView;
   ecgView->setMinimumSize(QSize(100, 80));
   ecgView->setFocusPolicy(Qt::NoFocus);
