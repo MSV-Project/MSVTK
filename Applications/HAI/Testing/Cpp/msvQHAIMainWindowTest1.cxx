@@ -22,18 +22,18 @@
 #include <QApplication>
 #include <QTimer>
 
-// ECG includes
-#include "msvQECGMainWindow.h"
+// HAI includes
+#include "msvQHAIMainWindow.h"
 
 // STD includes
 #include <cstdlib>
 
 // -----------------------------------------------------------------------------
-int msvQECGMainWindowTest1(int argc, char * argv[] )
+int msvQHAIMainWindowTest1(int argc, char * argv[] )
 {
   QApplication app(argc, argv);
 
-  msvQECGMainWindow mainWindow;
+  msvQHAIMainWindow mainWindow;
   mainWindow.show();
 
   // Wait until the end of the player

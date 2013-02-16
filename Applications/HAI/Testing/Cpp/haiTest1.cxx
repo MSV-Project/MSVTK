@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVECG
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -18,7 +18,7 @@
 
 ==============================================================================*/
 
-// QT includes
+// Qt includes
 #include <QCoreApplication>
 #include <QProcess>
 
@@ -27,11 +27,11 @@
 #include <iostream>
 
 // -----------------------------------------------------------------------------
-int ecgTest1(int argc, char * argv[])
+int haiTest1(int argc, char * argv[])
 {
   QCoreApplication app(argc, argv);
   QString path = (argc > 2) ? ("\"" + QString(argv[2]) + "/") : "";
-  QString command = QString(path + "ecg\"");
+  QString command = QString(path + "hai\"");
   QProcess process;
   process.start(command);
   bool res = process.waitForStarted();

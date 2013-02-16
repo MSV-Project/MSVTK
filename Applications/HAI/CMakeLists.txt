@@ -1,3 +1,23 @@
+###########################################################################
+#
+#  Library: MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
 set(KIT HAI)
 project(msv${KIT})
 
@@ -64,6 +84,11 @@ target_link_libraries(msv${KIT}
   msvQtWidgets
   )
 
+install(TARGETS msv${KIT}
+  RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
+  LIBRARY DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
+  ARCHIVE DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT Development
+  )
 
 # --------------------------------------------------------------------------
 # Build the executable
@@ -72,7 +97,7 @@ target_link_libraries(msv${KIT}
 add_executable(${KIT}
   hai.cxx
   )
-set_target_properties(${KIT} PROPERTIES OUTPUT_NAME HAI)
+set_target_properties(${KIT} PROPERTIES OUTPUT_NAME hai)
 
 target_link_libraries(${KIT}
   msv${KIT}
@@ -99,3 +124,16 @@ set(dynamicHeaders
 if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif()
+
+# --------------------------------------------------------------------------
+# Install
+# --------------------------------------------------------------------------
+if(NOT PACKAGE_WITH_BUNDLE)
+  set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR})
+else()
+  set(${KIT}_INSTALL_DESTINATION_ARGS RUNTIME DESTINATION ".")
+endif()
+
+install(TARGETS ${KIT}
+  ${${KIT}_INSTALL_DESTINATION_ARGS}
+  COMPONENT Runtime)
