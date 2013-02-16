@@ -192,14 +192,14 @@ void msvVTKLODWidget::EndSelectAction(vtkAbstractWidget *w)
     vtkSelectionNode* node = res->GetNode(0);
     vtkObjectBase* object = node->GetProperties()->Get(vtkSelectionNode::PROP());
     vtkActor* actor = vtkActor::SafeDownCast(object);
-    vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(actor->GetMapper());
-    if (composite)
+    if (actor->GetMapper()->IsA("vtkCompositePolyDataMapper2"))
       {
       vtkIdType composite = node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX());
       std::cout << "Composite index: " << composite << std::endl;
+      self->InvokeEvent(vtkCommand::PickEvent, reinterpret_cast<void*>(composite));
       }
     }
-  res->Print(std::cout);
+  //res->Print(std::cout);
 }
 
 //-------------------------------------------------------------------------

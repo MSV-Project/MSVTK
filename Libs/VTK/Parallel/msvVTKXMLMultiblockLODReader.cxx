@@ -72,10 +72,16 @@ public:
                            unsigned int defaultLOD,
                            int parent = 0);
 
-  void UpdateNodesFromDefaultLOD(vtkXMLDataElement* root,
-                                 unsigned int LODLevel,
-                                 unsigned int lod,
-                                 int pieceIndex = -1);
+  void SetLODToNodes(vtkXMLDataElement* root,
+                     unsigned int LODLevel,
+                     int pieceIndex = -1,
+                     int lod = 0);
+  bool GetNodeLOD(vtkXMLDataElement* root,
+                  unsigned int LODLevel,
+                  int pieceIndex,
+                  int& lod);
+  int GetNodePieceIndex(vtkXMLDataElement* root,
+                        vtkIdType compositeIndex);
 
   static unsigned int CountNumberOfNodes(vtkXMLDataElement* root);
   static int GetLevel(vtkXMLDataElement* node);
@@ -120,7 +126,7 @@ int msvVTKXMLMultiblockLODReaderInternal::GetFatherLOD(unsigned int nodeIndex)
 {
   assert(nodeIndex < this->NodesInfos.size());
   return this->NodesInfos[
-    this->NodesInfos[nodeIndex].MixedIndexFatherLOD].MixedIndexFatherLOD;
+    this->GetFatherIndex(nodeIndex)].MixedIndexFatherLOD;
 }
 
 //------------------------------------------------------------------------------
@@ -224,11 +230,11 @@ void msvVTKXMLMultiblockLODReaderInternal::InitListUpdateNodes(
 }
 
 //------------------------------------------------------------------------------
-void msvVTKXMLMultiblockLODReaderInternal::UpdateNodesFromDefaultLOD(
+void msvVTKXMLMultiblockLODReaderInternal::SetLODToNodes(
   vtkXMLDataElement* element,
   unsigned int lodTreeLevel,
-  unsigned int lod,
-  int pieceIndex)
+  int pieceIndex,
+  int lod)
 {
   if (element == 0)
     {
@@ -236,7 +242,8 @@ void msvVTKXMLMultiblockLODReaderInternal::UpdateNodesFromDefaultLOD(
     }
   const char* tag = element->GetName();
   if (strcmp(tag, "vtkMultiBlockDataSet") != 0 &&
-        strcmp(tag, "Block") != 0 && strcmp(tag, "Piece") != 0)
+      strcmp(tag, "Block") != 0 &&
+      strcmp(tag, "Piece") != 0)
     {
     return;
     }
@@ -264,24 +271,139 @@ void msvVTKXMLMultiblockLODReaderInternal::UpdateNodesFromDefaultLOD(
          pieceIndex == -1))
       {
       // Clamp the LOD required to the available one
-      unsigned int clampLOD = std::min(lod,
-        static_cast<unsigned int>(childXML->GetNumberOfNestedElements())-1);
+      int clampLOD = std::min(lod,
+        childXML->GetNumberOfNestedElements()-1);
 
       this->NodesInfos[this->CurrentFlatIndex].MixedIndexFatherLOD = clampLOD;
       }
 
     // Child is a multiblock dataset itself or a multipiece
     const char* tagName = childXML->GetName();
-    if (strcmp(tagName, "Block") == 0 || strcmp(tagName, "Piece") == 0)
+    if (strcmp(tagName, "Block") == 0 ||
+        strcmp(tagName, "Piece") == 0)
       {
-      this->UpdateNodesFromDefaultLOD(childXML, lodTreeLevel, lod);
+      this->SetLODToNodes(childXML, lodTreeLevel, -1, lod);
       }
     }
 }
 
 //------------------------------------------------------------------------------
-unsigned int msvVTKXMLMultiblockLODReaderInternal::
-CountNumberOfNodes(vtkXMLDataElement* node)
+bool msvVTKXMLMultiblockLODReaderInternal::GetNodeLOD(
+  vtkXMLDataElement* element,
+  unsigned int lodTreeLevel,
+  int pieceIndex,
+  int& lod
+  )
+{
+  bool res = false;
+  if (element == 0)
+    {
+    assert(element != 0);
+    return res;
+    }
+  const char* tag = element->GetName();
+  if (strcmp(tag, "vtkMultiBlockDataSet") != 0 &&
+      strcmp(tag, "Block") != 0 &&
+      strcmp(tag, "Piece") != 0)
+    {
+    return res;
+    }
+
+  unsigned int maxElems = element->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < maxElems; ++cc)
+    {
+    vtkXMLDataElement* childXML = element->GetNestedElement(cc);
+    if (!childXML ||
+        (strcmp(childXML->GetName(), "DataSet") != 0 &&
+         strcmp(childXML->GetName(), "Block") != 0 &&
+         strcmp(childXML->GetName(), "Piece") != 0))
+      {
+      continue;
+      }
+
+    this->CurrentFlatIndex++;
+    // Parents of the LOD definitions - We set the information
+    // If there is a specific piece which need to change but not the current
+    // one we just continue to go through the tree
+    if (msvVTKXMLMultiblockLODReaderInternal::GetLevel(childXML) ==
+        static_cast<int>(lodTreeLevel)-1 &&
+        ((pieceIndex >= 0 && static_cast<unsigned int>(pieceIndex) == cc) ||
+         pieceIndex == -1))
+      {
+      lod = this->NodesInfos[this->CurrentFlatIndex].MixedIndexFatherLOD;
+      res = true;
+      break;
+      }
+
+    // Child is a multiblock dataset itself or a multipiece
+    const char* tagName = childXML->GetName();
+    if (strcmp(tagName, "Block") == 0 ||
+        strcmp(tagName, "Piece") == 0)
+      {
+      res = this->GetNodeLOD(childXML, lodTreeLevel, -1, lod);
+      if (res)
+        {
+        break;
+        }
+      }
+    }
+  return res;
+}
+
+//------------------------------------------------------------------------------
+int msvVTKXMLMultiblockLODReaderInternal
+::GetNodePieceIndex(vtkXMLDataElement* element,
+                    vtkIdType compositeIndex)
+{
+  if (element == 0)
+    {
+    return -1;
+    }
+  const char* tag = element->GetName();
+  if (strcmp(tag, "vtkMultiBlockDataSet") != 0 &&
+      strcmp(tag, "Block") != 0 &&
+      strcmp(tag, "Piece") != 0)
+    {
+    return -1;
+    }
+
+  unsigned int maxElems = element->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < maxElems; ++cc)
+    {
+    vtkXMLDataElement* childXML = element->GetNestedElement(cc);
+    if (!childXML ||
+        (strcmp(childXML->GetName(), "DataSet") != 0 &&
+         strcmp(childXML->GetName(), "Block") != 0 &&
+         strcmp(childXML->GetName(), "Piece") != 0))
+      {
+      continue;
+      }
+
+    this->CurrentFlatIndex++;
+
+    if (this->CurrentFlatIndex == compositeIndex)
+      {
+      return cc;
+      }
+
+    // Child is a multiblock dataset itself or a multipiece
+    const char* tagName = childXML->GetName();
+    if (strcmp(tagName, "Block") == 0 ||
+        strcmp(tagName, "Piece") == 0)
+      {
+      int res = this->GetNodePieceIndex(childXML, compositeIndex);
+      if (res >= 0)
+        {
+        return res;
+        }
+      }
+    }
+  return -1;
+}
+
+//------------------------------------------------------------------------------
+unsigned int msvVTKXMLMultiblockLODReaderInternal
+::CountNumberOfNodes(vtkXMLDataElement* node)
 {
   if (node == 0)
     {
@@ -319,8 +441,8 @@ CountNumberOfNodes(vtkXMLDataElement* node)
 }
 
 //------------------------------------------------------------------------------
-int msvVTKXMLMultiblockLODReaderInternal::
-GetLevel(vtkXMLDataElement* node)
+int msvVTKXMLMultiblockLODReaderInternal
+::GetLevel(vtkXMLDataElement* node)
 {
   if (!node)
     {
@@ -620,9 +742,8 @@ unsigned int  msvVTKXMLMultiblockLODReader::GetDefaultLOD()
 void msvVTKXMLMultiblockLODReader::SetDefaultLOD(unsigned int lod)
 {
   this->Internal->CurrentFlatIndex = 0;
-  this->Internal->UpdateNodesFromDefaultLOD(this->GetPrimaryElement(),
-                                            this->Internal->CurrentLODTreeLevel, lod);
-
+  this->Internal->SetLODToNodes(this->GetPrimaryElement(),
+                                this->Internal->CurrentLODTreeLevel, -1, lod);
   this->Internal->DefaultLOD = lod;
   this->Modified();
 }
@@ -631,12 +752,46 @@ void msvVTKXMLMultiblockLODReader::SetDefaultLOD(unsigned int lod)
 void msvVTKXMLMultiblockLODReader::SetPieceLOD(int pieceIndex, unsigned int lod)
 {
   this->Internal->CurrentFlatIndex = 0;
-  this->Internal->UpdateNodesFromDefaultLOD(this->GetPrimaryElement(),
-                                            this->Internal->CurrentLODTreeLevel,
-                                            lod,
-                                            pieceIndex);
+  this->Internal->SetLODToNodes(this->GetPrimaryElement(),
+                                this->Internal->CurrentLODTreeLevel,
+                                pieceIndex, lod);
 
   this->Modified();
+}
+
+//------------------------------------------------------------------------------
+void msvVTKXMLMultiblockLODReader::SetPieceVisibility(int pieceIndex, bool visible)
+{
+  this->Internal->CurrentFlatIndex = 0;
+  int lod = 0;
+  bool found = this->Internal->GetNodeLOD(this->GetPrimaryElement(),
+                                          this->Internal->CurrentLODTreeLevel, pieceIndex, lod);
+  assert(found);
+  int newLOD = lod;
+  if (lod < 0 && visible)
+    {
+    newLOD = -(lod + 1);
+    }
+  else if (lod >= 0 && !visible)
+    {
+    newLOD = -(lod + 1);
+    }
+  if (newLOD != lod)
+    {
+    this->SetPieceLOD(pieceIndex, static_cast<unsigned int>(newLOD));
+    }
+}
+
+//------------------------------------------------------------------------------
+int msvVTKXMLMultiblockLODReader::GetPieceFromCompositeIndex(vtkIdType compositeIndex)
+{
+  this->Internal->CurrentFlatIndex = 0;
+  int pieceIndex = this->Internal->GetNodePieceIndex(
+    this->GetPrimaryElement(),
+    this->Internal->GetFatherIndex(compositeIndex));
+  //int pieceIndex = this->Internal->GetNodePieceIndex(
+  //  this->GetPrimaryElement(), compositeIndex);
+  return pieceIndex;
 }
 
 //------------------------------------------------------------------------------

@@ -50,6 +50,10 @@ public slots:
 
 protected slots:
   void updateLODFromItem(QTreeWidgetItem* item);
+  void onPick(vtkObject* lodWidget, void* compositeIndex);
+  void decreaseCurrentLOD();
+  void increaseCurrentLOD();
+
 protected:
   QScopedPointer<msvQHAIMainWindowPrivate> d_ptr;
 

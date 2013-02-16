@@ -20,6 +20,7 @@
 
 // Qt includes
 #include <QFileDialog>
+#include <QMenu>
 
 // MSV includes
 #include "msvQHAIMainWindow.h"
@@ -56,6 +57,7 @@ class msvQHAIMainWindowPrivate: public Ui_msvQHAIMainWindow
   Q_DECLARE_PUBLIC(msvQHAIMainWindow);
 protected:
   msvQHAIMainWindow* const q_ptr;
+  bool IgnoreUpdate;
 
   void setupView();
   void updateItem(QTreeWidgetItem* item, vtkDataObject* dataObject);
@@ -71,17 +73,24 @@ protected:
   vtkSmartPointer<vtkActor> lodActor;
 
   vtkSmartPointer<msvVTKLODWidget> lodWidget;
+
+  QVector<int> IndexToAutoHide;
+  QMenu* PieceMenu;
 public:
   msvQHAIMainWindowPrivate(msvQHAIMainWindow& object);
   ~msvQHAIMainWindowPrivate();
 
   virtual void setupUi(QMainWindow*);
   void update();
+  void refresh();
   void updateUi();
+  void clear();
 
   void readCompositeFile(const QString& fileName);
 
-  void clear();
+  QTreeWidgetItem* itemFromIndex(int index)const;
+  vtkDataObject* dataFromIndex(int index)const;
+  QTreeWidgetItem* selectedItem()const;
 };
 
 //------------------------------------------------------------------------------
@@ -91,6 +100,8 @@ public:
 msvQHAIMainWindowPrivate::msvQHAIMainWindowPrivate(msvQHAIMainWindow& object)
   : q_ptr(&object)
 {
+  this->IgnoreUpdate = false;
+  this->PieceMenu = 0;
   // Renderer
   this->threeDRenderer = vtkSmartPointer<vtkRenderer>::New();
   this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
@@ -127,6 +138,8 @@ msvQHAIMainWindowPrivate::msvQHAIMainWindowPrivate(msvQHAIMainWindow& object)
   //this->lodActor->GetProperty()->SetOpacity(0.5);
   //this->lodActor->GetProperty()->SetBackfaceCulling(1);
   //this->lodActor->GetProperty()->SetFrontfaceCulling(0);
+  this->IndexToAutoHide << 29 << 39 << 40 << 223 << 224 << 225 << 238 << 234
+                        << 235 << 239 << 240 << 802 << 803 << 804;
 }
 
 //------------------------------------------------------------------------------
@@ -141,7 +154,7 @@ void msvQHAIMainWindowPrivate::clear()
   Q_Q(msvQHAIMainWindow);
 
   this->lodReader->SetFileName("");  // clean up the reader
-  this->update(); // update the pipeline
+  this->refresh(); // update the pipeline
 }
 
 //------------------------------------------------------------------------------
@@ -172,11 +185,16 @@ void msvQHAIMainWindowPrivate::setupUi(QMainWindow * mainWindow)
   this->actionAboutHAIApplication->setIcon(informationIcon);
 
   this->setupView();
+
+  this->PieceMenu = new QMenu(q);
+  this->PieceMenu->addAction("- LOD", q, SLOT(decreaseCurrentLOD()));
+  this->PieceMenu->addAction("+ LOD", q, SLOT(increaseCurrentLOD()));
 }
 
 //------------------------------------------------------------------------------
 void msvQHAIMainWindowPrivate::setupView()
 {
+  Q_Q(msvQHAIMainWindow);
   this->threeDView->GetRenderWindow()->AddRenderer(this->threeDRenderer);
 
   // Marker annotation
@@ -190,21 +208,45 @@ void msvQHAIMainWindowPrivate::setupView()
   lodWidget = vtkSmartPointer<msvVTKLODWidget>::New();
   lodWidget->SetInteractor(iren);
   lodWidget->SetEnabled(1);
+  q->qvtkConnect(lodWidget, vtkCommand::PickEvent, q, SLOT(onPick(vtkObject*,void*)));
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindowPrivate::refresh()
+{
+  this->threeDRenderer->ResetCamera();
+  this->update();
+  this->updateUi();
+
+  this->IgnoreUpdate =  true;
+  foreach(int index, this->IndexToAutoHide)
+    {
+    QTreeWidgetItem* item = this->itemFromIndex(index);
+    if (item)
+      {
+      item->setData(0,Qt::CheckStateRole, Qt::Unchecked);
+      }
+    }
+  this->IgnoreUpdate = false;
 }
 
 //------------------------------------------------------------------------------
 void msvQHAIMainWindowPrivate::update()
 {
-  this->threeDRenderer->ResetCamera();
+  if (this->IgnoreUpdate)
+    {
+    return;
+    }
+  //this->threeDRenderer->ResetCamera();
   this->threeDView->GetRenderWindow()->Render();
-  this->updateUi();
+  //this->updateUi();
 }
 
 //------------------------------------------------------------------------------
 void msvQHAIMainWindowPrivate::readCompositeFile(const QString& fileName)
 {
   this->lodReader->SetFileName(fileName.toLatin1());
-  this->update();
+  this->refresh();
 }
 
 //------------------------------------------------------------------------------
@@ -227,6 +269,7 @@ void msvQHAIMainWindowPrivate::updateUi()
   this->updateItem(rootItem, dataSet);
   this->organsTreeWidget->blockSignals(false);
   this->organsTreeWidget->expandItem(rootItem);
+  this->organsTreeWidget->header()->setResizeMode(QHeaderView::ResizeToContents);
 }
 
 //------------------------------------------------------------------------------
@@ -258,8 +301,12 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
     for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
       {
       vtkDataObject* childObject = it->GetCurrentDataObject();
-      QTreeWidgetItem* childItem = new QTreeWidgetItem();
-      item->addChild(childItem);
+      QTreeWidgetItem* childItem = item->child(childIndex);
+      if (!childItem)
+        {
+        childItem = new QTreeWidgetItem();
+        item->addChild(childItem);
+        }
       childItem->setText(0, QString("%1 #%2").arg(type).arg(childIndex++));
       this->updateItem(childItem, childObject);
       if (childObject != 0)
@@ -269,6 +316,7 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
       }
     if (childIndex == 3)
       {
+      item->setData(0, Qt::CheckStateRole, (usedLODIndex>= 0? Qt::Checked : Qt::Unchecked));
       item->setData(1, Qt::DisplayRole, QVariant(usedLODIndex));
       item->setFlags(item->flags() | Qt::ItemIsEditable);
       }
@@ -281,6 +329,7 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
     {
     vtkPolyData* polyData = vtkPolyData::SafeDownCast(dataObject);
     item->setText(1, QString::number(polyData->GetNumberOfPolys()));
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     }
 
   /*--------------------------------------------------------------------------*/
@@ -302,6 +351,41 @@ void msvQHAIMainWindowPrivate::updateItem(QTreeWidgetItem* item, vtkDataObject* 
     it->GoToNextItem();
     }
   */
+}
+
+//------------------------------------------------------------------------------
+QTreeWidgetItem* msvQHAIMainWindowPrivate::itemFromIndex(int index)const
+{
+  return this->organsTreeWidget->topLevelItem(0)->child(index);
+}
+
+//------------------------------------------------------------------------------
+vtkDataObject* msvQHAIMainWindowPrivate::dataFromIndex(int index)const
+{
+  vtkMultiBlockDataSet* compositeDataSet =
+    vtkMultiBlockDataSet::SafeDownCast(this->lodReader->GetOutput());
+  vtkCompositeDataIterator* it = compositeDataSet->NewIterator();
+  it->SetVisitOnlyLeaves(0);
+  it->SetTraverseSubTree(0);
+  it->SetSkipEmptyNodes(0);
+  unsigned int childIndex = 0;
+  int usedLODIndex = -1;
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+    {
+    if (index == childIndex)
+      {
+      return it->GetCurrentDataObject();
+      }
+    ++childIndex;
+    }
+  return 0;
+}
+
+//------------------------------------------------------------------------------
+QTreeWidgetItem* msvQHAIMainWindowPrivate::selectedItem()const
+{
+  return this->organsTreeWidget->selectedItems().count() ?
+    this->organsTreeWidget->selectedItems()[0] : 0;
 }
 
 //------------------------------------------------------------------------------
@@ -353,7 +437,7 @@ void msvQHAIMainWindow::setDefaultLOD(int lod)
 {
   Q_D(msvQHAIMainWindow);
   d->lodReader->SetDefaultLOD(lod);
-  d->update();
+  d->refresh();
 }
 
 //------------------------------------------------------------------------------
@@ -367,6 +451,72 @@ void msvQHAIMainWindow::updateLODFromItem(QTreeWidgetItem* item)
     }
   int index = parent->indexOfChild(item);
   Q_ASSERT(index >= 0);
-  d->lodReader->SetPieceLOD(index, item->data(1,Qt::DisplayRole).toInt());
+  int lod = item->data(1,Qt::DisplayRole).toInt();
+  bool visibility = (item->data(0, Qt::CheckStateRole).toInt() == Qt::Checked);
+  d->lodReader->SetPieceLOD(index, lod);
+  d->lodReader->SetPieceVisibility(index, visibility);
+  if (d->IgnoreUpdate)
+    {
+    return;
+    }
+  // Apply the same properties to all the selected rows.
+  foreach(QTreeWidgetItem* selectedItem, d->organsTreeWidget->selectedItems())
+    {
+    if (selectedItem == item)
+      {
+      continue;
+      }
+    bool wasIgnoring = d->IgnoreUpdate;
+    d->IgnoreUpdate = true;
+    selectedItem->setData(1, Qt::DisplayRole, lod);
+    selectedItem->setData(0, Qt::CheckStateRole, visibility ? Qt::Checked : Qt::Unchecked);
+    d->IgnoreUpdate = wasIgnoring;
+    }
   d->update();
+  bool wasModifying = d->organsTreeWidget->blockSignals(true);
+  d->updateItem(item, d->dataFromIndex(index));
+  d->organsTreeWidget->blockSignals(wasModifying);
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::onPick(vtkObject* vtkNotUsed(lodWidget), void* callData)
+{
+  Q_D(msvQHAIMainWindow);
+  vtkIdType compositeIndex = reinterpret_cast<vtkIdType>(callData);
+  int index = d->lodReader->GetPieceFromCompositeIndex(compositeIndex);
+  if (index < 0)
+    {
+    return;
+    }
+  QTreeWidgetItem* item = d->itemFromIndex(index);
+  if (!item)
+    {
+    Q_ASSERT(item);
+    return;
+    }
+  //d->organsTreeWidget->selectionModel()->clearSelection();
+  //item->setSelected(true);
+  d->organsTreeWidget->setCurrentItem(item, QItemSelectionModel::ClearAndSelect);
+  d->organsTreeWidget->scrollToItem(item);
+  d->PieceMenu->popup(QCursor::pos());
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::decreaseCurrentLOD()
+{
+  Q_D(msvQHAIMainWindow);
+  QTreeWidgetItem* selectedItem = d->selectedItem();
+  Q_ASSERT(selectedItem);
+  int lod = selectedItem->data(1, Qt::DisplayRole).toInt();
+  selectedItem->setData(1, Qt::DisplayRole, qMax(0, lod -1));
+}
+
+//------------------------------------------------------------------------------
+void msvQHAIMainWindow::increaseCurrentLOD()
+{
+  Q_D(msvQHAIMainWindow);
+  QTreeWidgetItem* selectedItem = d->selectedItem();
+  Q_ASSERT(selectedItem);
+  int lod = selectedItem->data(1, Qt::DisplayRole).toInt();
+  selectedItem->setData(1, Qt::DisplayRole, lod + 1);
 }

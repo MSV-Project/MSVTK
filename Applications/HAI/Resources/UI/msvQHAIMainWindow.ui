@@ -82,6 +82,9 @@
      </item>
      <item>
       <widget class="QTreeWidget" name="organsTreeWidget">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
        <column>
         <property name="text">
          <string notr="true">1</string>

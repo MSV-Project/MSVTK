@@ -40,16 +40,28 @@ public:
   vtkTypeMacro(msvVTKXMLMultiblockLODReader, vtkXMLMultiBlockDataReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
   // Get / Set the level of details by default for the whole composite dataset
   // The SetDefaultLOD method restore each piece to the DefaultLOD.
   unsigned int GetDefaultLOD();
   void SetDefaultLOD(unsigned int lod);
 
+  // Description:
   // Restore each piece to the LOD by default
   void RestoreDefaultLOD();
 
-  // Givent the  number Index of a piece, request him to change its LOD.
-  void SetPieceLOD(int,unsigned int);
+  // Description:
+  // Given the  number Index of a piece, request him to change its LOD.
+  void SetPieceLOD(int pieceIndex, unsigned int lod);
+
+  // Description:
+  // Set the visibility of a given piece. When the visibility is restored, the
+  // LOD is restored too.
+  void SetPieceVisibility(int pieceIndex, bool visible);
+
+  // Description:
+  // Return the piece index of a composite index.
+  int GetPieceFromCompositeIndex(vtkIdType compositeIndex);
 
 protected:
   msvVTKXMLMultiblockLODReader();
