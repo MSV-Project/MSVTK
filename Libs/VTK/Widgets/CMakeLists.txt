@@ -75,6 +75,7 @@ set(msvVTKWidgets_SRCS
   msvVTKButtonsGroup.cxx
   msvVTKButtonsInterface.cxx
   msvVTKButtonsManager.cxx
+  msvVTKLODWidget.cxx
   msvVTKProp3DButtonRepresentation.cxx
   msvVTKSliderFixedRepresentation2D.cxx
   msvVTKWidgetClusters.cxx

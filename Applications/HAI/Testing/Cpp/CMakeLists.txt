@@ -18,26 +18,27 @@
 #
 ###########################################################################
 
-project(msvVTKLibs)
-
-# --------------------------------------------------------------------------
-#                      ----] W A R N I N G [----
-# --------------------------------------------------------------------------
-# Order of project directory matters. Project should be topologically ordered
-# --------------------------------------------------------------------------
-set(dirs)
-list(APPEND dirs
-  Filtering
-  Graphics
-  Parallel
-  Rendering
-  Widgets
+set(KIT HAI)
+set(KIT_TEST_SRCS
+  haiTest1.cxx
+  msvQHAIMainWindowTest1.cxx
   )
 
-#-----------------------------------------------------------------------------
-# Loop over list of directories
-#-----------------------------------------------------------------------------
-foreach(dir ${dirs})
-  message(STATUS "Configuring library: msvVTK${dir}")
-  add_subdirectory(${dir})
-endforeach()
+create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
+  ${KIT_TEST_SRCS}
+  )
+
+set(LIBRARY_NAME msv${KIT})
+
+add_executable(msv${KIT}CxxTests ${Tests})
+target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
+
+#
+# Add Tests
+#
+
+msv_test(ecgTest1
+  $<TARGET_FILE:msv${KIT}CxxTests> ecgTest1
+    --ecg $<TARGET_FILE_DIR:msv${KIT}CxxTests>
+  )
+simple_test( msvQHAIMainWindowTest1 )
