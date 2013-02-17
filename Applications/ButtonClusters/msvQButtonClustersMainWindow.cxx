@@ -120,8 +120,9 @@ public:
   virtual void clear();
 
   virtual void readData(const QString&);
-  virtual void readDataFiles(const QString&, int&, int);
-  virtual void readDataFile(const QString&, int&, int);
+  virtual void readData(const QString& directory, int& idx, int group);
+  virtual void readDataFiles(const QString&, int& idx, int group);
+  virtual void readDataFile(const QString&, int& idx, int group);
 
   void readPolyData(const QString&, int idx, int group);
   void readVolumeData(const QString&, int idx, int group);
@@ -387,15 +388,14 @@ void msvQButtonClustersMainWindowPrivate::setupView()
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::update()
 {
-  this->updateUi();
   this->updateView();
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::updateUi()
 {
-//   this->enableClustering(this->EnableClustering->isChecked());
-//   this->setPixelRadius(this->PixelRadius->value());
+   this->enableClustering(this->EnableClustering->isChecked());
+   this->setPixelRadius(this->PixelRadius->value());
 }
 
 // ------------------------------------------------------------------------------
@@ -490,74 +490,69 @@ void msvQButtonClustersMainWindowPrivate::readPolyData(const QString &file,
 }
 
 // ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindowPrivate::readDataFiles(const QString& dirName,
-                                                        int &          idx,
-                                                        int            group)
+void msvQButtonClustersMainWindowPrivate::readDataFiles(const QString& directory,
+                                                        int& idx,
+                                                        int group)
 {
-  QDir        dir(dirName);
-  QStringList dataFiles = dir.entryList(QDir::Files, QDir::Name).filter("vtk");
+  QFileInfoList dataFiles = QDir(directory).entryInfoList(
+    QStringList("*.vtk"), QDir::Files, QDir::Name);
 
-  foreach(const QString &file, dataFiles)
+  foreach(const QFileInfo &file, dataFiles)
     {
-    QString fileName = QFileInfo(dir,file).absoluteFilePath();
-    this->DataLoader->insertItem(idx,file); 
-    readDataFile(fileName,idx,group);
+    this->DataLoader->insertItem(idx,file.baseName());
+    this->readDataFile(file.absoluteFilePath(), idx, group);
     this->DataLoader->setItemData(idx-1, Qt::Checked, Qt::CheckStateRole);
     }
 }
 
 // ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindowPrivate::readDataFile(const QString& fileName,
-                                                       int &          idx,
-                                                       int            group)
+void msvQButtonClustersMainWindowPrivate
+::readDataFile(const QString& fileName, int& idx, int group)
 {
   vtkNew<vtkDataReader> reader;
   reader->SetFileName(fileName.toLatin1().constData());
-  if(reader->IsFilePolyData())
+  if (reader->IsFilePolyData())
     {
-    readPolyData(fileName,idx,group);
+    this->readPolyData(fileName,idx,group);
     idx++;
     }
-  else if(reader->IsFileStructuredPoints())
+  else if (reader->IsFileStructuredPoints())
     {
-    readVolumeData(fileName,idx,group);
+    this->readVolumeData(fileName,idx,group);
     idx++;
     }
   else
     {
-    return;
+    qCritical() << "File" << fileName << "is not supported.";
     }
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::readData(const QString& rootDirectory)
 {
-  QDir dir(rootDirectory);
-
-  QStringList files =
-    dir.entryList(QDir::Files, QDir::Name).filter("vtk");
-  QStringList directories = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot,
-    QDir::Name);
-
   int idx   = 0;
   int group = 0;
-  foreach(const QString &file, files)
-    {
-    QString fileName = QFileInfo(dir,file).absoluteFilePath();
-    this->DataLoader->insertItem(idx,file);
-    readDataFile(fileName,idx,group);
-    this->DataLoader->setItemData(idx-1, Qt::Checked, Qt::CheckStateRole);
-    }
-  foreach(const QString &directory, directories)
-    {
-    readDataFiles(QFileInfo(dir,directory).absoluteFilePath(),idx,group);
-    }
+  this->readData(rootDirectory, idx, group);
+
+  this->updateUi();
 
   // Render
   double extent[6];
   this->getMaximumExtent(extent);
   this->ThreeDRenderer->ResetCamera(extent);
+}
 
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindowPrivate
+::readData(const QString& directory, int& idx, int group)
+{
+  QFileInfoList subDirectories = QDir(directory).entryInfoList(
+    QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+  foreach(const QFileInfo& subdirectory, subDirectories)
+    {
+    this->readData(subdirectory.absoluteFilePath(), idx, group);
+    }
+  this->readDataFiles(directory,idx, group);
 }
 
 // ------------------------------------------------------------------------------
