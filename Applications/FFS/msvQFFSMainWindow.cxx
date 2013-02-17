@@ -1,22 +1,22 @@
 /*==============================================================================
 
-   Library: MSVTK
+  Library: MSVTK
 
-   Copyright (c) Kitware Inc.
+  Copyright (c) Kitware Inc.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
       http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
-   ==============================================================================*/
+==============================================================================*/
 
 // Qt includes
 #include <QDebug>
@@ -134,6 +134,7 @@ protected:
 
   unsigned int       currentColor;
   const unsigned int colorCount;
+  
 public:
   msvQFFSMainWindowPrivate(msvQFFSMainWindow& object);
   ~msvQFFSMainWindowPrivate();
@@ -144,6 +145,7 @@ public:
   virtual void update();
   virtual void updateUi();
   virtual void updateView();
+  virtual void runTimeStep();
 
   void renderSurfaceVectorField();
 
@@ -242,6 +244,20 @@ msvQFFSMainWindowPrivate::msvQFFSMainWindowPrivate(msvQFFSMainWindow& object)
 
 }
 
+//------------------------------------------------------------------------------
+void msvQFFSMainWindowPrivate::runTimeStep()
+{
+  unsigned int count = static_cast<unsigned int>(
+    this->numberOfTimeSteps->value());
+  qDebug() << "Running " << count << " time steps.";
+  for(unsigned int i = 0; i < count; ++i)
+    {
+    this->fluidSimulator->Run();
+    }
+  qDebug() << "End of running time steps.";
+}
+
+//------------------------------------------------------------------------------
 void msvQFFSMainWindowPrivate::renderSurfaceVectorField()
 {
   this->arrowSource = vtkSmartPointer<vtkArrowSource>::New();
@@ -266,15 +282,19 @@ void msvQFFSMainWindowPrivate::renderSurfaceVectorField()
   this->vectorActor->SetMapper(this->vectorMapper);
 }
 
+//------------------------------------------------------------------------------
 void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
 {
-  if (dir.cd(QString("Morpho")))
+  bool res = dir.cd(QString("Morpho"));
+  if (!res || !dir.exists("geometry.vtk"))
     {
-    this->polyDataReader->SetFileName(
-      dir.filePath("zmMesh.vtk").toLatin1().constData());
-    this->polyDataReader->Update();
+    qCritical() << "The selected directory should contain a "
+                << "\"Morpho/geometry.vtk\" file.";
+    return;
     }
-  else { return; }
+  this->polyDataReader->SetFileName(
+    dir.filePath("geometry.vtk").toLatin1().constData());
+  this->polyDataReader->Update();
 
   double bounds[6] = {0};
   this->polyDataReader->GetOutput()->GetBounds(bounds);
@@ -286,13 +306,13 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
   data->GetBounds(bounds);
   std::cout << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " << bounds[3] << " " << bounds[4] << " " << bounds[5] << " " << std::endl;
 
-  const char *fileName = "Resources/simulator.config";
-  this->fluidSimulator->SetInitFile(fileName);
-  this->fluidSimulator->SetMaxLevels(5);
-  this->fluidSimulator->SetDataLevel(4);
-  this->fluidSimulator->SetCoarsestGridSpacing(4);
+  QFileInfo simulatorConfig(QDir(qApp->applicationDirPath()), "Resources/simulator.config");
+  this->fluidSimulator->SetInitFile(simulatorConfig.absoluteFilePath().toLatin1());
+  this->fluidSimulator->SetMaxLevels(this->maxLevelsSpinBox->value());
+  this->fluidSimulator->SetDataLevel(this->dataLevelsSpinBox->value());
+  this->fluidSimulator->SetRefinamentRatio(4);
+  this->fluidSimulator->SetCoarsestGridSpacing(8);
   this->fluidSimulator->Init(data);
-//   this->fluidSimulator->SetDataSet();
   // Render
   double extent[6];
   this->amrLagrangianSurfaceMapper->GetBounds(extent);
@@ -303,6 +323,10 @@ void msvQFFSMainWindowPrivate::readImmersedBoundary(QDir dir)
   this->threeDRenderer->AddActor(this->amrSelectBoundaryActor);
 //   this->threeDRenderer->AddActor(this->sourceActor);
   this->threeDRenderer->ResetCamera(extent);
+
+  this->LoadingGroupBox->setEnabled(false);
+  this->VisualisationGroupBox->setEnabled(true);
+  this->SimulationGroupBox->setEnabled(true);
 }
 
 
@@ -316,6 +340,9 @@ msvQFFSMainWindowPrivate::~msvQFFSMainWindowPrivate()
 void msvQFFSMainWindowPrivate::clear()
 {
   this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
+  this->LoadingGroupBox->setEnabled(true);
+  this->VisualisationGroupBox->setEnabled(false);
+  this->SimulationGroupBox->setEnabled(false);
 }
 
 //------------------------------------------------------------------------------
@@ -406,7 +433,10 @@ void msvQFFSMainWindow::openData()
     this, tr("Select root Data Folder"), QDir::homePath(),
     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
   if (dir.isEmpty())
+    {
+    qDebug() << "Cancel loading...";
     return;
+    }
 
   d->clear();             // Clean Up data and scene
   d->readImmersedBoundary(dir);  // Load data
@@ -423,59 +453,52 @@ void msvQFFSMainWindow::closeData()
 }
 
 //------------------------------------------------------------------------------
+void msvQFFSMainWindow::on_maxLevelsSpinBox_valueChanged(int value)
+{
+  Q_D(msvQFFSMainWindow);
+  d->dataLevelsSpinBox->setMaximum(value-1);
+  this->updateView();
+}
+
+//------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showCartesianGrid_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrHierarchicalActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrHierarchicalActor->VisibilityOff();
-    }
+  d->amrHierarchicalActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showSurface_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrLagrangianSurfaceActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrLagrangianSurfaceActor->VisibilityOff();
-    }
+  d->amrLagrangianSurfaceActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showBoundaryEdges_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrSelectBoundaryActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrSelectBoundaryActor->VisibilityOff();
-    }
+  d->amrSelectBoundaryActor->SetVisibility(state);
+  this->updateView();
 }
 
 //------------------------------------------------------------------------------
 void msvQFFSMainWindow::on_showOutlineCorners_stateChanged(int state)
 {
   Q_D(msvQFFSMainWindow);
-  if(state)
-    {
-    d->amrOutlineCornerActor->VisibilityOn();
-    }
-  else
-    {
-    d->amrOutlineCornerActor->VisibilityOff();
-    }
+  d->amrOutlineCornerActor->SetVisibility(state);
+  this->updateView();
+}
+
+//------------------------------------------------------------------------------
+void msvQFFSMainWindow::on_runTimeSteps_clicked()
+{
+  Q_D(msvQFFSMainWindow);
+  
+  d->runTimeStep();
+  
 }
 
 //------------------------------------------------------------------------------

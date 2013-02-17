@@ -30,8 +30,8 @@
 
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
-#include "msvQTimePlayerWidget.h"
-#include "msvVTKDataFileSeriesReader.h"
+//#include "msvQTimePlayerWidget.h"
+//#include "msvVTKDataFileSeriesReader.h"
 #include "ui_msvQVTKButtonsMainWindow.h"
 #include "msvQVTKButtonsAboutDialog.h"
 #include "msvQVTKButtonsManager.h"
@@ -80,21 +80,22 @@ protected:
   void setOnCenter(bool center);
     
   // Scene Rendering
-  vtkSmartPointer<vtkRenderer> threeDRenderer;
-  vtkSmartPointer<vtkAxesActor> axes;
-  vtkSmartPointer<vtkOrientationMarkerWidget> orientationMarker;
+  vtkSmartPointer<vtkRenderer> ThreeDRenderer;
+  vtkSmartPointer<vtkAxesActor> Axes;
+  vtkSmartPointer<vtkOrientationMarkerWidget> OrientationMarker;
 
-  // CartoSignals
-  //vtkSmartPointer<vtkPlotLine> currentTimePlot;
-  vtkSmartPointer<vtkTable> currentTimeLine;
+  vtkSmartPointer<vtkDataSetReader> PolyDataReader;
 
-  // CartoPoints Pipeline
-  vtkSmartPointer<vtkDataSetReader>              polyDataReader;
+  vtkSmartPointer<vtkPolyDataMapper> SurfaceMapper;
+  vtkSmartPointer<vtkActor>SurfaceActor;
 
-  vtkSmartPointer<vtkPolyDataMapper>              surfaceMapper;
-  vtkSmartPointer<vtkActor>                       surfaceActor;
+  QVector<msvQVTKButtons *> Buttons;
 
-  QVector<msvQVTKButtons *> buttons;
+  bool ShowLabels;
+  bool ShowButtons;
+  bool FlyTo;
+  bool OnCenter;
+
 public:
   msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsMainWindow& object);
   virtual ~msvQVTKButtonsMainWindowPrivate();
@@ -118,43 +119,34 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
   : q_ptr(&object)
 {
   // Renderer
-  this->threeDRenderer = vtkSmartPointer<vtkRenderer>::New();
-  this->threeDRenderer->SetBackground(0.1, 0.2, 0.4);
-  this->threeDRenderer->SetBackground2(0.2, 0.4, 0.8);
-  this->threeDRenderer->SetGradientBackground(true);
+  this->ThreeDRenderer = vtkSmartPointer<vtkRenderer>::New();
+  this->ThreeDRenderer->SetBackground(0.1, 0.2, 0.4);
+  this->ThreeDRenderer->SetBackground2(0.2, 0.4, 0.8);
+  this->ThreeDRenderer->SetGradientBackground(true);
 
-  msvQVTKButtonsManager::instance()->setRenderer(this->threeDRenderer);
+  msvQVTKButtonsManager::instance()->setRenderer(this->ThreeDRenderer);
 
-  this->axes = vtkSmartPointer<vtkAxesActor>::New();
-  this->orientationMarker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-  this->orientationMarker->SetOutlineColor(0.9300, 0.5700, 0.1300);
-  this->orientationMarker->SetOrientationMarker(axes);
-
-  // CartoSignals
-  this->currentTimeLine = vtkSmartPointer<vtkTable>::New();
-  vtkNew<vtkDoubleArray> xCoords;
-  xCoords->SetName("Time (ms)");
-  xCoords->InsertNextValue(-1.);
-  xCoords->InsertNextValue(-1.);
-  this->currentTimeLine->AddColumn(xCoords.GetPointer());
-
-  vtkNew<vtkDoubleArray> yCoords;
-  yCoords->SetName("Vertical bar");
-  yCoords->InsertNextValue(0.);
-  yCoords->InsertNextValue(1.);
-  this->currentTimeLine->AddColumn(yCoords.GetPointer());
+  this->Axes = vtkSmartPointer<vtkAxesActor>::New();
+  this->OrientationMarker = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+  this->OrientationMarker->SetOutlineColor(0.9300, 0.5700, 0.1300);
+  this->OrientationMarker->SetOrientationMarker(Axes);
 
   // CartoPoints Readers
-  this->polyDataReader    = vtkSmartPointer<vtkDataSetReader>::New();
+  this->PolyDataReader    = vtkSmartPointer<vtkDataSetReader>::New();
 
   // Create Pipeline for the CartoPoints
-  this->surfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->surfaceMapper->ScalarVisibilityOff();
-  this->surfaceActor = vtkSmartPointer<vtkActor>::New();
-  this->surfaceActor->GetProperty()->SetOpacity(0.66);
-  this->surfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
-  this->surfaceActor->GetProperty()->BackfaceCullingOn();
-  this->surfaceActor->SetMapper(this->surfaceMapper);
+  this->SurfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  this->SurfaceMapper->ScalarVisibilityOff();
+  this->SurfaceActor = vtkSmartPointer<vtkActor>::New();
+  this->SurfaceActor->GetProperty()->SetOpacity(0.66);
+  this->SurfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
+  this->SurfaceActor->GetProperty()->BackfaceCullingOn();
+  this->SurfaceActor->SetMapper(this->SurfaceMapper);
+
+  ShowLabels = true;
+  ShowButtons = true;
+  FlyTo = true;
+  OnCenter = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -168,9 +160,9 @@ void msvQVTKButtonsMainWindowPrivate::clear()
 {
   //Q_Q(msvQVTKButtonsMainWindow);
 
-  this->timePlayerWidget->play(false);            // stop the player widget
-  this->threeDRenderer->RemoveAllViewProps();     // clean up the renderer
-  this->timePlayerWidget->updateFromFilter();     // update the player widget
+  //this->timePlayerWidget->play(false);            // stop the player widget
+  this->ThreeDRenderer->RemoveAllViewProps();     // clean up the renderer
+  //this->timePlayerWidget->updateFromFilter();     // update the player widget
 }
 
 //------------------------------------------------------------------------------
@@ -187,9 +179,9 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 
   this->Ui_msvQVTKButtonsMainWindow::setupUi(mainWindow);
 
-  this->vtkButtonsPanel->toggleViewAction()->setText("VTKButtons panel");
-  this->vtkButtonsPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
-  this->menuView->addAction(this->vtkButtonsPanel->toggleViewAction());
+  //this->vtkButtonsPanel->toggleViewAction()->setText("VTKButtons panel");
+  //this->vtkButtonsPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
+  //this->menuView->addAction(this->vtkButtonsPanel->toggleViewAction());
 
   this->vtkButtonsReviewPanel->toggleViewAction()->setText("VTKButtons review panel");
   this->vtkButtonsReviewPanel->toggleViewAction()->setShortcut(QKeySequence("Ctrl+2"));
@@ -205,8 +197,8 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
              SLOT(aboutApplication()));
 
   // Playback Controller
-  q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
-             q, SLOT(onCurrentTimeChanged(double)));
+  //q->connect(this->timePlayerWidget, SIGNAL(currentTimeChanged(double)),
+  //           q, SLOT(onCurrentTimeChanged(double)));
 
   // Customize QAction icons with standard pixmaps
   QIcon dirIcon = q->style()->standardIcon(QStyle::SP_DirIcon);
@@ -220,13 +212,13 @@ void msvQVTKButtonsMainWindowPrivate::setupUi(QMainWindow * mainWindow)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::setupView()
 {
-  this->threeDView->GetRenderWindow()->AddRenderer(this->threeDRenderer);
+  this->threeDView->GetRenderWindow()->AddRenderer(this->ThreeDRenderer);
 
   // Marker annotation
-  this->orientationMarker->SetInteractor
-    (this->threeDRenderer->GetRenderWindow()->GetInteractor());
-  this->orientationMarker->SetEnabled(1);
-  this->orientationMarker->InteractiveOn();
+  this->OrientationMarker->SetInteractor
+    (this->ThreeDRenderer->GetRenderWindow()->GetInteractor());
+  this->OrientationMarker->SetEnabled(1);
+  this->OrientationMarker->InteractiveOn();
 }
 
 //------------------------------------------------------------------------------
@@ -251,17 +243,17 @@ void msvQVTKButtonsMainWindowPrivate::updateView()
 void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 {
   //import VTK Data
-  polyDataReader->SetFileName(filePath.toAscii().data());
-  polyDataReader->Update();
+  PolyDataReader->SetFileName(filePath.toAscii().data());
+  PolyDataReader->Update();
 
-  int type = polyDataReader->ReadOutputType();
+  int type = PolyDataReader->ReadOutputType();
 
   if (type == 0)
     {
     // render data into the scene
-    this->surfaceMapper->SetInputConnection(polyDataReader->GetOutputPort());
-    this->threeDRenderer->AddActor(this->surfaceActor);
-    this->threeDRenderer->ResetCamera();
+    this->SurfaceMapper->SetInputConnection(PolyDataReader->GetOutputPort());
+    this->ThreeDRenderer->AddActor(this->SurfaceActor);
+    this->ThreeDRenderer->ResetCamera();
     }
   else
     {
@@ -272,7 +264,7 @@ void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
 {
-  double *bounds = polyDataReader->GetOutput()->GetBounds();
+  double *bounds = PolyDataReader->GetOutput()->GetBounds();
 
   QString text("<table border=\"0\"");
   text.append("<tr>");
@@ -337,7 +329,7 @@ void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
 void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent)
 {
   msvQVTKButtons *toolButton = msvQVTKButtonsManager::instance()->createButtons();
-  buttons.append(toolButton);
+  Buttons.append(toolButton);
   QString name("TestData");
   toolButton->setShowButton(true);
   QString iconFileName(":/Images/buttonIcon.png");
@@ -345,19 +337,24 @@ void msvQVTKButtonsMainWindowPrivate::addVTKButton(QObject *parent)
   image.load(iconFileName);
   toolButton->setImage(image);
   toolButton->setLabel(name);
-  toolButton->setBounds(polyDataReader->GetOutput()->GetBounds());
-  toolButton->setData(polyDataReader->GetOutput());
+  toolButton->setBounds(PolyDataReader->GetOutput()->GetBounds());
+  toolButton->setData(PolyDataReader->GetOutput());
   this->setToolTip(toolButton);
   QObject::connect(toolButton, SIGNAL(showTooltip(QString)),
                    parent, SLOT(showTooltip(QString)));
-  toolButton->setCurrentRenderer(this->threeDRenderer);
+  toolButton->setCurrentRenderer(this->ThreeDRenderer);
+  toolButton->setShowButton(ShowButtons);
+  toolButton->setShowLabel(ShowLabels);
+  toolButton->setFlyTo(FlyTo);
+  toolButton->setOnCenter(OnCenter);
   toolButton->update();
 }
 
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::showButtons(bool value)
 {
-  Q_FOREACH(msvQVTKButtons *button, buttons)
+  ShowButtons = value;
+  Q_FOREACH(msvQVTKButtons *button, Buttons)
     {
     button->setShowButton(value);
     button->update();
@@ -367,7 +364,8 @@ void msvQVTKButtonsMainWindowPrivate::showButtons(bool value)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::showLabels(bool value)
 {
-  Q_FOREACH(msvQVTKButtons *button, buttons)
+  ShowLabels = value;
+  Q_FOREACH(msvQVTKButtons *button, Buttons)
     {
     button->setShowLabel(value);
     button->update();
@@ -377,7 +375,8 @@ void msvQVTKButtonsMainWindowPrivate::showLabels(bool value)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::setFlyTo(bool value)
 {
-  Q_FOREACH(msvQVTKButtons *button, buttons)
+  FlyTo = value;
+  Q_FOREACH(msvQVTKButtons *button, Buttons)
     {
     button->setFlyTo(value);
     button->update();
@@ -387,7 +386,8 @@ void msvQVTKButtonsMainWindowPrivate::setFlyTo(bool value)
 //------------------------------------------------------------------------------
 void msvQVTKButtonsMainWindowPrivate::setOnCenter(bool value)
 {
-  Q_FOREACH(msvQVTKButtons *button, buttons)
+  OnCenter = value;
+  Q_FOREACH(msvQVTKButtons *button, Buttons)
     {
     button->setOnCenter(value);
     button->update();

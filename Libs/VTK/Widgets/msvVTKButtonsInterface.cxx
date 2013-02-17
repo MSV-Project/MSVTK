@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -17,20 +17,6 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtonsInterface.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 
 #include "vtkBalloonRepresentation.h"
 #include "vtkButtonWidget.h"
@@ -59,8 +45,6 @@ msvVTKButtonsInterface::msvVTKButtonsInterface()
   this->ButtonWidget=NULL;
   this->Image=NULL;
 
-  // Bounds of the data related to the buttonWin
-  double Bounds[6];
   vtkTexturedButtonRepresentation2D* rep = vtkTexturedButtonRepresentation2D::New();
   rep->SetNumberOfStates(1);
   GetButton()->SetRepresentation(rep);
@@ -80,6 +64,10 @@ msvVTKButtonsInterface::~msvVTKButtonsInterface()
     delete[] this->LabelText;
     this->LabelText = NULL;
     }
+  if(this->ButtonWidget != NULL)
+  {
+    this->ButtonWidget->Delete();
+  }
 }
 
 //----------------------------------------------------------------------

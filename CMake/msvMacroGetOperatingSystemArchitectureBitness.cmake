@@ -37,19 +37,18 @@
 #
 ################################################################################
 
-#
-# SlicerMacroGetOperatingSystemArchitectureBitness(<var-prefix>)
-# is used to extract information associated with the current platform.
-#
-# The macro defines the following variables:
-#  <var-prefix>_BITNESS - bitness of the platform: 32 or 64
-#  <var-prefix>_OS - which is on the this value: linux, macosx, win
-#  <var-prefix>_ARCHITECTURE - which is on the this value: i386, amd64, ppc
-
 set(MSVTK_OS_LINUX_NAME "linux")
 set(MSVTK_OS_MAC_NAME "macosx")
 set(MSVTK_OS_WIN_NAME "win")
 
+#! \brief Extract OS information.
+#! SlicerMacroGetOperatingSystemArchitectureBitness(<var-prefix>)
+#! is used to extract information associated with the current platform.
+#!
+#! The macro defines the following variables:
+#!  <var-prefix>_BITNESS - bitness of the platform: 32 or 64
+#!  <var-prefix>_OS - which is on the this value: linux, macosx, win
+#!  <var-prefix>_ARCHITECTURE - which is on the this value: i386, amd64, ppc
 macro(msvMacroGetOperatingSystemArchitectureBitness)
   set(options)
   set(oneValueArgs VAR_PREFIX)

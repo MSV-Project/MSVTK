@@ -32,6 +32,7 @@
 
 class msvQFFSMainWindowPrivate;
 
+/// \brief Main window for the FFS demo.
 class MSV_FFS_EXPORT msvQFFSMainWindow : public QMainWindow
 {
   Q_OBJECT
@@ -47,10 +48,14 @@ public slots:
   void aboutApplication();
   void updateView();
 
+protected slots:
+  // Automatically connected because of the on_XXX_YYY() slot name.
+  void on_maxLevelsSpinBox_valueChanged(int value);
   void on_showSurface_stateChanged(int state);
   void on_showCartesianGrid_stateChanged(int state);
   void on_showOutlineCorners_stateChanged(int state);
   void on_showBoundaryEdges_stateChanged(int state);
+  void on_runTimeSteps_clicked();
 
 protected:
   QScopedPointer<msvQFFSMainWindowPrivate> d_ptr;

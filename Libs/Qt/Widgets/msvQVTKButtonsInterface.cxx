@@ -35,7 +35,7 @@ class msvQVTKButtonsInterfacePrivate
 
 protected:
   msvQVTKButtonsInterface* const q_ptr; ///< PIMPL pointer
-  msvVTKButtonsInterface* VtkButtonsInterface;
+  msvVTKButtonsInterface* VTKButtonsInterface;
   msvQVTKButtonsAction* Action;
 
 public:
@@ -76,7 +76,7 @@ public:
   inline void bounds(double bds[6]){this->vtkButtonsInterface()->GetBounds(bds);};
 
   inline void setVTKButtonsInterface(msvVTKButtonsInterface *buttons){
-    this->VtkButtonsInterface = buttons;};
+    this->VTKButtonsInterface = buttons;};
 
   void setImage(QImage image);
   msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object);
@@ -86,7 +86,7 @@ public:
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInterface& object)
-  : VtkButtonsInterface(NULL), q_ptr(&object)
+  :  q_ptr(&object), VTKButtonsInterface(NULL)
 {
 
 }
@@ -94,7 +94,7 @@ msvQVTKButtonsInterfacePrivate::msvQVTKButtonsInterfacePrivate(msvQVTKButtonsInt
 //------------------------------------------------------------------------------
 /*virtual*/ msvVTKButtonsInterface* msvQVTKButtonsInterfacePrivate::vtkButtonsInterface()
 {
-  return VtkButtonsInterface;
+  return VTKButtonsInterface;
 }
 
 //------------------------------------------------------------------------------

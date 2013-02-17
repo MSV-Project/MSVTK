@@ -32,6 +32,7 @@
 
 class msvQFFSAboutDialogPrivate;
 
+/// \brief About dialog for the FFS demo.
 class MSV_FFS_EXPORT msvQFFSAboutDialog : public QDialog
 {
   Q_OBJECT

@@ -24,14 +24,12 @@
 // Qt includes
 #include <QDialog>
 
-// CTK includes
-#include <ctkPimpl.h>
-
 // VTKButtons includes
 #include "msvVTKButtonsExport.h"
 
 class msvQVTKButtonsAboutDialogPrivate;
 
+/// \brief About dialog for the VTKButtons demo.
 class MSV_VTKButtons_EXPORT msvQVTKButtonsAboutDialog : public QDialog
 {
   Q_OBJECT

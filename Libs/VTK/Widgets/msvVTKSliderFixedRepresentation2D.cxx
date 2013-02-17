@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -169,8 +169,8 @@ void msvVTKSliderFixedRepresentation2D::BuildRepresentation()
     double radius = maxY/2.0 + textSize[1]*cos(theta) + textSize[0]*sin(theta);
     this->Points->SetPoint(17, 0.0,-radius,0.0); //title
 
-    double tx = static_cast<double>((p1[0]+p2[0])/2.0);
-    double ty = static_cast<double>((p1[1]+p2[1])/2.0);
+    //double tx = static_cast<double>((p1[0]+p2[0])/2.0);
+   // double ty = static_cast<double>((p1[1]+p2[1])/2.0);
 
     // fixed transform
     // @ToDo Expose API to translate and scale

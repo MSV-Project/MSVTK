@@ -17,20 +17,6 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtonsGroup.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 // .NAME msvVTKButtonsGroup -
 // .SECTION Description
 //
@@ -72,6 +58,10 @@ public:
   // Description:
   // Remove a buttons to the buttons' vector
   void RemoveElement(msvVTKButtonsInterface* buttons);
+
+  // Description:
+  // Remove all buttons from the buttons' vector
+  void RemoveElements();
 
   // Description:
   // Get the specified element
@@ -132,6 +122,10 @@ public:
   // Description:
   // Calculate position (center or corner)
   void CalculatePosition();
+
+  // Description:
+  // Get the size of the elemets array
+  size_t GetNumberOfElements();
 
 protected:
   // Object constructor

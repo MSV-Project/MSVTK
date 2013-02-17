@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVTK
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 
@@ -17,20 +17,6 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtonsGroup.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 
 #include "vtkButtonRepresentation.h"
 #include "vtkButtonWidget.h"
@@ -65,6 +51,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
     State = !State;
     // Show / Hide slider
     this->ToolButton->ShowSlider(State);
@@ -96,6 +83,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
 //    vtkTexturedButtonRepresentation2D *rep =
 //      vtkTexturedButtonRepresentation2D::SafeDownCast(caller);
 //    int highlightState = rep->GetHighlightState();
@@ -126,6 +114,7 @@ public:
 class vtkSliderInteractionCallback : public vtkCommand
 {
 public:
+
   static vtkSliderInteractionCallback *New()
   {
     return new vtkSliderInteractionCallback;
@@ -135,13 +124,15 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
+    (void)caller;
     vtkSliderWidget *sliderWidget = vtkSliderWidget::SafeDownCast(caller);
     double ratio = vtkSliderRepresentation::SafeDownCast(
       sliderWidget->GetRepresentation())->GetValue();
     this->ToolButton->SetCameraPositionOnPath(ratio);
   }
 
-  vtkSliderInteractionCallback() : ToolButton(NULL), Renderer(0) {}
+  vtkSliderInteractionCallback() :  Renderer(0), ToolButton(NULL) {}
+
   vtkRenderer *Renderer;
   msvVTKButtonsGroup *ToolButton;
 };
@@ -169,7 +160,7 @@ public:
     animateCamera->Execute(this->Renderer, bounds, 20);
   }
 
-  vtkSliderStartInteractionCallback() : ToolButton(NULL), Renderer(0) {}
+  vtkSliderStartInteractionCallback() : Renderer(0), ToolButton(NULL) {}
   vtkRenderer *Renderer;
   msvVTKButtonsGroup *ToolButton;
 };
@@ -246,10 +237,23 @@ void msvVTKButtonsGroup::RemoveElement(msvVTKButtonsInterface* buttons)
     {
     if (*buttonsIt == buttons)
       {
+      buttons->GetButton()->Delete();
       Elements.erase(buttonsIt);
       return;
       }
     }
+}
+
+//----------------------------------------------------------------------
+void msvVTKButtonsGroup::RemoveElements()
+{
+  //int index = 0;
+  for(std::vector<msvVTKButtonsInterface*>::iterator buttonsIt = Elements.begin();
+      buttonsIt != Elements.end(); ++buttonsIt)
+    {
+    (*buttonsIt)->GetButton()->Delete();
+    }
+  Elements.clear();
 }
 
 //----------------------------------------------------------------------
@@ -390,7 +394,6 @@ void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
   // (0-1 value)
 
   // calculate intermediate bounds
-  double resetBounds[6];
   double b1[6];
   double b2[6];
 
@@ -503,4 +506,9 @@ void msvVTKButtonsGroup::CalculatePosition()
   rep->PlaceWidget(bds);
   rep->Modified();
   this->GetButton()->SetRepresentation(rep);
+}
+
+size_t msvVTKButtonsGroup::GetNumberOfElements()
+{
+  return this->Elements.size();
 }

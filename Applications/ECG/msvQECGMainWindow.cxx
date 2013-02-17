@@ -317,7 +317,6 @@ void msvQECGMainWindowPrivate::updateView()
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::readCartoData(const QString& rootDirectory)
 {
-  Q_Q(msvQECGMainWindow);
   QDir dir(rootDirectory);
 
   if (dir.cd(QString("CartoSignals"))) {
@@ -378,13 +377,14 @@ void msvQECGMainWindowPrivate::readCartoSignals(QDir dir)
   dir.setNameFilters(signalFileFilters);
   QStringList signalFiles = dir.entryList(QDir::Files,QDir::Name);
 
-  if (signalFiles.size() == 0){
+  if (signalFiles.size() == 0)
+    {
     qWarning() << "No carto signals in" << dir;
-  }
+    }
 
   // Resort files using their index number
   qSort(signalFiles.begin(), signalFiles.end(),
-        msvQECGMainWindowPrivate::fileLessThan);
+      msvQECGMainWindowPrivate::fileLessThan);
 
   // Fill the FileSerieReader
   foreach(const QString& signalFile, signalFiles)
@@ -422,8 +422,6 @@ bool msvQECGMainWindowPrivate::fileLessThan(const QString &s1, const QString &s2
 //------------------------------------------------------------------------------
 void msvQECGMainWindowPrivate::addCartoSignal(vtkDelimitedTextReader* signal)
 {
-  Q_Q(msvQECGMainWindow);
-
   ctkVTKChartView* ecgView = new ctkVTKChartView;
   ecgView->setMinimumSize(QSize(100, 80));
   ecgView->setFocusPolicy(Qt::NoFocus);

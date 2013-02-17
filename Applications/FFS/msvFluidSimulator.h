@@ -1,27 +1,25 @@
 /*==============================================================================
-   Library: MSVTK
 
-   Copyright (c) Kitware Inc.
+  Library: MSVTK
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Copyright (c) Kitware Inc.
 
-   http://www.apache.org/licenses/LICENSE-2.0.txt
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   ==============================================================================*/
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  
+==============================================================================*/
 
 #ifndef __msvFluidSimulator_h
 #define __msvFluidSimulator_h
-
-// STL includes
-#include <string>
 
 // VTK includes
 #include <vtkObject.h>
@@ -99,9 +97,11 @@ public:
   virtual void SetAMRDataset(vtkHierarchicalBoxDataSet*);
   vtkGetMacro(AMRDataset,vtkHierarchicalBoxDataSet*);
   
+  // Description:
   // Initialize AMR data structure, solver and main algorithms
   virtual void Init(vtkPolyData *polydata);
 
+  // Description:
   // Run one time-step of the fluid solver
   virtual void Run();
 

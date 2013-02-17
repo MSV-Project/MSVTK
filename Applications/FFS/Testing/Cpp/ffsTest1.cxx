@@ -1,6 +1,6 @@
 /*==============================================================================
 
-  Program: MSVECG
+  Library: MSVTK
 
   Copyright (c) Kitware Inc.
 

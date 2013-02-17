@@ -18,6 +18,8 @@
 #
 ###########################################################################
 
+#! \brief Search and configure Qt libraries
+#! Qt Plugins can be specified to be use by the project.
 #! \ingroup CMakeUtilities
 macro(msvMacroSetupQt)
 

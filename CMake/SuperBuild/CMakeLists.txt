@@ -18,7 +18,10 @@
 #
 ###########################################################################
 
-set(MSVTK_DEPENDENCIES VTK CTK IBAMR)
+set(MSVTK_DEPENDENCIES VTK CTK)
+if(ENABLE_IBAMR)
+  list(APPEND MSVTK_DEPENDENCIES IBAMR)
+endif()  
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -131,7 +134,6 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # Set superbuild boolean args
 #
-
 set(ctk_cmake_boolean_args
   BUILD_TESTING
   #BUILD_QTDESIGNER_PLUGINS
@@ -144,6 +146,9 @@ set(ctk_cmake_boolean_args
   #${ctk_applications_bool_vars}
   #${ctk_lib_options_list}
   )
+foreach(app ${MSVTK_APPLICATIONS_SUBDIRS})
+  list(APPEND ctk_cmake_boolean_args MSVTK_APP_${app})
+endforeach()
 
 set(ctk_superbuild_boolean_args)
 foreach(ctk_cmake_arg ${ctk_cmake_boolean_args})
@@ -194,6 +199,7 @@ ExternalProject_Add(${proj}
     -DMSVTK_C_FLAGS:STRING=${MSVTK_C_FLAGS}
     -DMSVTK_EXTERNAL_LIBRARY_DIRS:STRING=${MSVTK_EXTERNAL_LIBRARY_DIRS}
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+    -DENABLE_IBAMR:BOOL=${ENABLE_IBAMR}
     -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
     ${MSVTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}

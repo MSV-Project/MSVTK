@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>FFS - Multi Scale Visualization Toolkit</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../msvQFFS.qrc">
+    <normaloff>:/Logo/icon.png</normaloff>:/Logo/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
     <property name="margin">
@@ -29,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>698</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -46,13 +50,7 @@
     </property>
     <addaction name="actionAboutFFSApplication"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -75,43 +73,137 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QCheckBox" name="showCartesianGrid">
-       <property name="text">
-        <string>Show Cartesian Grid</string>
+      <widget class="QGroupBox" name="LoadingGroupBox">
+       <property name="title">
+        <string>Loading</string>
        </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="maxLevelsLabel">
+          <property name="text">
+           <string>Max Levels:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="maxLevelsSpinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>5</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="dataLevelsLabel">
+          <property name="text">
+           <string>Data Levels:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="dataLevelsSpinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>4</number>
+          </property>
+          <property name="value">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="showSurface">
-       <property name="text">
-        <string>Show Surface</string>
+      <widget class="QGroupBox" name="VisualisationGroupBox">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
-       <property name="checked">
-        <bool>true</bool>
+       <property name="title">
+        <string>Visualisation</string>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QCheckBox" name="showCartesianGrid">
+          <property name="text">
+           <string>Show Cartesian Grid</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="showSurface">
+          <property name="text">
+           <string>Show Surface</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="showBoundaryEdges">
+          <property name="text">
+           <string>Show boundary edges</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="showOutlineCorners">
+          <property name="text">
+           <string>Show outline corners</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="showBoundaryEdges">
-       <property name="text">
-        <string>Show boundary edges</string>
+      <widget class="QGroupBox" name="SimulationGroupBox">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
-       <property name="checked">
-        <bool>true</bool>
+       <property name="title">
+        <string>Simulation</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="showOutlineCorners">
-       <property name="text">
-        <string>Show outline corners</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="timeStepsLabel">
+          <property name="text">
+           <string>Time Steps:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="numberOfTimeSteps">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QPushButton" name="runTimeSteps">
+          <property name="text">
+           <string>Run</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -161,6 +253,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../msvQFFS.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,3 +1,23 @@
+###########################################################################
+#
+#  Library: MSVTK
+#
+#  Copyright (c) Kitware Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
 project(msvIBTK)
 set(KIT IBTK_SRC)
 
@@ -93,17 +113,10 @@ set(dynamicHeaders
 # --------------------------------------------------------------------------
 # Install library
 # --------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_INSTALL_BIN_DIR)
-  set(${PROJECT_NAME}_INSTALL_BIN_DIR bin)
-endif()
-if(NOT DEFINED ${PROJECT_NAME}_INSTALL_LIB_DIR)
-  set(${PROJECT_NAME}_INSTALL_LIB_DIR lib/${PROJECT_NAME})
-endif()
-
 install(TARGETS ${lib_name}
-  RUNTIME DESTINATION ${${PROJECT_NAME}_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
-  LIBRARY DESTINATION ${${PROJECT_NAME}_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
-  ARCHIVE DESTINATION ${${PROJECT_NAME}_INSTALL_LIB_DIR} COMPONENT Development
+  RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
+  LIBRARY DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
+  ARCHIVE DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT Development
   )
 
 # --------------------------------------------------------------------------

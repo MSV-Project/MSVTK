@@ -17,23 +17,11 @@
   limitations under the License.
 
 ==============================================================================*/
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    msvVTKButtons.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 // .NAME msvVTKButtons -
 // .SECTION Description
-//
+// Wrapper around a vtk widget that adds extra functionalities
+// such as controlling the renderer current camera to zoom on the associated
+// data on click.
 
 // .SECTION See Also
 //

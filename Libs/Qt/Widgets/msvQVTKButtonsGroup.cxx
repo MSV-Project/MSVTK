@@ -46,8 +46,8 @@ class msvQVTKButtonsGroupPrivate
 protected:
 
   msvQVTKButtonsGroup* const q_ptr;
+  msvVTKButtonsGroup* VTKButtonsGroup;
   QVector<msvQVTKButtonsInterface*> Elements;
-  msvVTKButtonsGroup* VtkButtonsGroup;
 
 public:
   msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& object);
@@ -74,7 +74,7 @@ public:
 
 //------------------------------------------------------------------------------
 msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& object)
-  : VtkButtonsGroup(NULL), q_ptr(&object)
+  : q_ptr(&object), VTKButtonsGroup(NULL)
 {
   Q_Q(msvQVTKButtonsGroup);
   q->setVTKButtonsInterface(this->vtkButtons());
@@ -83,11 +83,11 @@ msvQVTKButtonsGroupPrivate::msvQVTKButtonsGroupPrivate(msvQVTKButtonsGroup& obje
 //------------------------------------------------------------------------------
 msvVTKButtonsInterface* msvQVTKButtonsGroupPrivate::vtkButtons()
 {
-  if (!this->VtkButtonsGroup)
+  if (!this->VTKButtonsGroup)
   {
-    this->VtkButtonsGroup = msvVTKButtonsGroup::New();
+    this->VTKButtonsGroup = msvVTKButtonsGroup::New();
   }
-  return this->VtkButtonsGroup;
+  return this->VTKButtonsGroup;
 }
 
 //------------------------------------------------------------------------------

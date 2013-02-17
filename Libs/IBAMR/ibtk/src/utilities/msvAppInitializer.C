@@ -63,18 +63,17 @@ msvAppInitializer::msvAppInitializer(
   const std::string &input_filename,
   const std::string& default_log_file_name)
 {
-  
   // Create input database and parse all data in input file.
   d_input_db = new InputDatabase("input_db");
   InputManager::getManager()->parseInputFile(input_filename, d_input_db);
-  
+
   // Process "Main" section of the input database.
   Pointer<Database> main_db = new NullDatabase();
   if (d_input_db->isDatabase("Main"))
   {
     main_db = d_input_db->getDatabase("Main");
   }
-  
+
   // Configure logging options.
   const std::string log_file_name = main_db->getStringWithDefault("log_file_name", default_log_file_name);
   const bool log_all_nodes = main_db->getBoolWithDefault("log_all_nodes", false);
@@ -89,8 +88,7 @@ msvAppInitializer::msvAppInitializer(
       PIO::logOnlyNodeZero(log_file_name);
     }
   }
-  
-  
+
   return;
 }// msvAppInitializer
 

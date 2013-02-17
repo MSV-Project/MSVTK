@@ -102,8 +102,8 @@ int main(int argc, char * argv[])
   timePlayerWidget->setCurrentTime(1.);
   timePlayerWidget->goToFirstFrame();
   timePlayerWidget->play(false);
-  timePlayerWidget->onPlay(true);
-  timePlayerWidget->onPlayReverse(true);
+  timePlayerWidget->playForward(true);
+  timePlayerWidget->playBackward(true);
   timePlayerWidget->pause();
   timePlayerWidget->stop();
 

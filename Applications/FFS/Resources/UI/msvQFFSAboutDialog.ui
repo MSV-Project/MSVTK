@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>About MSV FFS Application</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../msvQFFS.qrc">
+    <normaloff>:/Logo/icon.png</normaloff>:/Logo/icon.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -23,10 +27,10 @@
    <item>
     <widget class="QLabel" name="msvQFFSLabel">
      <property name="pixmap">
-      <pixmap resource="../msvQFFS.qrc">:/Logo/msv-logo.png</pixmap>
+      <pixmap>../../../../msvLogo.png</pixmap>
      </property>
      <property name="scaledContents">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -42,14 +46,11 @@
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MSVTK Library&lt;br /&gt;Copyright (c) Kitware Inc. &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;VTK &lt;a href=&quot;http://www.vtk.org/copyright.php&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.vtk.org/copyright.php&lt;/span&gt;&lt;/a&gt; &lt;br /&gt;CTK &lt;a href=&quot;https://github.com/commontk/CTK/blob/master/LICENSE&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/commontk/CTK/blob/master/LICENSE&lt;/span&gt;&lt;/a&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The application has been written by Michael Jeulin-Lagarrigue and Julien Finet.&lt;br /&gt;Funding for this work comes from the European Commission within the MSV project (FP7-IST-248032)&lt;br /&gt;Different spatial scales (Challenge #Ch1), heterogeneous data type (Challenge #Ch5) and time varying issues(Challenge #Ch9) are handled by the application.&lt;br /&gt;It uses Electro-physiological dataset structured as the following: &lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoPoints: collection of .vtk files describing sparse 3D points localized on the heart surface for each time step. &lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;CartoDataFolder/CartoSignals: collection of .csv files corresponding to the entire FFS of a subset of points with each parameter being I, II, III, AvR, AvL, AvF, V1, V2, V3, V4, V5 and V6 derivations. &lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It makes the usage of the new VTK pipeline architecture and its temporal pipeline extensions through new modules and widgets added in MSVTK. It also shows and implements the vtkButtons and vtkCharts widgets. &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The VTK (&amp;gt;5.0) pipeline architecture is needed in order to have time support. Utility classes have been added to MSVTK to ease the use of time in VTK. vtkButtons and vtkCharts widgets are also demo-ed. &lt;br /&gt;Time is represented differently depending on the data type: 3D point clouds are displayed in the VTK render window and animated depending on the FFS coupled time, while the FFSs are represented in a separate VTK chart view(s) as static representations. &lt;br /&gt;3D points for which FFS measurements are recorded are clickable through vtkButtons. vtkButtons are displayed in the VTK render window as cube and linked to the point cloud. Buttons are the connection between the 3D points and the FFS. They are used to display the FFS chart corresponding to the clicked point. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;MSVTK Library&lt;br /&gt;Copyright (c) Kitware Inc. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;VTK &lt;/span&gt;&lt;a href=&quot;http://www.vtk.org/copyright.php&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt; text-decoration: underline; color:#0000ff;&quot;&gt;http://www.vtk.org/copyright.php&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt; &lt;br /&gt;CTK &lt;/span&gt;&lt;a href=&quot;https://github.com/commontk/CTK/blob/master/LICENSE&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/commontk/CTK/blob/master/LICENSE&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;The application has been written by Ricardo Ortiz and Julien Finet.&lt;br /&gt;Funding for this work comes from the European Commission within the MSV project (FP7-IST-248032)&lt;br /&gt;An interface to the &lt;/span&gt;&lt;a href=&quot;https://code.google.com/p/ibamr/&quot;&gt;&lt;span style=&quot; font-size:11pt; text-decoration: underline; color:#508ed8;&quot;&gt;IBAMR&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt; (Immersed Boundary Method with Adaptive Mesh Refinament ) fluid flow simulator library is implemented. &lt;br /&gt;It uses the cerebral aneurism datasets.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;It makes the usage of the new VTK pipeline architecture through new modules added in MSVTK.  It also uses the VTK AMR dataset to display the simulation results.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>

@@ -85,7 +85,7 @@ msvQVTKButtons *msvQVTKButtonsManagerPrivate::createButtons()
 msvQVTKButtonsManager::msvQVTKButtonsManager(QObject *parent)
   : d_ptr(new msvQVTKButtonsManagerPrivate(*this))
 {
-
+  Q_UNUSED(parent);
 }
 
 //------------------------------------------------------------------------------
