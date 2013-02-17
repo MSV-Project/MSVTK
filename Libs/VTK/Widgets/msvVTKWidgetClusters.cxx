@@ -267,7 +267,10 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
     for(unsigned int i = 0; i < numPieces; ++i)
       {
       vtkPolyData* ds = vtkPolyData::SafeDownCast(groupDS->GetPiece(i));
-
+      if (!ds)
+        {
+        continue;
+        }
       vtkPoints *points = ds->GetPoints();
       for(vtkIdType j = 0; j < points->GetNumberOfPoints(); ++j)
         {
@@ -348,6 +351,10 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
     {
     vtkPolyData* dataSet =
       vtkPolyData::SafeDownCast(groupDS->GetPiece(i));
+    if (!dataSet)
+      {
+      continue;
+      }
     vtkPoints *     dataSetPoints = dataSet->GetPoints();
     vtkIdType       clusterIndex  = 0;
     int             buttonRange[2] = {0};
@@ -949,7 +956,10 @@ void msvVTKWidgetClusters::UpdateWidgets()
           {
           vtkPolyData* ds
             = vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx));
-
+          if (!ds)
+            {
+            continue;
+            }
           vtkPoints *points = ds->GetPoints();
           for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
             {
@@ -1010,6 +1020,10 @@ void msvVTKWidgetClusters::UpdateWidgets()
         {
         vtkPolyData* ds
           = vtkPolyData::SafeDownCast(groupDS->GetPiece(dataSetIdx));
+        if (!ds)
+          {
+          continue;
+          }
         // Recompute clusters for each dataset
         vtkPoints *points     = ds->GetPoints();
         vtkIdType     clusterIdx = this->Internal->ComputeClusters(points);
@@ -1136,6 +1150,7 @@ void msvVTKWidgetClusters::HideClusterButtons()
       }
     }
 }
+
 
 // ------------------------------------------------------------------------------
 void msvVTKWidgetClusters::ShowButtons()

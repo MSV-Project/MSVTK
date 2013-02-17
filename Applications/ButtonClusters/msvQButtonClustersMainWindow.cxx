@@ -421,6 +421,7 @@ void msvQButtonClustersMainWindowPrivate::readVolumeData(const QString &file,
   reader->SetFileName(file.toLatin1().constData());
   reader->Update();
 
+#ifdef CREATE_VOLUME_CORNER_BUTTONS
   // Create 8 buttons for the volume.
   vtkNew<vtkPoints> points;
   points->SetNumberOfPoints(8);
@@ -443,6 +444,7 @@ void msvQButtonClustersMainWindowPrivate::readVolumeData(const QString &file,
     points->InsertPoint(i, point[i]);
     }
   this->ButtonsManager->SetDataSet(group,idx,points.GetPointer());
+#endif
   this->VolumeList.push_back(volume.GetPointer());
   this->dataActorMap[idx] = volume.GetPointer();
 }
