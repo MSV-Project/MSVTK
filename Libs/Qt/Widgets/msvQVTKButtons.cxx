@@ -22,6 +22,9 @@
 #include <QImage>
 #include <QDir>
 
+// CTK includes
+#include <ctkVTKWidgetsUtils.h>
+
 // VTK Includes
 #include <vtkButtonWidget.h>
 #include <vtkCommand.h>
@@ -164,7 +167,8 @@ msvQVTKButtonsPrivate::~msvQVTKButtonsPrivate()
 
 //------------------------------------------------------------------------------
 msvQVTKButtons::msvQVTKButtons(QObject *parent)
-  : msvQVTKButtonsInterface(), d_ptr(new msvQVTKButtonsPrivate(*this))
+  : msvQVTKButtonsInterface()
+  , d_ptr(new msvQVTKButtonsPrivate(*this))
 {
   Q_UNUSED(parent);
 }
@@ -212,36 +216,13 @@ QImage msvQVTKButtons::getPreview(int width, int height)
 {
   Q_D(msvQVTKButtons);
   if (d->data())
-  {
+    {
     double bounds[6];
     d->data()->GetBounds(bounds);
 
-    vtkImageData* vtkImage=d->preview(width,height);
-    if (!vtkImage)
-        return QImage();
-    vtkUnsignedCharArray* scalars =
-      vtkUnsignedCharArray::SafeDownCast(
-        vtkImage->GetPointData()->GetScalars());
-
-    if (!width || !height || !scalars)
-        return QImage();
-    QImage qImage(width, height, QImage::Format_ARGB32);
-    vtkIdType tupleIndex=0;
-    int qImageBitIndex=0;
-    QRgb* qImageBits = (QRgb*)qImage.bits();
-    unsigned char* scalarTuples = scalars->GetPointer(0);
-    for (int j=0; j<height; ++j)
-    {
-      for (int i=0; i<width; ++i)
-      {
-        unsigned char* tuple = scalarTuples+(++tupleIndex*3);
-        QRgb color = qRgba(tuple[0], tuple[1], tuple[2], 255);
-        *(qImageBits+(++qImageBitIndex))=color;
-      }
+    vtkImageData* vtkImage=d->preview(width, height);
+    return ctk::vtkImageDataToQImage(vtkImage);
     }
-    vtkImage->Delete();
-    return qImage;
-  }
   return QImage();
 }
 

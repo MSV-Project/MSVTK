@@ -16,7 +16,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-==============================================================================*/
+   ==============================================================================*/
 // .NAME msvVTKButtonsManager -
 // .SECTION Description
 // Manager class to manage groups of msvVTKButtons and msvVTKButtonsGroup
@@ -86,9 +86,7 @@ public:
 
   // Description:
   // Get the number of elements
-  inline int GetNumberOfElements(){
-    return Elements.size();
-  };
+  vtkIdType GetNumberOfElements();
 
   // Description:
   // Set the renderer

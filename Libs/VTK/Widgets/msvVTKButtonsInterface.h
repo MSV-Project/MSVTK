@@ -107,11 +107,11 @@ public:
 
   // Description:
   // Add vtk button to Renderer
-  void SetCurrentRenderer(vtkRenderer *renderer);
+  virtual void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Description:
-  // update graphic objects
-  void Update();
+  // Update graphic objects and render the view if requested.
+  virtual void Update(bool render = true);
 
   // Description:
   // Get the current renderer

@@ -8,7 +8,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0.txt
+    http://www.apache.org/licenses/LICENSE-2.0.txt
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -112,26 +112,26 @@ public:
 
   // Description:
   // Add widget positions
-  virtual void SetDataSet(size_t group, size_t idx,
+  virtual void SetDataSet(vtkIdType group, vtkIdType idx,
                           vtkPoints* dataSet);
 
   // Description:
   // Set the number of data set at a given group.
-  void SetNumberOfDataSets(size_t group, size_t numdatasets);
+  void SetNumberOfDataSets(vtkIdType group, vtkIdType numdatasets);
 
   // Description:
   // Returns the number of data sets available at any group.
-  size_t GetNumberOfDataSets(size_t group);
+  vtkIdType GetNumberOfDataSets(vtkIdType group);
 
   // Description:
   // Set the number of refinement groups. This call might cause
   // allocation if the new number of groups is larger than the
   // current one.
-  void SetNumberOfLevels(size_t numLevels);
+  void SetNumberOfLevels(vtkIdType numLevels);
 
   // Description:
   // Returns the number of groups.
-  size_t GetNumberOfGroups();
+  vtkIdType GetNumberOfGroups();
 
   static vtkInformationIdTypeKey* CLUSTER_IDX();
   static vtkInformationIdTypeKey* DATASET_BUTTONS_OFFSET();
@@ -140,16 +140,16 @@ public:
   virtual void UpdateWidgets();
   virtual void Clear();
   virtual void SetCustersButtonsVisibility(bool show);
-  virtual void ShowButtons();
-  virtual void ShowButtons(size_t group);
-  virtual void HideButtons();
-  virtual void HideButtons(size_t group);
+  void SetButtonsVisibility(bool show);
+  void UpdateButtons();
+  virtual void ShowButtons(vtkIdType group);
+  virtual void HideButtons(vtkIdType group);
   virtual void ShowClusterButtons();
-  virtual void ShowClusterButtons(size_t group);
+  virtual void ShowClusterButtons(vtkIdType group);
   virtual void HideClusterButtons();
-  virtual void HideClusterButtons(size_t group);
+  virtual void HideClusterButtons(vtkIdType group);
   virtual void SetClustersRepresentations();
-  virtual void SetClustersRepresentations(size_t group);
+  virtual void SetClustersRepresentations(vtkIdType group);
 
 protected:
   msvVTKWidgetClusters();

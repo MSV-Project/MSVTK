@@ -1,22 +1,22 @@
 /*==============================================================================
 
-   Library: MSVTK
+  Library: MSVTK
 
-   Copyright (c) Kitware Inc.
+  Copyright (c) Kitware Inc.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
-   ==============================================================================*/
+==============================================================================*/
 
 // Qt includes
 #include <QDebug>
@@ -24,7 +24,6 @@
 #include <QMessageBox>
 #include <QModelIndex>
 #include <QString>
-#include <unistd.h>
 
 // MSV includes
 #include "msvQButtonClustersMainWindow.h"
@@ -57,7 +56,10 @@
 #include "vtkVolumeProperty.h"
 #include "vtkVolume.h"
 
-
+// STD includes
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 // ------------------------------------------------------------------------------
 class msvQButtonClustersMainWindowPrivate
@@ -84,7 +86,7 @@ protected:
   vtkSmartPointer<vtkPolyDataMapper> SurfaceMapper;
   vtkSmartPointer<vtkActor>          SurfaceActor;
 
-  std::vector<vtkSmartPointer<vtkVolume> >   VolumeList;
+  std::vector<vtkSmartPointer<vtkVolume> > VolumeList;
   std::vector<vtkSmartPointer<vtkPolyData> > PolyDataList;
   std::map<int,vtkProp3D*>                   dataActorMap;
 
@@ -118,8 +120,9 @@ public:
   virtual void clear();
 
   virtual void readData(const QString&);
-  virtual void readDataFiles(const QString&, int&, int);
-  virtual void readDataFile(const QString&, int&, int);
+  virtual void readData(const QString& directory, int& idx, int group);
+  virtual void readDataFiles(const QString&, int& idx, int group);
+  virtual void readDataFile(const QString&, int& idx, int group);
 
   void readPolyData(const QString&, int idx, int group);
   void readVolumeData(const QString&, int idx, int group);
@@ -216,8 +219,9 @@ msvQButtonClustersMainWindowPrivate::msvQButtonClustersMainWindowPrivate(
   this->VolumeProperty->SetSpecular(0.2);
 
   // Set the buttons manager
+  QFileInfo icon(QDir(qApp->applicationDirPath()), "Resources/Logo/icon.png");
   this->buttonsIcon = vtkSmartPointer<vtkPNGReader>::New();
-  this->buttonsIcon->SetFileName("Resources/Logo/icon.png");
+  this->buttonsIcon->SetFileName(icon.absoluteFilePath().toLatin1());
   this->buttonsIcon->Update();
   this->ButtonsManager = vtkSmartPointer<msvVTKWidgetClusters>::New();
   this->ButtonsManager->UseImprovedClusteringOn();
@@ -250,21 +254,13 @@ msvQButtonClustersMainWindowPrivate::~msvQButtonClustersMainWindowPrivate()
 void msvQButtonClustersMainWindowPrivate::showData(int idx, bool value)
 {
   this->dataActorMap[idx]->SetVisibility(value);
-  this->updateView();
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
 {
   this->ButtonsManager->SetClustering(value);
-  if(value)
-    {
-    this->ButtonsManager->HideButtons();
-    }
-  else
-    {
-    this->ButtonsManager->ShowButtons();
-    }
+  this->ButtonsManager->SetCustersButtonsVisibility(value);
   this->ButtonsManager->UpdateWidgets();
   this->updateView();
 }
@@ -383,15 +379,14 @@ void msvQButtonClustersMainWindowPrivate::setupView()
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::update()
 {
-  this->updateUi();
   this->updateView();
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::updateUi()
 {
-//   this->enableClustering(this->EnableClustering->isChecked());
-//   this->setPixelRadius(this->PixelRadius->value());
+   this->enableClustering(this->EnableClustering->isChecked());
+   this->setPixelRadius(this->PixelRadius->value());
 }
 
 // ------------------------------------------------------------------------------
@@ -417,6 +412,7 @@ void msvQButtonClustersMainWindowPrivate::readVolumeData(const QString &file,
   reader->SetFileName(file.toLatin1().constData());
   reader->Update();
 
+#ifdef CREATE_VOLUME_CORNER_BUTTONS
   // Create 8 buttons for the volume.
   vtkNew<vtkPoints> points;
   points->SetNumberOfPoints(8);
@@ -424,14 +420,14 @@ void msvQButtonClustersMainWindowPrivate::readVolumeData(const QString &file,
   double *bounds      = reader->GetOutput()->GetBounds();
   double  point[8][3] =
     {
-      {bounds[0], bounds[2], bounds[4]},
-      {bounds[0], bounds[2], bounds[5]},
-      {bounds[0], bounds[3], bounds[4]},
-      {bounds[0], bounds[3], bounds[5]},
-      {bounds[1], bounds[2], bounds[4]},
-      {bounds[1], bounds[2], bounds[5]},
-      {bounds[1], bounds[3], bounds[4]},
-      {bounds[1], bounds[3], bounds[5]}
+                          {bounds[0], bounds[2], bounds[4]},
+                          {bounds[0], bounds[2], bounds[5]},
+                          {bounds[0], bounds[3], bounds[4]},
+                          {bounds[0], bounds[3], bounds[5]},
+                          {bounds[1], bounds[2], bounds[4]},
+                          {bounds[1], bounds[2], bounds[5]},
+                          {bounds[1], bounds[3], bounds[4]},
+                          {bounds[1], bounds[3], bounds[5]}
     };
 
   for(vtkIdType i = 0; i < 8; ++i)
@@ -439,6 +435,7 @@ void msvQButtonClustersMainWindowPrivate::readVolumeData(const QString &file,
     points->InsertPoint(i, point[i]);
     }
   this->ButtonsManager->SetDataSet(group,idx,points.GetPointer());
+#endif
   this->VolumeList.push_back(volume.GetPointer());
   this->dataActorMap[idx] = volume.GetPointer();
 }
@@ -484,74 +481,69 @@ void msvQButtonClustersMainWindowPrivate::readPolyData(const QString &file,
 }
 
 // ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindowPrivate::readDataFiles(const QString& dirName,
-                                                        int &          idx,
-                                                        int            group)
+void msvQButtonClustersMainWindowPrivate::readDataFiles(const QString& directory,
+                                                        int& idx,
+                                                        int group)
 {
-  QDir        dir(dirName);
-  QStringList dataFiles = dir.entryList(QDir::Files, QDir::Name).filter("vtk");
+  QFileInfoList dataFiles = QDir(directory).entryInfoList(
+    QStringList("*.vtk"), QDir::Files, QDir::Name);
 
-  foreach(const QString &file, dataFiles)
+  foreach(const QFileInfo &file, dataFiles)
     {
-    QString fileName = QFileInfo(dir,file).absoluteFilePath();
-    this->DataLoader->insertItem(idx,file);
-    readDataFile(fileName,idx,group);
+    this->DataLoader->insertItem(idx,file.baseName());
+    this->readDataFile(file.absoluteFilePath(), idx, group);
     this->DataLoader->setItemData(idx-1, Qt::Checked, Qt::CheckStateRole);
     }
 }
 
 // ------------------------------------------------------------------------------
-void msvQButtonClustersMainWindowPrivate::readDataFile(const QString& fileName,
-                                                       int &          idx,
-                                                       int            group)
+void msvQButtonClustersMainWindowPrivate
+::readDataFile(const QString& fileName, int& idx, int group)
 {
   vtkNew<vtkDataReader> reader;
   reader->SetFileName(fileName.toLatin1().constData());
-  if(reader->IsFilePolyData())
+  if (reader->IsFilePolyData())
     {
-    readPolyData(fileName,idx,group);
+    this->readPolyData(fileName,idx,group);
     idx++;
     }
-  else if(reader->IsFileStructuredPoints())
+  else if (reader->IsFileStructuredPoints())
     {
-    readVolumeData(fileName,idx,group);
+    this->readVolumeData(fileName,idx,group);
     idx++;
     }
   else
     {
-    return;
+    qCritical() << "File" << fileName << "is not supported.";
     }
 }
 
 // ------------------------------------------------------------------------------
 void msvQButtonClustersMainWindowPrivate::readData(const QString& rootDirectory)
 {
-  QDir dir(rootDirectory);
-
-  QStringList files =
-    dir.entryList(QDir::Files, QDir::Name).filter("vtk");
-  QStringList directories = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot,
-    QDir::Name);
-
   int idx   = 0;
   int group = 0;
-  foreach(const QString &file, files)
-    {
-    QString fileName = QFileInfo(dir,file).absoluteFilePath();
-    this->DataLoader->insertItem(idx,file);
-    readDataFile(fileName,idx,group);
-    this->DataLoader->setItemData(idx-1, Qt::Checked, Qt::CheckStateRole);
-    }
-  foreach(const QString &directory, directories)
-    {
-    readDataFiles(QFileInfo(dir,directory).absoluteFilePath(),idx,group);
-    }
+  this->readData(rootDirectory, idx, group);
+
+  this->updateUi();
 
   // Render
   double extent[6];
   this->getMaximumExtent(extent);
   this->ThreeDRenderer->ResetCamera(extent);
+}
 
+// ------------------------------------------------------------------------------
+void msvQButtonClustersMainWindowPrivate
+::readData(const QString& directory, int& idx, int group)
+{
+  QFileInfoList subDirectories = QDir(directory).entryInfoList(
+    QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+  foreach(const QFileInfo& subdirectory, subDirectories)
+    {
+    this->readData(subdirectory.absoluteFilePath(), idx, group);
+    }
+  this->readDataFiles(directory,idx, group);
 }
 
 // ------------------------------------------------------------------------------
@@ -576,7 +568,6 @@ void msvQButtonClustersMainWindowPrivate::getMaximumExtent(double extent[6])
         {
         extent[j+1] = bounds[j+1];
         }
-
       }
     }
   size = this->PolyDataList.size();
@@ -707,14 +698,12 @@ void msvQButtonClustersMainWindow::on_DataLoader_checkedIndexesChanged( )
 {
   Q_D(msvQButtonClustersMainWindow);
   QModelIndexList dataList = d->DataLoader->checkedIndexes();
-  for(size_t i = 0, end = d->dataActorMap.size(); i < end; ++i)
+  for(vtkIdType i = 0, end = d->dataActorMap.size(); i < end; ++i)
     {
-    d->showData(i,false);
+    QModelIndex index = d->DataLoader->model()->index(i,0);
+    d->showData(i, d->DataLoader->checkState(index) == Qt::Checked);
     }
-  foreach(const QModelIndex &index, dataList)
-    {
-    d->showData(index.row(),true);
-    }
+  d->updateView();
 }
 
 // ------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,8 +56,8 @@ public:
       rendererSize[0] = static_cast<double>(intRendererSize[0]);
       rendererSize[1] = static_cast<double>(intRendererSize[1]);
 
-      for (int i = 0;
-           i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
+      for(vtkIdType i = 0;
+          i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
         {
         msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(
           msvVTKButtonsManager::GetInstance()->GetElement(i));
@@ -71,7 +71,7 @@ public:
           double extBounds[6];
           toolButton->GetBounds(bounds);
 
-          for (int i=0; i< 5; i+=2)
+          for(int i=0; i< 5; i+=2)
             {
             extBounds[i]   = bounds[i] - (bounds[i+1] - bounds[i])/2.;
             extBounds[i+1] = bounds[i+1] + (bounds[i+1] - bounds[i])/2.;
@@ -81,7 +81,7 @@ public:
           double avgDistance =
             ((extBounds[1] -
               extBounds[0]) +
-             (extBounds[3] - extBounds[2]) + (extBounds[5] - extBounds[4]))/6.;
+           (extBounds[3] - extBounds[2]) + (extBounds[5] - extBounds[4]))/6.;
           double bbCenter[3];
           bbCenter[0] = bounds[0] + (bounds[1]-bounds[0])/2.;
           bbCenter[1] = bounds[2] + (bounds[3]-bounds[2])/2.;
@@ -115,6 +115,7 @@ public:
             this->MoveOverlappingButtons();
             }
           toolButton->SetOpacity(1-opacity);
+          toolButton->Update(false);
           }
         }
       }
@@ -126,8 +127,8 @@ public:
     double yTolerance = 24;
     // Sort buttons along y axis
     std::vector<msvVTKButtons*> sortedElements;
-    for (int i = 0;
-         i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
+    for(vtkIdType i = 0;
+        i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
       {
       msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(
         msvVTKButtonsManager::GetInstance()->GetElement(i));
@@ -139,8 +140,8 @@ public:
         toolButton->SetYOffset(0);
         bool added = false;
 
-        for (std::vector<msvVTKButtons*>::iterator it = sortedElements.begin();
-             it != sortedElements.end(); ++it)
+        for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin();
+            it != sortedElements.end(); ++it)
           {
           double curPos[2];
           (*it)->GetDisplayPosition(curPos);
@@ -158,27 +159,23 @@ public:
         }
       }
 
-    for (std::vector<msvVTKButtons*>::iterator it = sortedElements.begin()+1;
-         it != sortedElements.end(); ++it)
+    for(std::vector<msvVTKButtons*>::iterator it = sortedElements.begin()+1;
+        it != sortedElements.end(); ++it)
       {
-      for (std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin();
-           it2 != it; ++it2)
+      for(std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin();
+          it2 != it; ++it2)
         {
-        for(std::vector<msvVTKButtons*>::iterator it2 = sortedElements.begin();
-            it2 != it; ++it2)
+        double pos[2];
+        (*it)->GetDisplayPosition(pos);
+        double prevPos[2];
+        (*it2)->GetDisplayPosition(prevPos);
+        if (pos[0] >= prevPos[0] - xTolerance && pos[0] <= prevPos[0] +
+            xTolerance &&
+            pos[1] >= prevPos[1] - yTolerance && pos[1] <= prevPos[1] +
+            yTolerance)
           {
-          double pos[2];
-          (*it)->GetDisplayPosition(pos);
-          double prevPos[2];
-          (*it2)->GetDisplayPosition(prevPos);
-          if (pos[0] >= prevPos[0] - xTolerance && pos[0] <= prevPos[0] +
-              xTolerance &&
-              pos[1] >= prevPos[1] - yTolerance && pos[1] <= prevPos[1] +
-              yTolerance)
-            {
-            (*it)->SetYOffset((*it)->GetYOffset() + yTolerance -
-              (pos[1] - prevPos[1]));
-            }
+          (*it)->SetYOffset((*it)->GetYOffset() + yTolerance -
+            (pos[1] - prevPos[1]));
           }
         }
       }
@@ -196,13 +193,12 @@ vtkStandardNewMacro(msvVTKButtonsManager);
 msvVTKButtonsManager::msvVTKButtonsManager()
 {
   this->CameraCallback = NULL;
-  this->Animation      = new msvVTKAnimatePath();
 }
 
 //------------------------------------------------------------------------------
 msvVTKButtonsManager::~msvVTKButtonsManager()
 {
-  delete this->Animation;
+
 }
 
 //------------------------------------------------------------------------------
@@ -242,6 +238,12 @@ msvVTKButtonsInterface * msvVTKButtonsManager::GetElement(int index)
 }
 
 //------------------------------------------------------------------------------
+vtkIdType msvVTKButtonsManager::GetNumberOfElements()
+{
+  return this->Elements.size();
+}
+
+//------------------------------------------------------------------------------
 msvVTKButtonsManager* msvVTKButtonsManager::GetInstance()
 {
   static msvVTKButtonsManager manager;
@@ -254,8 +256,7 @@ void msvVTKButtonsManager::SetRenderer(vtkRenderer *renderer)
   this->CameraCallback = vtkCameraCallback::New();
   renderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent,
     CameraCallback);
-  vtkCameraCallback::SafeDownCast(CameraCallback)->Renderer = renderer;
-  this->Renderer                                            = renderer;
+  this->CameraCallback->Renderer = renderer;
 }
 
 //------------------------------------------------------------------------------

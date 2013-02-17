@@ -27,6 +27,8 @@
 #include <QVector>
 #include <QBuffer>
 
+// CTK includes
+#include <ctkWidgetsUtils.h>
 
 // MSV includes
 #include "msvQVTKButtonsMainWindow.h"
@@ -270,12 +272,7 @@ void msvQVTKButtonsMainWindowPrivate::setToolTip(msvQVTKButtons *b)
   text.append("<tr>");
   text.append("<td>");
   QImage preview = b->getPreview(180,180);
-  QByteArray ba;
-  QBuffer buffer(&ba);
-  buffer.open(QIODevice::WriteOnly);
-  preview.save(&buffer, "PNG");
-
-  text.append(QString("<img src=\"data:image/png;base64,%1\">").arg(QString(buffer.data().toBase64())));
+  text.append(QString("<img src=\"%1\">").arg(ctk::base64HTMLImageTagSrc(preview)));
   text.append("</td>");
 
   text.append("<td>");

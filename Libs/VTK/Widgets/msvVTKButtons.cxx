@@ -202,18 +202,14 @@ vtkImageData* msvVTKButtons::GetPreview(int width, int height)
 }
 
 //------------------------------------------------------------------------------
-void msvVTKButtons::Update()
+void msvVTKButtons::Update(bool render)
 {
-  Superclass::Update();
   this->CalculatePosition();
-  if (ButtonCallback)
+  if (this->ButtonCallback)
     {
-    vtkButtonCallback::SafeDownCast(ButtonCallback)->FlyTo = FlyTo;
-    if (vtkButtonCallback::SafeDownCast(ButtonCallback)->Renderer)
-      {
-      Renderer->GetRenderWindow()->Render();
-      }
+    vtkButtonCallback::SafeDownCast(this->ButtonCallback)->FlyTo = FlyTo;
     }
+  this->Superclass::Update(render);
 }
 
 //------------------------------------------------------------------------------

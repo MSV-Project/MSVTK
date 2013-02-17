@@ -380,7 +380,7 @@ void msvVTKButtonsGroup::ShowSlider(bool show)
 void msvVTKButtonsGroup::GetCameraPositionOnPath(double ratio, double b[6])
 {
 
-  int numOfElements = this->Elements.size();
+  vtkIdType numOfElements = this->Elements.size();
 
   if (numOfElements < 1)
     {
@@ -483,10 +483,10 @@ void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
 }
 
 //----------------------------------------------------------------------
-void msvVTKButtonsGroup::Update()
+void msvVTKButtonsGroup::Update(bool render)
 {
-  Superclass::Update();
   this->CalculatePosition();
+  this->Superclass::Update(render);
 }
 
 //----------------------------------------------------------------------

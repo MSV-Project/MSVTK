@@ -84,6 +84,13 @@ target_link_libraries(msv${KIT}
   msvQtWidgets
   )
 
+add_custom_command(TARGET msv${KIT} PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Logo/icon.png"
+    "$<TARGET_FILE_DIR:msv${KIT}>/Resources/Logo/icon.png")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Logo/icon.png"
+        DESTINATION "${MSVTK_INSTALL_BIN_DIR}/Resources/Logo/")
+
 install(TARGETS msv${KIT}
   RUNTIME DESTINATION ${MSVTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
   LIBRARY DESTINATION ${MSVTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries

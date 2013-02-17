@@ -93,8 +93,8 @@ public:
   void SetCurrentRenderer(vtkRenderer *renderer);
 
   // Description:
-  // Perform update
-  void Update();
+  // Recalculate its position and request a rendering if \a render is true.
+  void Update(bool render = true);
 
   // Description:
   // Calculate position (center or corner)
