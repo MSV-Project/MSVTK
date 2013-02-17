@@ -715,7 +715,7 @@ msvFluidSimulator::msvFluidSimulator()
   this->AMRDataset          = vtkHierarchicalBoxDataSet::New();
   this->CoarsestGridSpacing = 8;
   this->MaxLevels           = 5;
-  this->RefinamentRatio     = 2;
+  this->RefinamentRatio     = 4;
   this->FinestGridSpacing   = this->CoarsestGridSpacing << (this->MaxLevels-1);
   this->DataLevel           = this->MaxLevels-1;
   this->FluidDensity        = 1.0;
