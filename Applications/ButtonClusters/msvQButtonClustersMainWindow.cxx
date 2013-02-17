@@ -254,7 +254,6 @@ msvQButtonClustersMainWindowPrivate::~msvQButtonClustersMainWindowPrivate()
 void msvQButtonClustersMainWindowPrivate::showData(int idx, bool value)
 {
   this->dataActorMap[idx]->SetVisibility(value);
-  this->updateView();
 }
 
 // ------------------------------------------------------------------------------
@@ -709,13 +708,11 @@ void msvQButtonClustersMainWindow::on_DataLoader_checkedIndexesChanged( )
   Q_D(msvQButtonClustersMainWindow);
   QModelIndexList dataList = d->DataLoader->checkedIndexes();
   for(vtkIdType i = 0, end = d->dataActorMap.size(); i < end; ++i)
-  {
-    d->showData(i,false);
-  }
-  foreach(const QModelIndex &index, dataList)
-  {
-    d->showData(index.row(),true);
-  }
+    {
+    QModelIndex index = d->DataLoader->model()->index(i,0);
+    d->showData(i, d->DataLoader->checkState(index) == Qt::Checked);
+    }
+  d->updateView();
 }
 
 // ------------------------------------------------------------------------------
