@@ -218,8 +218,9 @@ msvQButtonClustersMainWindowPrivate::msvQButtonClustersMainWindowPrivate(
   this->VolumeProperty->SetSpecular(0.2);
 
   // Set the buttons manager
+  QFileInfo icon(QDir(qApp->applicationDirPath()), "Resources/Logo/icon.png");
   this->buttonsIcon = vtkSmartPointer<vtkPNGReader>::New();
-  this->buttonsIcon->SetFileName("Resources/Logo/icon.png");
+  this->buttonsIcon->SetFileName(icon.absoluteFilePath().toLatin1());
   this->buttonsIcon->Update();
   this->ButtonsManager = vtkSmartPointer<msvVTKWidgetClusters>::New();
   this->ButtonsManager->UseImprovedClusteringOn();
