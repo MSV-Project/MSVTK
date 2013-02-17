@@ -483,10 +483,10 @@ void msvVTKButtonsGroup::SetCurrentRenderer(vtkRenderer *renderer)
 }
 
 //----------------------------------------------------------------------
-void msvVTKButtonsGroup::Update()
+void msvVTKButtonsGroup::Update(bool render)
 {
-  Superclass::Update();
   this->CalculatePosition();
+  this->Superclass::Update(render);
 }
 
 //----------------------------------------------------------------------

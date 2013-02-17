@@ -114,6 +114,7 @@ public:
             this->MoveOverlappingButtons();
             }
           toolButton->SetOpacity(1-opacity);
+          toolButton->Update(false);
           }
         }
       }

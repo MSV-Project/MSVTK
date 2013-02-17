@@ -117,7 +117,7 @@ public:
 
   // Description:
   // Perform update
-  void Update();
+  virtual void Update(bool render = true);
 
   // Description:
   // Calculate position (center or corner)

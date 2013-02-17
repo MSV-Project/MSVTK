@@ -100,7 +100,7 @@ void msvVTKButtonsInterface::SetCurrentRenderer(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------
-void msvVTKButtonsInterface::Update()
+void msvVTKButtonsInterface::Update(bool render)
 {
   vtkTexturedButtonRepresentation2D *rep =
     vtkTexturedButtonRepresentation2D::SafeDownCast(
@@ -143,6 +143,10 @@ void msvVTKButtonsInterface::Update()
     this->GetButton()->GetRepresentation()->SetVisibility(false);
     this->GetButton()->EnabledOff();
     }
+  if (this->Renderer && render)
+    {
+    this->Renderer->GetRenderWindow()->Render();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -155,7 +159,6 @@ void msvVTKButtonsInterface::SetImage(vtkImageData* image)
   rep->SetButtonTexture(0,Image);
   int size[2]; size[0] = 16; size[1] = 16;
   rep->GetBalloon()->SetImageSize(size);
-  //this->Update();
 }
 
 //----------------------------------------------------------------------
@@ -164,20 +167,22 @@ void msvVTKButtonsInterface::SetOpacity(double opacity)
   if (opacity > 1) opacity=1;
   if (opacity < 0) opacity=0;
 
-  Opacity = opacity;
-
-  this->Update();
+  this->Opacity = opacity;
 }
 
 //----------------------------------------------------------------------
 void msvVTKButtonsInterface::RestorePreviousOpacity()
 {
-  this->SetOpacity(PreviousOpacity);
+  this->SetOpacity(this->PreviousOpacity);
 }
 
 //----------------------------------------------------------------------
 void msvVTKButtonsInterface::SetShowButton(bool show)
 {
+  if (this->ShowButton == show)
+    {
+    return;
+    }
   this->ShowButton = show;
   if (this->Renderer)
     {

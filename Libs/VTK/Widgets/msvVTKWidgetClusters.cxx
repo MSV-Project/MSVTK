@@ -97,8 +97,7 @@ public:
 
     vtkSmartPointer<vtkButtonWidget> ButtonWidget;
     vtkSmartPointer<ButtonProp>      PropButton;
-    void Show();
-    void Hide();
+    void SetVisibility(bool show);
   };
 
   struct vtkDataSetItem
@@ -214,17 +213,10 @@ msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::
 }
 
 // ------------------------------------------------------------------------------
-void msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::Show()
+void msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::SetVisibility(bool show)
 {
-  this->ButtonWidget->GetRepresentation()->VisibilityOn();
-  this->ButtonWidget->EnabledOn();
-}
-
-// ------------------------------------------------------------------------------
-void msvVTKWidgetClusters::vtkInternal::ButtonHandleReprensentation::Hide()
-{
-  this->ButtonWidget->GetRepresentation()->VisibilityOff();
-  this->ButtonWidget->EnabledOff();
+  this->ButtonWidget->GetRepresentation()->SetVisibility(show);
+  this->ButtonWidget->SetEnabled(show);
 }
 
 // ------------------------------------------------------------------------------
@@ -340,7 +332,7 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
         msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(buttonRange[0]+j));
         button->SetBounds(clusterGraph->Graph->GetBounds());
         button->SetData(clusterGraph->Graph);
-        button->Update();
+        button->Update(false);
         }
       this->External->Renderer->AddActor(clusterGraph->GraphActor);
       }
@@ -418,7 +410,7 @@ void msvVTKWidgetClusters::vtkInternal::CreateClustersRepresentations(
         msvVTKButtons *button = msvVTKButtons::SafeDownCast(buttonGroup->GetElement(buttonRange[0]+j));
         button->SetBounds(clusterGraph->Graph->GetBounds());
         button->SetData(clusterGraph->Graph);
-        button->Update();
+        button->Update(false);
         }
       this->External->Renderer->AddActor(clusterGraph->GraphActor);
       }
@@ -476,7 +468,7 @@ void msvVTKWidgetClusters::vtkInternal::SetButtons(
                          center[2] - size / 2,
                          center[2] + size / 2};
     msvVTKButtons *button  = buttonList->CreateButtons();
-    button->SetShowButton(true);
+    button->SetShowButton(!this->External->UsePlainVTKButtons);
     button->SetOnCenter(true);
     button->SetCurrentRenderer(this->External->Renderer);
     const char* label = "Zoom";
@@ -485,11 +477,8 @@ void msvVTKWidgetClusters::vtkInternal::SetButtons(
       {
       button->SetImage(this->External->ButtonIcon);
       }
-    if(this->External->UsePlainVTKButtons)
-      {
-      button->SetBounds(bounds);
-      button->Update();
-      }
+    button->SetBounds(bounds);
+    button->Update(false);
     }
 //   for(vtkIdType i = 0; i < buttonList->GetNumberOfElements(); ++i)
 //     {
@@ -836,21 +825,23 @@ void msvVTKWidgetClusters::SetDataSet(vtkIdType group, vtkIdType idx,
       vtkIdType offset = this->Internal->ButtonList.size();
       info->Set(DATASET_BUTTONS_OFFSET(), offset);
       }
-//     if(this->UsePlainVTKButtons)
-//       {
-//       this->Internal->SetButtons(points, this->Internal->ButtonList);
-//       }
-//     else
-//       {
-//       msvVTKButtonsGroup *buttonGroup =
-//         this->Internal->ButtonManager->CreateGroup();
-//       this->Internal->SetButtons(points,buttonGroup);
-//       std::cout << "Number of buttons in group ["
-//                 << group
-//                 << ", idx "
-//                 << idx
-//                 << "] = " << buttonGroup->GetNumberOfElements() << std::endl;
-//       }
+/**/
+     if(this->UsePlainVTKButtons)
+       {
+       this->Internal->SetButtons(points, this->Internal->ButtonList);
+       }
+     else
+       {
+       msvVTKButtonsGroup *buttonGroup =
+         this->Internal->ButtonManager->CreateGroup();
+       this->Internal->SetButtons(points,buttonGroup);
+       std::cout << "Number of buttons in group ["
+                 << group
+                 << ", idx "
+                 << idx
+                 << "] = " << buttonGroup->GetNumberOfElements() << std::endl;
+       }
+/**/
     }
 }
 
@@ -938,6 +929,7 @@ void msvVTKWidgetClusters::UpdateWidgets()
   this->Clear();
   if(!this->Clustering)
     {
+    this->UpdateButtons();
     return;
     }
 
@@ -1052,6 +1044,7 @@ void msvVTKWidgetClusters::UpdateWidgets()
           }
         else
           {
+          // Create cluster buttons
           msvVTKButtonsGroup *buttonGroup
             = msvVTKButtonsGroup::SafeDownCast(
             this->Internal->ButtonManager->GetElement(0));
@@ -1107,7 +1100,7 @@ void msvVTKWidgetClusters::ShowClusterButtons()
     vtkIdType end = this->Internal->ClusterButtons.size();
     for (vtkIdType i = 0; i != end; ++i)
       {
-      this->Internal->ClusterButtons[i]->Show();
+      this->Internal->ClusterButtons[i]->SetVisibility(true);
       }
     }
   else
@@ -1121,6 +1114,7 @@ void msvVTKWidgetClusters::ShowClusterButtons()
       msvVTKButtons *button = msvVTKButtons::SafeDownCast(
         clusterGroup->GetElement(i));
       button->SetShowButton(true);
+      button->Update(false);
       }
     }
 }
@@ -1133,7 +1127,7 @@ void msvVTKWidgetClusters::HideClusterButtons()
     vtkIdType end = this->Internal->ClusterButtons.size();
     for (vtkIdType i = 0; i != end; ++i)
       {
-      this->Internal->ClusterButtons[i]->Hide();
+      this->Internal->ClusterButtons[i]->SetVisibility(false);
       }
     }
   else
@@ -1147,19 +1141,20 @@ void msvVTKWidgetClusters::HideClusterButtons()
       msvVTKButtons *button = msvVTKButtons::SafeDownCast(
         clusterGroup->GetElement(i));
       button->SetShowButton(false);
+      button->Update(false);
       }
     }
 }
 
 
 // ------------------------------------------------------------------------------
-void msvVTKWidgetClusters::ShowButtons()
+void msvVTKWidgetClusters::SetButtonsVisibility(bool show)
 {
   if(this->UsePlainVTKButtons)
     {
     for (vtkIdType i = 0, end = this->Internal->ButtonList.size(); i != end; ++i)
       {
-      this->Internal->ButtonList[i]->Show();
+      this->Internal->ButtonList[i]->SetVisibility(show);
       }
     }
   else
@@ -1175,21 +1170,19 @@ void msvVTKWidgetClusters::ShowButtons()
         {
         msvVTKButtons *button = msvVTKButtons::SafeDownCast(
           buttonGroup->GetElement(j));
-        button->SetShowButton(true);
+        button->SetShowButton(show);
         }
       }
+    this->UpdateButtons();
     }
 }
 
 // ------------------------------------------------------------------------------
-void msvVTKWidgetClusters::HideButtons()
+void msvVTKWidgetClusters::UpdateButtons()
 {
-  if(this->UsePlainVTKButtons)
+  if (this->UsePlainVTKButtons)
     {
-    for (size_t i = 0, end = this->Internal->ButtonList.size(); i != end; ++i)
-      {
-      this->Internal->ButtonList[i]->Hide();
-      }
+    // those buttons don't need to be updated
     }
   else
     {
@@ -1204,7 +1197,7 @@ void msvVTKWidgetClusters::HideButtons()
         {
         msvVTKButtons *button = msvVTKButtons::SafeDownCast(
           buttonGroup->GetElement(j));
-        button->SetShowButton(false);
+        button->Update(false);
         }
       }
     }
@@ -1228,7 +1221,7 @@ void msvVTKWidgetClusters::ShowClusterButtons(vtkIdType group)
         info->Get(CLUSTER_BUTTONS_OFFSET(),offset);
         for(int i = 0; i < offset[1]; ++i)
           {
-          this->Internal->ClusterButtons[offset[0]+i]->Show();
+          this->Internal->ClusterButtons[offset[0]+i]->SetVisibility(true);
           }
         }
       return;
@@ -1243,7 +1236,7 @@ void msvVTKWidgetClusters::ShowClusterButtons(vtkIdType group)
         info->Get(CLUSTER_BUTTONS_OFFSET(),offset);
         for(int i = 0; i < offset[1]; ++i)
           {
-          this->Internal->ClusterButtons[offset[0]+i]->Show();
+          this->Internal->ClusterButtons[offset[0]+i]->SetVisibility(true);
           }
         }
       }
@@ -1271,7 +1264,7 @@ void msvVTKWidgetClusters::HideClusterButtons(vtkIdType group)
         info->Get(CLUSTER_BUTTONS_OFFSET(),offset);
         for(int i = 0; i < offset[1]; ++i)
           {
-          this->Internal->ClusterButtons[offset[0]+i]->Hide();
+          this->Internal->ClusterButtons[offset[0]+i]->SetVisibility(false);
           }
         }
       return;
@@ -1286,7 +1279,7 @@ void msvVTKWidgetClusters::HideClusterButtons(vtkIdType group)
         info->Get(CLUSTER_BUTTONS_OFFSET(),offset);
         for(int i = 0; i < offset[1]; ++i)
           {
-          this->Internal->ClusterButtons[offset[0]+i]->Hide();
+          this->Internal->ClusterButtons[offset[0]+i]->SetVisibility(false);
           }
         }
       }
@@ -1320,7 +1313,7 @@ void msvVTKWidgetClusters::ShowButtons(vtkIdType group)
         vtkIdType offset = info->Get(DATASET_BUTTONS_OFFSET());
         for(vtkIdType i = offset, end = offset+numButtons; i < end; ++i)
           {
-          this->Internal->ButtonList[i]->Show();
+          this->Internal->ButtonList[i]->SetVisibility(true);
           }
         }
       return;
@@ -1336,7 +1329,7 @@ void msvVTKWidgetClusters::ShowButtons(vtkIdType group)
         vtkIdType offset = info->Get(DATASET_BUTTONS_OFFSET());
         for(vtkIdType i = offset, end = offset+numButtons; i < end; ++i)
           {
-          this->Internal->ButtonList[i]->Show();
+          this->Internal->ButtonList[i]->SetVisibility(true);
           }
         }
       }
@@ -1366,7 +1359,7 @@ void msvVTKWidgetClusters::HideButtons(vtkIdType group)
         vtkIdType offset = info->Get(DATASET_BUTTONS_OFFSET());
         for(vtkIdType i = offset, end = offset+numButtons; i < end; ++i)
           {
-          this->Internal->ButtonList[i]->Hide();
+          this->Internal->ButtonList[i]->SetVisibility(false);
           }
         }
       return;
@@ -1382,7 +1375,7 @@ void msvVTKWidgetClusters::HideButtons(vtkIdType group)
         vtkIdType offset = info->Get(DATASET_BUTTONS_OFFSET());
         for(vtkIdType i = offset, end = offset+numButtons; i < end; ++i)
           {
-          this->Internal->ButtonList[i]->Hide();
+          this->Internal->ButtonList[i]->SetVisibility(false);
           }
         }
       }
@@ -1394,13 +1387,13 @@ void msvVTKWidgetClusters::SetCustersButtonsVisibility(bool show)
 {
   if(show)
     {
-    this->HideButtons();
+    this->SetButtonsVisibility(false);
     this->ShowClusterButtons();
     }
   else
     {
     this->HideClusterButtons();
-    this->ShowButtons();
+    this->SetButtonsVisibility(true);
     }
 }
 

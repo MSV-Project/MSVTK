@@ -260,15 +260,7 @@ void msvQButtonClustersMainWindowPrivate::showData(int idx, bool value)
 void msvQButtonClustersMainWindowPrivate::enableClustering(bool value)
 {
   this->ButtonsManager->SetClustering(value);
-  if(value)
-    {
-    
-    this->ButtonsManager->HideButtons();
-    }
-  else
-    {
-    this->ButtonsManager->ShowButtons();
-    }
+  this->ButtonsManager->SetCustersButtonsVisibility(value);
   this->ButtonsManager->UpdateWidgets();
   this->updateView();
 }

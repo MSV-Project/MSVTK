@@ -140,8 +140,8 @@ public:
   virtual void UpdateWidgets();
   virtual void Clear();
   virtual void SetCustersButtonsVisibility(bool show);
-  virtual void ShowButtons();
-  virtual void HideButtons();
+  void SetButtonsVisibility(bool show);
+  void UpdateButtons();
   virtual void ShowButtons(vtkIdType group);
   virtual void HideButtons(vtkIdType group);
   virtual void ShowClusterButtons();
