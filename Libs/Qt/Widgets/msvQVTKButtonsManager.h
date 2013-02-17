@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsManager_H
-#define msvQVTKButtonsManager_H
+#ifndef __msvQVTKButtonsManager_h
+#define __msvQVTKButtonsManager_h
 
 // MSVTK includes
 #include "msvQVTKButtons.h"
@@ -56,6 +56,9 @@ public:
   /// Set show label property for children elements
   void setShowLabel(bool show);
 
+  /// Set the renderer
+  void setRenderer(vtkRenderer* renderer);
+
 protected:
   QScopedPointer<msvQVTKButtonsManagerPrivate> d_ptr;
   msvQVTKButtonsManager(QObject *parent = 0);
@@ -65,8 +68,4 @@ private:
   Q_DISABLE_COPY(msvQVTKButtonsManager);
 };
 
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-#endif // msvQVTKButtonsManager_H
+#endif // __msvQVTKButtonsManager_h

@@ -33,6 +33,7 @@ class QListWidgetItem;
 
 class msvQECGMainWindowPrivate;
 
+/// \brief Main window for the ECG demo.
 class MSV_ECG_EXPORT msvQECGMainWindow : public QMainWindow
 {
   Q_OBJECT
@@ -43,10 +44,15 @@ public:
   virtual ~msvQECGMainWindow();
 
 public slots:
+  /// Load carto data.
   void openData();
+  /// Clear the views of all the loaded data.
   void closeData();
+  /// Open About dialog.
   void aboutApplication();
+  /// Refresh the view with the new data.
   void updateView();
+  /// Set the current ECG signal.
   void setCurrentSignal(int pointId);
 
 protected slots:

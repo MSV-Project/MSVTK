@@ -7,7 +7,7 @@ set(KIT_TEST_SRCS
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-create_test_sourcelist(Tests ${KIT}CxxTests.cxx
+create_test_sourcelist(Tests msv${KIT}CxxTests.cxx
   ${KIT_TEST_SRCS}
   )
 
@@ -17,8 +17,8 @@ QT4_GENERATE_MOCS(
   msvQTimePlayerWidgetTest.cxx
   )
 
-add_executable(${KIT}CxxTests ${Tests})
-target_link_libraries(${KIT}CxxTests ${LIBRARY_NAME})
+add_executable(msv${KIT}CxxTests ${Tests})
+target_link_libraries(msv${KIT}CxxTests ${LIBRARY_NAME})
 
 #
 # Add Tests

@@ -18,8 +18,8 @@
 
 ==============================================================================*/
 
-#ifndef msvQVTKButtonsGroup_H
-#define msvQVTKButtonsGroup_H
+#ifndef __msvQVTKButtonsGroup_h
+#define __msvQVTKButtonsGroup_h
 
 // Qt includes
 #include <QVariant>
@@ -32,22 +32,21 @@
 class vtkRenderer;
 class msvQVTKButtons;
 class vtkSliderWidget;
-class vtkSliderCallback;
 class vtkCommand;
 
 // Pimpl
 class msvQVTKButtonsGroupPrivate;
 
-/**
-Class name: msvQVTKButtonsGroup
-Manager class to manage groups of msvQVTKButtons
-*/
-
+/// \brief Qt wrapper around msvVTKButtonsGroup.
+/// It exposes Qt signal/slot mechanism for a msvVTKButtonsGroup.
+/// \sa msvVTKButtonsGroup
 class MSV_QT_WIDGETS_EXPORT msvQVTKButtonsGroup : public msvQVTKButtonsInterface
 {
   Q_OBJECT
 
 public:
+  typedef msvQVTKButtonsInterface Superclass;
+
   /// Object constructor.
   msvQVTKButtonsGroup(QObject *parent = 0);
 
@@ -76,7 +75,7 @@ public:
   void setShowLabel(bool show);
 
   /// set the icon path
-  void setIconFileName(QString iconFileName);
+  void setImage(QImage image);
 
   /// add vtk button to Renderer
   void setCurrentRenderer(vtkRenderer *renderer);
@@ -86,14 +85,6 @@ public:
 
   /// Get the slider widget
   vtkSliderWidget* slider();
-
-  /// Show/hide the slider widget
-  void showSlider(bool show);
-
-  /// Set the position on the path at the specified ratio
-  void setCameraPoistionOnPath(double ratio);
-
-  vtkCommand *sliderCallback() const;
 
 public slots:
 
@@ -109,35 +100,9 @@ protected:
   /// Calculate element position
   void calculatePosition();
 
-//   QVector<msvQVTKButtonsInterface*> m_Elements; //< Vector of buttons
-//   vtkSliderWidget* m_Slider; //< Slider widget
-  vtkSliderCallback* m_SliderCallback; //< Slider callback function
-
 private:
   Q_DECLARE_PRIVATE(msvQVTKButtonsGroup);
   Q_DISABLE_COPY(msvQVTKButtonsGroup);
 };
 
-/////////////////////////////////////////////////////////////
-// Inline methods
-/////////////////////////////////////////////////////////////
-
-inline void msvQVTKButtonsGroup::setShowButton(bool show)
-{
-  msvQVTKButtonsInterface::setShowButton(show);
-  setElementProperty("showButton",show);
-}
-
-inline void msvQVTKButtonsGroup::setShowLabel(bool show)
-{
-  msvQVTKButtonsInterface::setShowLabel(show);
-  setElementProperty("showLabel",show);
-}
-
-inline void msvQVTKButtonsGroup::setIconFileName(QString iconFileName)
-{
-  msvQVTKButtonsInterface::setIconFileName(iconFileName);
-  setElementProperty("iconFileName",iconFileName);
-}
-
-#endif // msvQVTKButtonsGroup_H
+#endif // __msvQVTKButtonsGroup_h
