@@ -84,9 +84,7 @@ public:
 
   // Description:
   // Get the number of elements
-  inline int GetNumberOfElements(){
-    return Elements.size();
-  };
+  vtkIdType GetNumberOfElements();
 
   // Description:
   // Set the renderer

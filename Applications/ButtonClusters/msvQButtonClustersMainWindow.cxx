@@ -710,7 +710,7 @@ void msvQButtonClustersMainWindow::on_DataLoader_checkedIndexesChanged( )
 {
   Q_D(msvQButtonClustersMainWindow);
   QModelIndexList dataList = d->DataLoader->checkedIndexes();
-  for(size_t i = 0, end = d->dataActorMap.size(); i < end; ++i)
+  for(vtkIdType i = 0, end = d->dataActorMap.size(); i < end; ++i)
   {
     d->showData(i,false);
   }

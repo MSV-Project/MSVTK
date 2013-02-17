@@ -55,7 +55,7 @@ public:
       rendererSize[0] = static_cast<double>(intRendererSize[0]);
       rendererSize[1] = static_cast<double>(intRendererSize[1]);
 
-      for(int i = 0;
+      for(vtkIdType i = 0;
           i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
         {
         msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(
@@ -125,7 +125,7 @@ public:
     double yTolerance = 24;
     // Sort buttons along y axis
     std::vector<msvVTKButtons*> sortedElements;
-    for(int i = 0;
+    for(vtkIdType i = 0;
         i < msvVTKButtonsManager::GetInstance()->GetNumberOfElements(); ++i)
       {
       msvVTKButtons* toolButton = msvVTKButtons::SafeDownCast(
@@ -233,6 +233,12 @@ msvVTKButtonsInterface * msvVTKButtonsManager::GetElement(int index)
   // add index control
 
   return Elements.at(index);
+}
+
+//------------------------------------------------------------------------------
+vtkIdType msvVTKButtonsManager::GetNumberOfElements()
+{
+  return this->Elements.size();
 }
 
 //------------------------------------------------------------------------------
