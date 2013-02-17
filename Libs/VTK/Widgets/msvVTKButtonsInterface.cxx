@@ -38,6 +38,8 @@ vtkStandardNewMacro(msvVTKButtonsInterface);
 //----------------------------------------------------------------------
 msvVTKButtonsInterface::msvVTKButtonsInterface()
 {
+  this->ButtonCallback = NULL;
+  this->HighlightCallback = NULL;
   this->LabelText=NULL;
   this->Tooltip=NULL;
   this->ShowButton=true;

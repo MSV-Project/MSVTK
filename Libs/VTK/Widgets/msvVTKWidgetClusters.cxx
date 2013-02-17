@@ -773,11 +773,6 @@ vtkInformationKeyRestrictedMacro(msvVTKWidgetClusters, CLUSTER_BUTTONS_OFFSET,
 // ------------------------------------------------------------------------------
 msvVTKWidgetClusters::msvVTKWidgetClusters()
 {
-  this->Internal         = new vtkInternal(this);
-  this->ColorLookUpTable = vtkLookupTable::New();
-  this->ColorLookUpTable->SetNumberOfColors(5);
-  this->ColorLookUpTable->Build();
-
   this->UseImprovedClustering     = true;
   this->Clustering                = true;
   this->ButtonWidgetSize          = 3,
@@ -786,6 +781,12 @@ msvVTKWidgetClusters::msvVTKWidgetClusters()
   this->ShiftWidgetCenterToCorner = false;
   this->ClusteringWithinGroups    = false;
   this->UsePlainVTKButtons        = true;
+
+  this->Internal = new vtkInternal(this);
+  this->ColorLookUpTable = vtkLookupTable::New();
+  this->ColorLookUpTable->SetNumberOfColors(5);
+  this->ColorLookUpTable->Build();
+  this->ButtonIcon = 0;
 }
 
 // ------------------------------------------------------------------------------
