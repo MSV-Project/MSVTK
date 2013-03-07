@@ -49,17 +49,18 @@ endforeach()
 #-----------------------------------------------------------------------------
 # Generate list of include directories
 #-----------------------------------------------------------------------------
+set(libraries)
 set(include_dirs)
 foreach(dir ${dirs})
-  list(APPEND include_dirs ${${dir}_INCLUDE_DIRS})
+  foreach(project ${${dir}_PROJECTS})
+    set(library msv${dir}${project})
+    list(APPEND libraries ${library})
+    list(APPEND include_dirs ${${library}_INCLUDE_DIRS})
+  endforeach()
 endforeach()
 
-# Set variable MSVTK_Libs_INCLUDE_DIRS
+# Set variables MSVTK_Libs_*
+set(MSVTK_Libs_LIBRARIES ${libraries} CACHE INTERNAL "MSVTK Libs libraries" FORCE)
 set(MSVTK_Libs_INCLUDE_DIRS ${include_dirs} CACHE INTERNAL "MSVTK Libs includes" FORCE)
-
-#-----------------------------------------------------------------------------
-# Set variable MSVTK_Libs_VTK_WRAPPED_LIBRARIES
-#-----------------------------------------------------------------------------
-set(MSVTK_Libs_VTK_WRAPPED_LIBRARIES
-  VTK
-  CACHE INTERNAL "MSVTK Libs VTK wrapped" FORCE)
+#message("MSVTK_Libs_LIBRARIES: ${MSVTK_Libs_LIBRARIES}")
+#message("MSVTK_Libs_INCLUDE_DIRS: ${MSVTK_Libs_INCLUDE_DIRS}")
