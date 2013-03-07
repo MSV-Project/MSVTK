@@ -88,9 +88,6 @@ protected:
 
   vtkSmartPointer<vtkDataSetReader> PolyDataReader;
 
-  vtkSmartPointer<vtkPolyDataMapper> SurfaceMapper;
-  vtkSmartPointer<vtkActor>SurfaceActor;
-
   QVector<msvQVTKButtons *> Buttons;
 
   bool ShowLabels;
@@ -135,15 +132,6 @@ msvQVTKButtonsMainWindowPrivate::msvQVTKButtonsMainWindowPrivate(msvQVTKButtonsM
 
   // CartoPoints Readers
   this->PolyDataReader    = vtkSmartPointer<vtkDataSetReader>::New();
-
-  // Create Pipeline for the CartoPoints
-  this->SurfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->SurfaceMapper->ScalarVisibilityOff();
-  this->SurfaceActor = vtkSmartPointer<vtkActor>::New();
-  this->SurfaceActor->GetProperty()->SetOpacity(0.66);
-  this->SurfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
-  this->SurfaceActor->GetProperty()->BackfaceCullingOn();
-  this->SurfaceActor->SetMapper(this->SurfaceMapper);
 
   ShowLabels = true;
   ShowButtons = true;
@@ -245,16 +233,23 @@ void msvQVTKButtonsMainWindowPrivate::updateView()
 void msvQVTKButtonsMainWindowPrivate::importVTKData(QString &filePath)
 {
   //import VTK Data
-  PolyDataReader->SetFileName(filePath.toAscii().data());
-  PolyDataReader->Update();
+  this->PolyDataReader = vtkSmartPointer<vtkDataSetReader>::New();
+  this->PolyDataReader->SetFileName(filePath.toAscii().data());
+  this->PolyDataReader->Update();
 
-  int type = PolyDataReader->ReadOutputType();
-
-  if (type == 0)
+  if (this->PolyDataReader->ReadOutputType() == VTK_POLY_DATA)
     {
     // render data into the scene
-    this->SurfaceMapper->SetInputConnection(PolyDataReader->GetOutputPort());
-    this->ThreeDRenderer->AddActor(this->SurfaceActor);
+    vtkNew<vtkPolyDataMapper> surfaceMapper;
+    //surfaceMapper->ScalarVisibilityOff();
+    vtkNew<vtkActor> surfaceActor;
+    surfaceActor->GetProperty()->SetOpacity(0.76);
+    //surfaceActor->GetProperty()->SetColor(226. / 255., 93. /255., 94. / 255.);
+    //surfaceActor->GetProperty()->BackfaceCullingOn();
+    surfaceActor->SetMapper(surfaceMapper.GetPointer());
+
+    surfaceMapper->SetInputConnection(this->PolyDataReader->GetOutputPort());
+    this->ThreeDRenderer->AddActor(surfaceActor.GetPointer());
     this->ThreeDRenderer->ResetCamera();
     }
   else
@@ -417,7 +412,7 @@ void msvQVTKButtonsMainWindow::openData()
     this, tr("Open Data"), QDir::homePath(), tr("VTK Files (*.vtk)"));
   if(!fileName.isEmpty())
   {
-    d->clear();             // Clean Up data and scene
+  //d->clear();             // Clean Up data and scene
     d->importVTKData(fileName);  // Load data
     d->addVTKButton(this);
     d->update();            // Update the Ui and the View
