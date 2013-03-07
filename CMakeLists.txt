@@ -460,13 +460,6 @@ include(CMake/msvMacroGetOperatingSystemArchitectureBitness.cmake)
 msvMacroGetOperatingSystemArchitectureBitness(VAR_PREFIX MSVTK)
 
 #-----------------------------------------------------------------------------
-# Configure files with settings
-#
-
-#CONFIGURE_FILE(${MSVTK_SOURCE_DIR}/UseMSVTK.cmake.in
-#              ${MSVTK_SUPERBUILD_BINARY_DIR}/UseMSVTK.cmake COPYONLY IMMEDIATE)
-
-#-----------------------------------------------------------------------------
 # Set C/CXX Flags
 #
 set(CMAKE_CXX_FLAGS ${MSVTK_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
@@ -534,3 +527,15 @@ add_subdirectory(Utilities/LastConfigureStep)
 # Packaging
 #
 include( CMake/msvCPack.cmake )
+
+#-----------------------------------------------------------------------------
+# Configure files with settings
+#
+
+set(MSVTK_USE_FILE ${MSVTK_SUPERBUILD_BINARY_DIR}/UseMSVTK.cmake )
+configure_file(${MSVTK_CMAKE_DIR}/UseMSVTK.cmake.in
+   ${MSVTK_USE_FILE} COPYONLY IMMEDIATE)
+
+# Configure CTKConfig.cmake for the build tree.
+configure_file(${MSVTK_CMAKE_DIR}/MSVTKConfig.cmake.in
+  ${MSVTK_SUPERBUILD_BINARY_DIR}/MSVTKConfig.cmake @ONLY IMMEDIATE)

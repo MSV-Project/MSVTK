@@ -18,7 +18,8 @@
 #
 ###########################################################################
 
-project(msvVTKLibs)
+set(KIT VTK)
+project(msv${KIT}Libs)
 
 # --------------------------------------------------------------------------
 #                      ----] W A R N I N G [----
@@ -41,3 +42,6 @@ foreach(dir ${dirs})
   message(STATUS "Configuring library: msvVTK${dir}")
   add_subdirectory(${dir})
 endforeach()
+
+set(${KIT}_PROJECTS ${dirs}
+  CACHE INTERNAL "${KIT} projects" FORCE)

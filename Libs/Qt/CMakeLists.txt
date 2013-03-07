@@ -18,7 +18,8 @@
 #
 ###########################################################################
 
-project(msvQtLibs)
+set(KIT Qt)
+project(msv${KIT}Libs)
 
 # --------------------------------------------------------------------------
 #                      ----] W A R N I N G [----
@@ -37,3 +38,6 @@ foreach(dir ${dirs})
   message(STATUS "Configuring library: msvQt${dir}")
   add_subdirectory(${dir})
 endforeach()
+
+set(${KIT}_PROJECTS ${dirs}
+  CACHE INTERNAL "${KIT} projects" FORCE)

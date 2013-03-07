@@ -1,0 +1,40 @@
+#
+# This module is provided as MSVTK_USE_FILE by MSVTKConfig.cmake.  It can
+# be INCLUDED in a project to load the needed compiler and linker
+# settings to use MSVTK.
+#
+
+if(NOT MSVTK_USE_FILE_INCLUDED)
+  set(MSVTK_USE_FILE_INCLUDED 1)
+
+  # Update CMAKE_MODULE_PATH so includes work.
+  set (CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${MSVTK_CMAKE_DIR})
+
+  # Add compiler flags needed to use VTK.
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MSVTK_REQUIRED_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVTK_REQUIRED_CXX_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MSVTK_REQUIRED_EXE_LINKER_FLAGS}")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MSVTK_REQUIRED_SHARED_LINKER_FLAGS}")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MSVTK_REQUIRED_MODULE_LINKER_FLAGS}")
+
+  # Add include directories needed to use VTK.
+  include_directories(${MSVTK_INCLUDE_DIRS})
+  link_directories(${MSVTK_LIBRARY_DIRS})
+
+  set(QT_QMAKE_EXECUTABLE_PATH ${MSVTK_QT_QMAKE_EXECUTABLE})
+  find_package(Qt4 REQUIRED)
+  set(QT_USE_QTOPENGL ON)
+  set(QT_USE_QTTEST ${BUILD_TESTING})
+  include(${QT_USE_FILE})
+
+  set(CTK_DIR ${MSVTK_CTK_DIR})
+  find_package(CTK REQUIRED)
+  include(${CTK_USE_FILE})
+
+  set(VTK_DIR ${MSVTK_VTK_DIR})
+  find_package(VTK REQUIRED)
+  include(${VTK_USE_FILE})
+
+endif()
