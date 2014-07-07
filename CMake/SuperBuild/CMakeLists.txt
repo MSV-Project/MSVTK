@@ -43,7 +43,7 @@ option(MSVTK_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http in
 
 set(git_protocol "git")
 if(NOT MSVTK_USE_GIT_PROTOCOL)
-  set(git_protocol "http")
+  set(git_protocol "https")
 endif()
 
 #-----------------------------------------------------------------------------
